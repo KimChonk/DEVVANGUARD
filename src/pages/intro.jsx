@@ -136,11 +136,44 @@ export default function Intro() {
                 Follow a carefully crafted path through coding concepts, with each lesson building upon the last.
               </p>
             </div>
+            
             <div className="feature-card">
               <div className="feature-icon"><i className="fas fa-trophy"></i></div>
               <h3 className="feature-title">Achievement System</h3>
               <p className="feature-description">
                 Earn badges and level up as you complete challenges and master new skills.
+              </p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon"><i className="fas fa-users"></i></div>
+              <h3 className="feature-title">Community Support</h3>
+              <p className="feature-description">
+                Join fellow adventurers on your coding journey and collaborate on quests together.
+              </p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon"><i className="fas fa-laptop-code"></i></div>
+              <h3 className="feature-title">Practice Your Coding Chops</h3>
+              <p className="feature-description">
+                Take your skills further with code challenges and project tutorials designed to help you apply what you learned.
+              </p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon"><i className="fas fa-project-diagram"></i></div>
+              <h3 className="feature-title">Build an Awesome Portfolio</h3>
+              <p className="feature-description">
+                Create your own interactive websites, mini-games, mobile apps, and data visualizations to showcase.
+              </p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon"><i className="fas fa-graduation-cap"></i></div>
+              <h3 className="feature-title">Level Up Your Learning</h3>
+              <p className="feature-description">
+                Gain XP and collect badges as you complete bite-sized lessons in Python, HTML, JavaScript, and more.
               </p>
             </div>
           </div>
@@ -161,7 +194,40 @@ export default function Intro() {
               </div>
               <h3 className="developer-name">Quang Trung Nguyen</h3>
               <p className="developer-role">Archmage of Frontend</p>
-              <p className="developer-quote">"The web is bug "</p>
+              <p className="developer-quote">"The web is beautiful and full of endless possibilities."</p>
+              <div className="developer-social">
+                <a href="#"><i className="fab fa-github"></i></a>
+                <a href="#"><i className="fab fa-linkedin"></i></a>
+                <a href="#"><i className="fab fa-twitter"></i></a>
+              </div>
+            </div>
+            
+            <div className="developer-card">
+              <div className="developer-image">
+                <img src="/images/developer2.jpg" alt="Developer 2" />
+              </div>
+              <h3 className="developer-name">Ja Chill</h3>
+              <p className="developer-role">Backend Sorceress</p>
+              <p className="developer-quote">"Every line of code is an incantation that brings digital worlds to life."</p>
+              <div className="developer-social">
+                <a href="#"><i className="fab fa-github"></i></a>
+                <a href="#"><i className="fab fa-linkedin"></i></a>
+                <a href="#"><i className="fab fa-twitter"></i></a>
+              </div>
+            </div>
+            
+            <div className="developer-card">
+              <div className="developer-image">
+                <img src="/images/developer3.png" alt="Developer 3" />
+              </div>
+              <h3 className="developer-name">Trong Tran</h3>
+              <p className="developer-role">Master of Data Structures</p>
+              <p className="developer-quote">"The path to becoming a code wizard begins with curiosity and perseverance."</p>
+              <div className="developer-social">
+                <a href="https://github.com/KimChonk"><i className="fab fa-github"></i></a>
+                <a href="#"><i className="fab fa-linkedin"></i></a>
+                <a href="https://www.facebook.com/TrongTranDev"><i className="fab fa-facebook"></i></a>
+              </div>
             </div>
           </div>
         </div>
@@ -175,11 +241,21 @@ export default function Intro() {
               <div className="stat-number">1,067,377</div>
               <div className="stat-label">Learners</div>
             </div>
+            
             <div className="stat-card">
               <div className="stat-number">192</div>
               <div className="stat-label">Countries</div>
             </div>
-            {/* … giữ nguyên các stat-card khác */}
+            
+            <div className="stat-card">
+              <div className="stat-number">6m+</div>
+              <div className="stat-label">Exercises</div>
+            </div>
+            
+            <div className="stat-card">
+              <div className="stat-number">14,955</div>
+              <div className="stat-label">Projects</div>
+            </div>
           </div>
         </div>
       </section>
