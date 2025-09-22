@@ -38,7 +38,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/devvangguard/public/images/paraddise_MAP.jpg');
+    background-image: url('/images/background.jpg');
     background-size: cover;
     background-position: center;
     filter: brightness(0.7);
@@ -57,7 +57,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 100%);
     z-index: -1;
 }
 
@@ -273,7 +273,7 @@ body {
 
 /* ===== COURSES SECTION ===== */
 .courses-section {
-    background-color: #0f0f0f;
+    background: linear-gradient(135deg, rgba(10, 15, 25, 0.9), rgba(20, 25, 35, 0.8));
     position: relative;
     overflow: hidden;
 }
@@ -285,10 +285,22 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../images/Countryside_MAP.jpg');
+    background-image: url('/images/Countryside_MAP.jpg');
     background-size: cover;
     background-position: center;
-    opacity: 0.1;
+    opacity: 0.4;
+    z-index: 0;
+    filter: hue-rotate(20deg) contrast(1.1);
+}
+
+.courses-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(76, 175, 80, 0.05) 50%, transparent 100%);
     z-index: 0;
 }
 
@@ -341,25 +353,45 @@ body {
 
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-    margin-bottom: 50px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 40px;
+    margin-bottom: 60px;
     position: relative;
     z-index: 1;
 }
 
 .course-card {
-    background-color: rgba(30, 30, 30, 0.8);
-    border-radius: 10px;
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(50, 50, 50, 0.8));
+    border-radius: 15px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.4s ease;
     position: relative;
     z-index: 1;
+    border: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.course-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(145deg, rgba(76, 175, 80, 0.1), rgba(255, 204, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 15px;
 }
 
 .course-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(76, 175, 80, 0.2), 0 0 30px rgba(76, 175, 80, 0.1);
+}
+
+.course-card:hover::before {
+    opacity: 1;
 }
 
 .course-image {
@@ -403,36 +435,91 @@ body {
 
 /* ===== FEATURES SECTION ===== */
 .features-section {
-    background-color: #080808;
+    background: linear-gradient(135deg, rgba(5, 10, 20, 0.9), rgba(15, 20, 30, 0.8));
     position: relative;
+    overflow: hidden;
+}
+
+.features-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+    z-index: 0;
+    filter: hue-rotate(40deg) contrast(1.2);
+}
+
+.features-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(from 0deg at 30% 70%, transparent 0deg, rgba(76, 175, 80, 0.08) 120deg, transparent 240deg);
+    z-index: 0;
 }
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 40px;
 }
 
 .feature-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(10px);
-    padding: 30px;
-    border-radius: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(145deg, rgba(20, 25, 35, 0.85), rgba(30, 40, 50, 0.8));
+    backdrop-filter: blur(15px);
+    padding: 35px;
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    border: none;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(255, 204, 0, 0.1));
+    opacity: 0;
+    transition: all 0.4s ease;
+    border-radius: 20px;
 }
 
 .feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border-color: rgba(76, 175, 80, 0.3);
+    transform: translateY(-12px) rotateY(5deg);
+    box-shadow: 0 25px 50px rgba(76, 175, 80, 0.2), 0 0 40px rgba(76, 175, 80, 0.1);
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1) rotateY(10deg);
+    text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
 }
 
 .feature-icon {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: 3rem;
+    margin-bottom: 25px;
     color: var(--primary-color);
-    text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    text-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 2;
 }
 
 .feature-title {
@@ -450,39 +537,95 @@ body {
 
 /* ===== DEVELOPERS SECTION ===== */
 .developers-section {
-    background-color: #0f0f0f;
+    background: linear-gradient(135deg, rgba(10, 15, 25, 0.9), rgba(20, 25, 35, 0.8));
     position: relative;
+    overflow: hidden;
+}
+
+.developers-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/paraddise_MAP.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+    z-index: 0;
+    filter: hue-rotate(60deg) saturate(1.2);
+}
+
+.developers-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 204, 0, 0.1), transparent 50%);
+    z-index: 0;
 }
 
 .developers-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 40px;
-    margin-top: 50px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 50px;
+    margin-top: 60px;
 }
 
 .developer-card {
-    background-color: rgba(30, 30, 30, 0.8);
-    border-radius: 15px;
-    padding: 30px;
+    background: linear-gradient(145deg, rgba(25, 30, 40, 0.9), rgba(40, 45, 55, 0.85));
+    border-radius: 20px;
+    padding: 35px;
     text-align: center;
-    transition: transform 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
+    border: none;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.developer-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(76, 175, 80, 0.1), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 20px;
 }
 
 .developer-card:hover {
-    transform: translateY(-10px);
-    border-color: rgba(76, 175, 80, 0.3);
+    transform: translateY(-15px) scale(1.03);
+    box-shadow: 0 25px 60px rgba(76, 175, 80, 0.2), 0 0 50px rgba(76, 175, 80, 0.1);
+}
+
+.developer-card:hover::before {
+    opacity: 1;
+}
+
+.developer-card:hover .developer-image {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.6);
 }
 
 .developer-image {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     overflow: hidden;
-    margin: 0 auto 20px;
+    margin: 0 auto 25px;
     border: 3px solid var(--primary-color);
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 2;
 }
 
 .developer-image img {
@@ -543,10 +686,10 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../images/background.jpg');
+    background-image: url('/images/background.jpg');
     background-size: cover;
     background-position: center;
-    opacity: 0.05;
+    opacity: 0.25;
     z-index: 0;
 }
 
@@ -561,24 +704,56 @@ body {
 
 .stat-card {
     text-align: center;
-    padding: 30px;
-    background-color: rgba(30, 30, 30, 0.6);
-    border-radius: 10px;
-    transition: transform 0.3s ease;
+    padding: 35px;
+    background: linear-gradient(145deg, rgba(30, 35, 45, 0.9), rgba(45, 50, 60, 0.8));
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    border: none;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(76, 175, 80, 0.1), rgba(255, 204, 0, 0.1));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 20px;
 }
 
 .stat-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-12px) scale(1.05);
+    box-shadow: 0 20px 50px rgba(76, 175, 80, 0.2), 0 0 40px rgba(255, 204, 0, 0.1);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-card:hover .stat-number {
+    transform: scale(1.1);
+    text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
 }
 
 .stat-number {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 700;
-    margin-bottom: 10px;
-    background: linear-gradient(45deg, var(--primary-color), #ffcc00);
+    margin-bottom: 15px;
+    background: linear-gradient(45deg, var(--primary-color), #ffcc00, #ff6b6b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
     font-family: 'MedievalSharp', cursive;
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-label {
@@ -601,11 +776,11 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../images/paraddise_MAP.jpg');
+    background-image: url('/images/paraddise_MAP.jpg');
     background-size: cover;
     background-position: center;
-    opacity: 0.1;
-    filter: blur(5px);
+    opacity: 0.4;
+    filter: blur(2px);
     z-index: 0;
 }
 
