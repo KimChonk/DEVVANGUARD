@@ -1,7 +1,10 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../assets/CSS/auth.css";
 
 export default function Login() {
+  const navigate = useNavigate();
+  
   useEffect(() => {
     // Magical sparkle effect
     const authCard = document.querySelector(".auth-card");
@@ -27,6 +30,13 @@ export default function Login() {
       authCard.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Here you would normally validate credentials
+    // For demo purposes, we'll just navigate to main menu
+    navigate("/main-menu");
+  };
 
   return (
     <div className="auth-container">
@@ -59,7 +69,7 @@ export default function Login() {
             <p className="auth-subtitle">Continue your coding adventure</p>
           </div>
 
-          <form className="auth-form">
+          <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="email" className="form-label">Email Address</label>
               <input type="email" id="email" name="email" className="form-input" placeholder="Enter your email" required />
@@ -78,7 +88,7 @@ export default function Login() {
                 <span className="checkmark"></span>
                 Remember me
               </label>
-              <a href="#" className="forgot-link">Forgot Password?</a>
+              <a href="/forgot-password" className="forgot-link">Forgot Password?</a>
             </div>
 
             <button type="submit" className="auth-btn">
