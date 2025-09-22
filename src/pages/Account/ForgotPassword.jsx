@@ -2,31 +2,32 @@ import { useEffect } from "react";
 import "../../assets/CSS/auth.css";
 
 export default function ForgotPassword() {
-  useEffect(() => {
-    // Magical sparkle effect
-    const authCard = document.querySelector(".auth-card");
-    if (!authCard) return;
+  // Disabled sparkle effect for performance
+  // useEffect(() => {
+  //   // Magical sparkle effect
+  //   const authCard = document.querySelector(".auth-card");
+  //   if (!authCard) return;
 
-    const handleMouseMove = (e) => {
-      const rect = authCard.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+  //   const handleMouseMove = (e) => {
+  //     const rect = authCard.getBoundingClientRect();
+  //     const x = e.clientX - rect.left;
+  //     const y = e.clientY - rect.top;
 
-      const sparkle = document.createElement("div");
-      sparkle.className = "sparkle";
-      sparkle.style.left = x + "px";
-      sparkle.style.top = y + "px";
-      authCard.appendChild(sparkle);
+  //     const sparkle = document.createElement("div");
+  //     sparkle.className = "sparkle";
+  //     sparkle.style.left = x + "px";
+  //     sparkle.style.top = y + "px";
+  //     authCard.appendChild(sparkle);
 
-      setTimeout(() => sparkle.remove(), 1000);
-    };
+  //     setTimeout(() => sparkle.remove(), 1000);
+  //   };
 
-    authCard.addEventListener("mousemove", handleMouseMove);
+  //   authCard.addEventListener("mousemove", handleMouseMove);
 
-    return () => {
-      authCard.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
+  //   return () => {
+  //     authCard.removeEventListener("mousemove", handleMouseMove);
+  //   };
+  // }, []);
 
   return (
     <div className="auth-container">

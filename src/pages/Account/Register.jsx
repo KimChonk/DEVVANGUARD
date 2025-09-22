@@ -9,22 +9,22 @@ export default function Register() {
 
     if (!authCard) return;
 
-    // ✨ Sparkle effect
-    const handleMouseMove = (e) => {
-      const rect = authCard.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    // Disabled sparkle effect for performance
+    // const handleMouseMove = (e) => {
+    //   const rect = authCard.getBoundingClientRect();
+    //   const x = e.clientX - rect.left;
+    //   const y = e.clientY - rect.top;
 
-      const sparkle = document.createElement("div");
-      sparkle.className = "sparkle";
-      sparkle.style.left = x + "px";
-      sparkle.style.top = y + "px";
-      authCard.appendChild(sparkle);
+    //   const sparkle = document.createElement("div");
+    //   sparkle.className = "sparkle";
+    //   sparkle.style.left = x + "px";
+    //   sparkle.style.top = y + "px";
+    //   authCard.appendChild(sparkle);
 
-      setTimeout(() => sparkle.remove(), 1000);
-    };
+    //   setTimeout(() => sparkle.remove(), 1000);
+    // };
 
-    authCard.addEventListener("mousemove", handleMouseMove);
+    // authCard.addEventListener("mousemove", handleMouseMove);
 
     // 🔒 Password confirmation validation
     const validatePassword = () => {
@@ -39,7 +39,7 @@ export default function Register() {
     confirmPassword?.addEventListener("keyup", validatePassword);
 
     return () => {
-      authCard.removeEventListener("mousemove", handleMouseMove);
+      // authCard.removeEventListener("mousemove", handleMouseMove);
       password?.removeEventListener("change", validatePassword);
       confirmPassword?.removeEventListener("keyup", validatePassword);
     };

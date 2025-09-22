@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../assets/CSS/mainmenu.css";
 
@@ -89,15 +89,15 @@ export default function MainMenu() {
     }
   ]);
 
-  const handleCourseClick = (courseId) => {
+  const handleCourseClick = useCallback((courseId) => {
     navigate(`/course/${courseId}`);
-  };
+  }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     navigate("/login");
-  };
+  }, [navigate]);
 
-  const getLevelIcon = (level) => {
+  const getLevelIcon = useCallback((level) => {
     switch (level) {
       case "Beginner":
         return <i className="fas fa-star"></i>;
@@ -108,11 +108,11 @@ export default function MainMenu() {
       default:
         return <i className="fas fa-star"></i>;
     }
-  };
+  }, []);
 
-  const getXPPercentage = () => {
+  const xpPercentage = useMemo(() => {
     return (user.currentXP / user.nextLevelXP) * 100;
-  };
+  }, [user.currentXP, user.nextLevelXP]);
 
   return (
     <div className="main-menu-container">
@@ -166,7 +166,7 @@ export default function MainMenu() {
               <div className="xp-bar">
                 <div 
                   className="xp-fill" 
-                  style={{ width: `${getXPPercentage()}%` }}
+                  style={{ width: `${xpPercentage}%` }}
                 ></div>
               </div>
             </div>

@@ -14,10 +14,39 @@ export default function Intro() {
       });
     });
 
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          // Unobserve after animation to improve performance
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // Observe all sections and cards for scroll animations
+    const elementsToAnimate = document.querySelectorAll(
+      '.courses-section, .features-section, .developers-section, .stats-section, .cta-section, .footer, ' +
+      '.course-card, .feature-card, .developer-card, .stat-card'
+    );
+    
+    elementsToAnimate.forEach(el => {
+      el.classList.add('animate-element');
+      observer.observe(el);
+    });
+
     return () => {
       links.forEach(anchor => {
         anchor.removeEventListener("click", () => {});
       });
+      observer.disconnect();
     };
   }, []);
 
@@ -87,10 +116,10 @@ export default function Intro() {
               <div className="course-content">
                 <span className="course-label">COURSE</span>
                 <h3 className="course-title">Python</h3>
+                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
                 <p className="course-description">
                   Learn programming fundamentals such as variables, control flow, and loops with the powerful Python language.
                 </p>
-                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
               </div>
             </div>
 
@@ -99,10 +128,10 @@ export default function Intro() {
               <div className="course-content">
                 <span className="course-label">COURSE</span>
                 <h3 className="course-title">HTML</h3>
+                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
                 <p className="course-description">
                   Create your first website with HTML, the building blocks of the web and dive into the world of markup.
                 </p>
-                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
               </div>
             </div>
 
@@ -111,15 +140,15 @@ export default function Intro() {
               <div className="course-content">
                 <span className="course-label">COURSE</span>
                 <h3 className="course-title">CSS</h3>
+                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
                 <p className="course-description">
                   Learn to use CSS selectors and properties to stylize your HTML pages with colors, fonts, and layouts.
                 </p>
-                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
               </div>
             </div>
           </div>
 
-          <a href="#" className="btn btn-secondary">
+          <a href="/login" className="btn">
             Explore All Courses <i className="fas fa-arrow-right"></i>
           </a>
         </div>
@@ -279,7 +308,7 @@ export default function Intro() {
             <p className="footer-tagline">Embark on your coding quest today!</p>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2024 DevVanguard. All rights reserved.</p>
+            <p>&copy; 2025 DevVanguard. All rights reserved.</p>
           </div>
         </div>
       </footer>

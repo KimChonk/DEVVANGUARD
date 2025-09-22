@@ -158,51 +158,52 @@ export default function CourseScreen() {
     }
   ]);
 
-  useEffect(() => {
-    // Sparkle effect on lesson cards
-    const lessonCards = document.querySelectorAll(".lesson-card");
+  // Disabled sparkle effect for performance
+  // useEffect(() => {
+  //   // Sparkle effect on lesson cards
+  //   const lessonCards = document.querySelectorAll(".lesson-card");
     
-    const handleMouseMove = (e, card) => {
-      if (card.classList.contains('locked')) return;
+  //   const handleMouseMove = (e, card) => {
+  //     if (card.classList.contains('locked')) return;
       
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+  //     const rect = card.getBoundingClientRect();
+  //     const x = e.clientX - rect.left;
+  //     const y = e.clientY - rect.top;
 
-      const sparkle = document.createElement("div");
-      sparkle.className = "sparkle";
-      sparkle.style.position = "absolute";
-      sparkle.style.left = x + "px";
-      sparkle.style.top = y + "px";
-      sparkle.style.width = "3px";
-      sparkle.style.height = "3px";
-      sparkle.style.background = "var(--primary-gold)";
-      sparkle.style.borderRadius = "50%";
-      sparkle.style.pointerEvents = "none";
-      sparkle.style.animation = "sparkleAnimation 1s ease-out forwards";
-      sparkle.style.zIndex = "10";
-      card.appendChild(sparkle);
+  //     const sparkle = document.createElement("div");
+  //     sparkle.className = "sparkle";
+  //     sparkle.style.position = "absolute";
+  //     sparkle.style.left = x + "px";
+  //     sparkle.style.top = y + "px";
+  //     sparkle.style.width = "3px";
+  //     sparkle.style.height = "3px";
+  //     sparkle.style.background = "var(--primary-gold)";
+  //     sparkle.style.borderRadius = "50%";
+  //     sparkle.style.pointerEvents = "none";
+  //     sparkle.style.animation = "sparkleAnimation 1s ease-out forwards";
+  //     sparkle.style.zIndex = "10";
+  //     card.appendChild(sparkle);
 
-      setTimeout(() => sparkle.remove(), 1000);
-    };
+  //     setTimeout(() => sparkle.remove(), 1000);
+  //   };
 
-    lessonCards.forEach(card => {
-      const boundHandleMouseMove = (e) => handleMouseMove(e, card);
-      card.addEventListener("mousemove", boundHandleMouseMove);
+  //   lessonCards.forEach(card => {
+  //     const boundHandleMouseMove = (e) => handleMouseMove(e, card);
+  //     card.addEventListener("mousemove", boundHandleMouseMove);
       
-      card._cleanup = () => {
-        card.removeEventListener("mousemove", boundHandleMouseMove);
-      };
-    });
+  //     card._cleanup = () => {
+  //       card.removeEventListener("mousemove", boundHandleMouseMove);
+  //     };
+  //   });
 
-    return () => {
-      lessonCards.forEach(card => {
-        if (card._cleanup) {
-          card._cleanup();
-        }
-      });
-    };
-  }, []);
+  //   return () => {
+  //     lessonCards.forEach(card => {
+  //       if (card._cleanup) {
+  //         card._cleanup();
+  //       }
+  //     });
+  //   };
+  // }, []);
 
   const handleBackToMenu = () => {
     navigate("/main-menu");
