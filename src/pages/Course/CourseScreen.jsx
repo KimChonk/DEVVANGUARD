@@ -212,9 +212,9 @@ export default function CourseScreen() {
   const handleLessonClick = (lesson) => {
     if (lesson.status === "locked") return;
     
-    // Here you would navigate to the lesson content
+    // Navigate to the lesson content
     console.log(`Starting lesson: ${lesson.title}`);
-    // navigate(`/lesson/${lesson.id}`);
+    navigate(`/lesson/${lesson.id}`);
   };
 
   const getDifficultyStars = (difficulty) => {

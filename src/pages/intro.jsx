@@ -124,25 +124,37 @@ export default function Intro() {
             </div>
 
             <div className="course-card">
-              <div className="course-image" style={{ backgroundImage: "url('/images/html_course.jpg')" }}></div>
+              <div className="course-image" style={{ backgroundImage: "url('/images/csharp_course.png')" }}></div>
               <div className="course-content">
                 <span className="course-label">COURSE</span>
-                <h3 className="course-title">HTML</h3>
+                <h3 className="course-title">C#</h3>
                 <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
                 <p className="course-description">
-                  Create your first website with HTML, the building blocks of the web and dive into the world of markup.
+                  Build powerful applications with C#, a versatile programming language for web, desktop, and mobile development.
                 </p>
               </div>
             </div>
 
             <div className="course-card">
-              <div className="course-image" style={{ backgroundImage: "url('/images/css_course.jpg')" }}></div>
+              <div className="course-image" style={{ backgroundImage: "url('/images/c_course.png')" }}></div>
               <div className="course-content">
                 <span className="course-label">COURSE</span>
-                <h3 className="course-title">CSS</h3>
+                <h3 className="course-title">C</h3>
                 <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
                 <p className="course-description">
-                  Learn to use CSS selectors and properties to stylize your HTML pages with colors, fonts, and layouts.
+                  Master the fundamentals of programming with C, the foundation language that powers modern computing.
+                </p>
+              </div>
+            </div>
+
+            <div className="course-card">
+              <div className="course-image" style={{ backgroundImage: "url('/images/java_course.png')" }}></div>
+              <div className="course-content">
+                <span className="course-label">COURSE</span>
+                <h3 className="course-title">Java</h3>
+                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
+                <p className="course-description">
+                  Learn object-oriented programming with Java, one of the most popular languages for enterprise applications.
                 </p>
               </div>
             </div>

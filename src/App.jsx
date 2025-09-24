@@ -5,6 +5,7 @@ import Register from "./pages/Account/Register";
 import ForgotPassword from "./pages/Account/ForgotPassword";
 import MainMenu from "./pages/Menu/MainMenu";
 import CourseScreen from "./pages/Course/CourseScreen";
+import LessonScreen from "./pages/Lesson/LessonScreen";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/main-menu" element={<MainMenu />} />
         <Route path="/course/:courseId" element={<CourseScreen />} />
+        <Route path="/lesson/:lessonId" element={<LessonScreen />} />
       </Routes>
     </BrowserRouter>
   );
