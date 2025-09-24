@@ -10,7 +10,7 @@ export default function LessonScreen() {
     avatar: "/images/default-avatar.jpg"
   });
 
-  // Sample lesson data based on lessonId
+  // Sample lesson data based on lessonId with test cases
   const [lesson] = useState({
     1: {
       id: 1,
@@ -18,106 +18,42 @@ export default function LessonScreen() {
       difficulty: "Easy",
       tags: ["Variables", "Data Types", "Python Basics"],
       description: "Learn how to declare variables and work with different data types in Python. Master the fundamental building blocks of any Python program.",
-      objectives: [
-        "Understand variable declaration in Python",
-        "Learn about different data types (int, float, string, boolean)",
-        "Practice variable assignment and manipulation",
-        "Write your first Python program with variables"
-      ],
-      examples: [
+      problem: "Create variables of different types and perform basic operations. Your code should define specific variables and print them in the expected format.",
+      testCases: [
         {
-          title: "Example 1: Basic Variable Declaration",
-          code: `# Declaring different types of variables
-name = "Knight Coder"
-age = 25
-height = 5.9
-is_student = True
-
-print(f"Name: {name}")
-print(f"Age: {age}")
-print(f"Height: {height}")
-print(f"Is Student: {is_student}")`
+          id: 1,
+          name: "Test Case 1: Variable Declaration",
+          description: "Your code should create a variable 'name' with value 'Knight' and print it",
+          expectedOutput: "Knight",
+          hint: "Remember to create a variable called 'name' and assign it the string 'Knight', then use print() to display it."
         },
         {
-          title: "Example 2: Variable Operations",
-          code: `# Mathematical operations with variables
-a = 10
-b = 3
-
-sum_result = a + b
-difference = a - b
-product = a * b
-quotient = a / b
-
-print(f"Sum: {sum_result}")
-print(f"Difference: {difference}")
-print(f"Product: {product}")
-print(f"Quotient: {quotient}")`
+          id: 2,
+          name: "Test Case 2: Number Operations",
+          description: "Create variables 'a = 10' and 'b = 5', then print their sum",
+          expectedOutput: "15",
+          hint: "Create two variables a=10 and b=5, then calculate a+b and print the result."
+        },
+        {
+          id: 3,
+          name: "Test Case 3: Boolean Values",
+          description: "Create a boolean variable 'is_knight = True' and print it",
+          expectedOutput: "True",
+          hint: "Create a boolean variable called 'is_knight' with value True and print it."
         }
       ],
-      constraints: [
-        "Use meaningful variable names",
-        "Follow Python naming conventions (snake_case)",
-        "Variables should not start with numbers",
-        "Avoid using Python reserved keywords as variable names"
-      ],
-      initialCode: `# Welcome to your Python adventure, Knight!
-# Complete the following tasks:
+      initialCode: `# Knight's Python Challenge!
+# Complete the tasks below to pass all test cases
 
-# Task 1: Create a variable called 'knight_name' and assign your name to it
-knight_name = 
+# Write your code here:
 
-# Task 2: Create a variable called 'level' and assign the number 1 to it
-level = 
-
-# Task 3: Create a variable called 'experience_points' and assign 0.0 to it
-experience_points = 
-
-# Task 4: Create a variable called 'has_sword' and assign True to it
-has_sword = 
-
-# Task 5: Print all variables using f-strings
-# Example: print(f"Knight Name: {knight_name}")
-
-# Your code here:
-
-
-# Task 6: Calculate new experience points by adding 50.5 to current experience_points
-# and assign it back to experience_points
-
-# Your code here:
-
-
-# Task 7: Print the updated experience points
-
-# Your code here:
 `,
-      solution: `# Welcome to your Python adventure, Knight!
-# Complete the following tasks:
-
-# Task 1: Create a variable called 'knight_name' and assign your name to it
-knight_name = "Knight Coder"
-
-# Task 2: Create a variable called 'level' and assign the number 1 to it
-level = 1
-
-# Task 3: Create a variable called 'experience_points' and assign 0.0 to it
-experience_points = 0.0
-
-# Task 4: Create a variable called 'has_sword' and assign True to it
-has_sword = True
-
-# Task 5: Print all variables using f-strings
-print(f"Knight Name: {knight_name}")
-print(f"Level: {level}")
-print(f"Experience Points: {experience_points}")
-print(f"Has Sword: {has_sword}")
-
-# Task 6: Calculate new experience points by adding 50.5 to current experience_points
-experience_points = experience_points + 50.5
-
-# Task 7: Print the updated experience points
-print(f"Updated Experience Points: {experience_points}")`
+      hints: [
+        "💡 Start by creating variables with meaningful names",
+        "⚔️ Use print() function to display your results",
+        "🏰 Remember Python is case-sensitive",
+        "✨ Check your variable assignments carefully"
+      ]
     },
     2: {
       id: 2,
@@ -125,80 +61,46 @@ print(f"Updated Experience Points: {experience_points}")`
       difficulty: "Medium",
       tags: ["If Statements", "Control Flow", "Conditions"],
       description: "Master the art of decision making in Python using if, elif, and else statements.",
-      objectives: [
-        "Understand conditional statements",
-        "Learn comparison operators",
-        "Practice if-elif-else chains",
-        "Create decision-based programs"
-      ],
-      examples: [
+      problem: "Create a decision system that determines a knight's action based on different conditions.",
+      testCases: [
         {
-          title: "Example: Grade Checker",
-          code: `score = 85
-
-if score >= 90:
-    grade = "A"
-elif score >= 80:
-    grade = "B"
-elif score >= 70:
-    grade = "C"
-else:
-    grade = "F"
-
-print(f"Your grade is: {grade}")`
+          id: 1,
+          name: "Test Case 1: High Health with Sword",
+          description: "With health=90 and has_sword=True, should print 'Attack!'",
+          expectedOutput: "Attack!",
+          hint: "Check if health > 80 AND has_sword is True, then print 'Attack!'"
+        },
+        {
+          id: 2,
+          name: "Test Case 2: Low Health",
+          description: "With health=20, should print 'Retreat!'",
+          expectedOutput: "Retreat!",
+          hint: "When health is less than 30, the knight should retreat for safety."
+        },
+        {
+          id: 3,
+          name: "Test Case 3: Medium Health",
+          description: "With health=50 and has_sword=False, should print 'Defend!'",
+          expectedOutput: "Defend!",
+          hint: "For medium health without a sword, the best strategy is to defend."
         }
       ],
-      constraints: [
-        "Use proper indentation (4 spaces)",
-        "Include meaningful condition checks",
-        "Handle edge cases appropriately"
-      ],
-      initialCode: `# Knight's Adventure Decision System
-# Help the knight make important decisions!
+      initialCode: `# Knight's Decision System
+# Create conditional logic for the knight's actions
 
-# Task: Create a decision system for a knight's adventure
+# Test variables (your code should work for any values)
+health = 90
+has_sword = True
 
-# Given variables (you can modify these for testing)
-knights_health = 100
-has_magic_sword = True
-enemy_strength = 75
-has_healing_potion = False
-
-# Your task: Write if-elif-else statements to determine the knight's action
-# Rules:
-# 1. If health > 80 and has_magic_sword: "Charge into battle!"
-# 2. If health > 50 and enemy_strength < 50: "Attack with caution!"
-# 3. If health < 30 and has_healing_potion: "Use healing potion!"
-# 4. If health < 30 and not has_healing_potion: "Retreat to safety!"
-# 5. Otherwise: "Defend and wait for opportunity!"
-
-# Write your code here:
+# Write your if-elif-else logic here:
 
 `,
-      solution: `# Knight's Adventure Decision System
-# Help the knight make important decisions!
-
-# Given variables
-knights_health = 100
-has_magic_sword = True
-enemy_strength = 75
-has_healing_potion = False
-
-# Decision system
-if knights_health > 80 and has_magic_sword:
-    action = "Charge into battle!"
-elif knights_health > 50 and enemy_strength < 50:
-    action = "Attack with caution!"
-elif knights_health < 30 and has_healing_potion:
-    action = "Use healing potion!"
-elif knights_health < 30 and not has_healing_potion:
-    action = "Retreat to safety!"
-else:
-    action = "Defend and wait for opportunity!"
-
-print(f"Knight's decision: {action}")
-print(f"Health: {knights_health}, Magic Sword: {has_magic_sword}")
-print(f"Enemy Strength: {enemy_strength}, Healing Potion: {has_healing_potion}")`
+      hints: [
+        "🗡️ Use 'and' to combine multiple conditions",
+        "🛡️ Remember to check health levels first",
+        "⚔️ Use elif for multiple conditions",
+        "🏰 Always include an else clause for safety"
+      ]
     }
   }[lessonId] || {
     id: 1,
@@ -206,23 +108,55 @@ print(f"Enemy Strength: {enemy_strength}, Healing Potion: {has_healing_potion}")
     difficulty: "Easy",
     tags: ["Error"],
     description: "The requested lesson could not be found.",
-    objectives: [],
-    examples: [],
-    constraints: [],
+    problem: "This lesson is not available. Please select a valid lesson.",
+    testCases: [
+      {
+        id: 1,
+        name: "Test Case 1: Error",
+        description: "No test available",
+        expectedOutput: "Error",
+        hint: "Please select a valid lesson"
+      }
+    ],
     initialCode: "# Lesson not found",
-    solution: "# Lesson not found"
+    hints: ["Please go back and select a valid lesson"]
   });
 
   const [code, setCode] = useState(lesson.initialCode);
   const [consoleOutput, setConsoleOutput] = useState([]);
-  const [activeTab, setActiveTab] = useState('code');
+  const [testResults, setTestResults] = useState([]);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
+  const [showHint, setShowHint] = useState(false);
+  const [currentHintIndex, setCurrentHintIndex] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
   // Initialize code when lesson changes
   useEffect(() => {
     setCode(lesson.initialCode);
     setConsoleOutput([]);
+    setTestResults([]);
+    setIsLocked(false);
+    setShowHint(false);
   }, [lesson.initialCode]);
+
+  // Lock timer effect
+  useEffect(() => {
+    let timer;
+    if (isLocked && lockTimeRemaining > 0) {
+      timer = setInterval(() => {
+        setLockTimeRemaining(prev => {
+          if (prev <= 1) {
+            setIsLocked(false);
+            setShowHint(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isLocked, lockTimeRemaining]);
 
   const handleBackToCourse = useCallback(() => {
     navigate("/course/1"); // Navigate back to course - you can make this dynamic
@@ -238,59 +172,143 @@ print(f"Enemy Strength: {enemy_strength}, Healing Potion: {has_healing_potion}")
   }, []);
 
   const runCode = useCallback(async () => {
+    if (isLocked) {
+      addToConsole(`Code editor is locked for ${lockTimeRemaining} more seconds`, 'warning');
+      return;
+    }
+
     setIsRunning(true);
     clearConsole();
     
     try {
       addToConsole('Running your code...', 'output');
       
-      // Simulate code execution (in a real app, you'd send this to a backend)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulate code execution
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       // Simple Python code simulation
+      const outputs = [];
       if (code.includes('print(')) {
-        // Extract print statements and simulate output
         const printMatches = code.match(/print\([^)]*\)/g);
         if (printMatches) {
-          printMatches.forEach((printStatement, index) => {
-            setTimeout(() => {
-              // Simple simulation - in reality you'd need a proper Python interpreter
-              const output = printStatement.replace(/print\(|\)/g, '').replace(/f?["']/g, '');
-              addToConsole(output, 'output');
-            }, (index + 1) * 200);
+          printMatches.forEach(printStatement => {
+            // Simple simulation - extract content between quotes or variable names
+            let output = printStatement.replace(/print\(|\)/g, '');
+            
+            // Handle f-strings and simple variables
+            if (output.includes('"')) {
+              output = output.match(/"([^"]*)"/)?.[1] || output;
+            } else if (output.includes("'")) {
+              output = output.match(/'([^']*)'/)?.[1] || output;
+            }
+            
+            outputs.push(output);
+            addToConsole(output, 'output');
           });
         }
         
-        setTimeout(() => {
-          addToConsole('Code executed successfully! ✨', 'success');
-        }, (printMatches?.length || 1) * 200 + 500);
+        addToConsole('Code executed successfully! ✨', 'success');
       } else {
-        setTimeout(() => {
-          addToConsole('No output to display. Add some print statements!', 'warning');
-        }, 1000);
+        addToConsole('No output to display. Add some print statements!', 'warning');
       }
       
     } catch (error) {
       addToConsole(`Error: ${error.message}`, 'error');
     } finally {
-      setTimeout(() => setIsRunning(false), 1500);
+      setIsRunning(false);
     }
-  }, [code, addToConsole, clearConsole]);
+  }, [code, addToConsole, clearConsole, isLocked, lockTimeRemaining]);
+
+  const validateCode = useCallback(() => {
+    const results = lesson.testCases.map(testCase => {
+      // Simple validation logic - in real implementation, you'd execute the code
+      let passed = false;
+      let actualOutput = '';
+      
+      // Basic validation based on test case requirements
+      if (testCase.id === 1 && lesson.id === 1) {
+        // Check for name variable and Knight value
+        if (code.includes('name') && code.includes('Knight') && code.includes('print')) {
+          passed = true;
+          actualOutput = 'Knight';
+        } else {
+          actualOutput = 'No output or incorrect variable';
+        }
+      } else if (testCase.id === 2 && lesson.id === 1) {
+        // Check for a=10, b=5, and sum calculation
+        if (code.includes('a = 10') && code.includes('b = 5') && code.includes('a + b')) {
+          passed = true;
+          actualOutput = '15';
+        } else {
+          actualOutput = 'Incorrect calculation or missing variables';
+        }
+      } else if (testCase.id === 3 && lesson.id === 1) {
+        // Check for boolean variable
+        if (code.includes('is_knight') && code.includes('True') && code.includes('print')) {
+          passed = true;
+          actualOutput = 'True';
+        } else {
+          actualOutput = 'Missing boolean variable or print statement';
+        }
+      }
+      
+      // For lesson 2 (if statements)
+      if (lesson.id === 2) {
+        if (testCase.id === 1 && code.includes('if') && code.includes('health > 80') && code.includes('Attack!')) {
+          passed = true;
+          actualOutput = 'Attack!';
+        } else if (testCase.id === 2 && code.includes('health') && code.includes('< 30') && code.includes('Retreat!')) {
+          passed = true;
+          actualOutput = 'Retreat!';
+        } else if (testCase.id === 3 && code.includes('else') && code.includes('Defend!')) {
+          passed = true;
+          actualOutput = 'Defend!';
+        }
+      }
+      
+      return {
+        ...testCase,
+        passed,
+        actualOutput
+      };
+    });
+    
+    setTestResults(results);
+    return results;
+  }, [code, lesson]);
 
   const submitCode = useCallback(() => {
+    if (isLocked) {
+      addToConsole(`Submission locked for ${lockTimeRemaining} more seconds`, 'warning');
+      return;
+    }
+
     clearConsole();
-    addToConsole('Submitting your solution...', 'output');
+    addToConsole('Validating your solution...', 'output');
     
-    // Simple validation (in a real app, this would be more sophisticated)
     setTimeout(() => {
-      if (code.trim().length > lesson.initialCode.trim().length) {
-        addToConsole('Great work, Knight! Your solution has been submitted! 🏆', 'success');
-        addToConsole('You have earned 50 XP for completing this lesson!', 'success');
+      const results = validateCode();
+      const passedCount = results.filter(r => r.passed).length;
+      const totalCount = results.length;
+      
+      if (passedCount === totalCount) {
+        addToConsole(`🏆 Excellent! All ${totalCount} test cases passed!`, 'success');
+        addToConsole('You have earned 100 XP for completing this lesson!', 'success');
+        addToConsole('Ready to advance to the next challenge!', 'success');
       } else {
-        addToConsole('Please complete the tasks before submitting.', 'warning');
+        addToConsole(`❌ ${passedCount}/${totalCount} test cases passed`, 'error');
+        addToConsole('Code editor locked for 10 seconds. Check the hint!', 'warning');
+        
+        // Lock the editor and show hint
+        setIsLocked(true);
+        setLockTimeRemaining(10);
+        setShowHint(true);
+        
+        // Cycle through hints
+        setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length);
       }
-    }, 1000);
-  }, [code, lesson.initialCode, addToConsole, clearConsole]);
+    }, 1200);
+  }, [isLocked, lockTimeRemaining, addToConsole, clearConsole, validateCode, lesson.hints.length]);
 
   const resetCode = useCallback(() => {
     setCode(lesson.initialCode);
@@ -340,7 +358,7 @@ print(f"Enemy Strength: {enemy_strength}, Healing Potion: {has_healing_potion}")
 
       {/* Main Content */}
       <div className="lesson-main-content">
-        {/* Left Panel - Problem Description */}
+        {/* Left Panel - Problem Description & Test Cases */}
         <div className="lesson-left-panel">
           <div className="lesson-header">
             <h1 className="lesson-title">{lesson.title}</h1>
@@ -358,38 +376,72 @@ print(f"Enemy Strength: {enemy_strength}, Healing Potion: {has_healing_potion}")
 
           <div className="lesson-content">
             <div className="lesson-section">
-              <p className="lesson-description">{lesson.description}</p>
+              <h3 className="section-title">📜 Problem Description</h3>
+              <p className="lesson-description">{lesson.problem}</p>
             </div>
 
             <div className="lesson-section">
-              <h3 className="section-title">🎯 Learning Objectives</h3>
-              <ul className="constraints-list">
-                {lesson.objectives.map((objective, index) => (
-                  <li key={index}>{objective}</li>
-                ))}
-              </ul>
+              <h3 className="section-title">🧪 Test Cases</h3>
+              {lesson.testCases.map((testCase, index) => {
+                const result = testResults.find(r => r.id === testCase.id);
+                return (
+                  <div key={index} className={`test-case-box ${
+                    result ? (result.passed ? 'test-passed' : 'test-failed') : 'test-pending'
+                  }`}>
+                    <div className="test-case-header">
+                      <span className="test-case-name">{testCase.name}</span>
+                      <span className={`test-status ${
+                        result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'
+                      }`}>
+                        {result ? (result.passed ? '✅' : '❌') : '⏳'}
+                      </span>
+                    </div>
+                    <p className="test-case-description">{testCase.description}</p>
+                    <div className="test-case-output">
+                      <div className="expected-output">
+                        <strong>Expected:</strong> <code>{testCase.expectedOutput}</code>
+                      </div>
+                      {result && (
+                        <div className={`actual-output ${
+                          result.passed ? 'output-correct' : 'output-incorrect'
+                        }`}>
+                          <strong>Your output:</strong> <code>{result.actualOutput}</code>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            {lesson.examples.length > 0 && (
-              <div className="lesson-section">
-                <h3 className="section-title">📝 Examples</h3>
-                {lesson.examples.map((example, index) => (
-                  <div key={index} className="example-box">
-                    <div className="example-title">{example.title}</div>
-                    <div className="code-snippet">{example.code}</div>
+            {/* Hint Section */}
+            {showHint && (
+              <div className="lesson-section hint-section">
+                <h3 className="section-title">💡 Knight's Assistant</h3>
+                <div className="hint-box">
+                  <div className="hint-header">
+                    <span className="hint-title">Need some guidance, brave knight?</span>
+                    <span className="lockout-timer">🔒 {lockTimeRemaining}s</span>
                   </div>
-                ))}
+                  <p className="hint-text">{lesson.hints[currentHintIndex]}</p>
+                  <div className="hint-navigation">
+                    <button 
+                      className="hint-nav-btn" 
+                      onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}
+                    >
+                      ← Previous
+                    </button>
+                    <span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span>
+                    <button 
+                      className="hint-nav-btn" 
+                      onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
-
-            <div className="lesson-section">
-              <h3 className="section-title">⚔️ Constraints & Guidelines</h3>
-              <ul className="constraints-list">
-                {lesson.constraints.map((constraint, index) => (
-                  <li key={index}>{constraint}</li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
 
@@ -397,50 +449,34 @@ print(f"Enemy Strength: {enemy_strength}, Healing Potion: {has_healing_potion}")
         <div className="lesson-right-panel">
           <div className="editor-header">
             <div className="editor-tabs">
-              <div 
-                className={`editor-tab ${activeTab === 'code' ? 'active' : ''}`}
-                onClick={() => setActiveTab('code')}
-              >
+              <div className="editor-tab active">
                 <i className="fas fa-code"></i> Solution.py
-              </div>
-              <div 
-                className={`editor-tab ${activeTab === 'solution' ? 'active' : ''}`}
-                onClick={() => setActiveTab('solution')}
-              >
-                <i className="fas fa-lightbulb"></i> Hint
               </div>
             </div>
             <div className="editor-actions">
-              <button className="run-btn" onClick={runCode} disabled={isRunning}>
+              <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}>
                 <i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
                 {isRunning ? 'Running...' : 'Run Code'}
               </button>
-              <button className="submit-btn" onClick={submitCode}>
-                <i className="fas fa-check"></i> Submit
+              <button className="submit-btn" onClick={submitCode} disabled={isLocked}>
+                <i className="fas fa-check"></i> 
+                {isLocked ? `Locked (${lockTimeRemaining}s)` : 'Submit'}
               </button>
-              <button className="reset-btn" onClick={resetCode}>
+              <button className="reset-btn" onClick={resetCode} disabled={isLocked}>
                 <i className="fas fa-undo"></i> Reset
               </button>
             </div>
           </div>
 
           <div className="editor-content">
-            {activeTab === 'code' ? (
-              <textarea
-                className="code-editor"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Write your Python code here..."
-                spellCheck={false}
-              />
-            ) : (
-              <div className="code-editor" style={{ padding: '20px', overflow: 'auto' }}>
-                <h3 style={{ color: 'var(--text-gold)', marginBottom: '15px' }}>💡 Solution Hint:</h3>
-                <pre className="code-snippet" style={{ whiteSpace: 'pre-wrap', fontSize: '13px' }}>
-                  {lesson.solution}
-                </pre>
-              </div>
-            )}
+            <textarea
+              className={`code-editor ${isLocked ? 'editor-locked' : ''}`}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Write your Python code here..."
+              spellCheck={false}
+              disabled={isLocked}
+            />
           </div>
 
           {/* Console Output */}
