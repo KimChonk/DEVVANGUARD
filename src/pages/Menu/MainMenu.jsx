@@ -10,7 +10,7 @@ export default function MainMenu() {
     level: "Code Knight",
     currentXP: 850,
     nextLevelXP: 1000,
-    dailyStreak: 7
+    dailyStreak: 7,
   });
 
   // Random daily advice that changes each time page loads
@@ -24,7 +24,7 @@ export default function MainMenu() {
     "Your next breakthrough is just one lesson away.",
     "Consistency beats intensity. Keep your coding streak alive!",
     "Every master was once a beginner. Every pro was once an amateur.",
-    "Code is poetry written in logic. Make yours beautiful."
+    "Code is poetry written in logic. Make yours beautiful.",
   ];
 
   const [dailyAdvice] = useState(() => {
@@ -36,62 +36,81 @@ export default function MainMenu() {
     {
       id: 1,
       title: "Python Mastery",
-      description: "Master the ancient art of Python programming and unlock the secrets of data manipulation.",
+      description:
+        "Master the ancient art of Python programming and unlock the secrets of data manipulation.",
       level: "Beginner",
       lessons: 24,
       progress: 35,
-      status: "continue"
+      status: "continue",
     },
     {
       id: 2,
       title: "HTML & CSS Foundations",
-      description: "Build the foundation of web development with HTML structure and CSS styling magic.",
+      description:
+        "Build the foundation of web development with HTML structure and CSS styling magic.",
       level: "Beginner",
       lessons: 18,
       progress: 100,
-      status: "completed"
+      status: "completed",
     },
     {
       id: 3,
       title: "JavaScript Adventures",
-      description: "Embark on dynamic adventures with JavaScript and bring your web pages to life.",
+      description:
+        "Embark on dynamic adventures with JavaScript and bring your web pages to life.",
       level: "Intermediate",
       lessons: 32,
       progress: 0,
-      status: "start"
+      status: "start",
     },
     {
       id: 4,
       title: "React Kingdom",
-      description: "Rule the React kingdom and build powerful, interactive user interfaces.",
+      description:
+        "Rule the React kingdom and build powerful, interactive user interfaces.",
       level: "Advanced",
       lessons: 28,
       progress: 0,
-      status: "start"
+      status: "start",
     },
     {
       id: 5,
       title: "Database Dungeons",
-      description: "Navigate through database dungeons and master the art of data storage and retrieval.",
+      description:
+        "Navigate through database dungeons and master the art of data storage and retrieval.",
       level: "Intermediate",
       lessons: 20,
       progress: 60,
-      status: "continue"
+      status: "continue",
     },
     {
       id: 6,
       title: "Algorithm Arena",
-      description: "Battle in the algorithm arena and sharpen your problem-solving skills.",
+      description:
+        "Battle in the algorithm arena and sharpen your problem-solving skills.",
       level: "Advanced",
       lessons: 25,
       progress: 0,
-      status: "start"
-    }
+      status: "start",
+    },
   ]);
 
-  const handleCourseClick = useCallback((courseId) => {
-    navigate(`/course/${courseId}`);
-  }, [navigate]);
+ const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
+  const [isPracticeMenuOpen, setPracticeMenuOpen] = useState(false);
+  const toggleLearnMenu = () => {
+    setLearnMenuOpen((prevState) => !prevState);
+  }; 
+
+  const handleCourseClick = useCallback(
+    (courseId) => {
+      navigate(`/course/${courseId}`);
+    },
+    [navigate]
+  );
+
+  const handleAvatarClick = () => {
+    navigate("/profile"); // This will navigate to the new profile page
+  };
 
   const handleLogout = useCallback(() => {
     navigate("/login");
@@ -102,9 +121,20 @@ export default function MainMenu() {
       case "Beginner":
         return <i className="fas fa-star"></i>;
       case "Intermediate":
-        return <><i className="fas fa-star"></i><i className="fas fa-star"></i></>;
+        return (
+          <>
+            <i className="fas fa-star"></i>
+            <i className="fas fa-star"></i>
+          </>
+        );
       case "Advanced":
-        return <><i className="fas fa-star"></i><i className="fas fa-star"></i><i className="fas fa-star"></i></>;
+        return (
+          <>
+            <i className="fas fa-star"></i>
+            <i className="fas fa-star"></i>
+            <i className="fas fa-star"></i>
+          </>
+        );
       default:
         return <i className="fas fa-star"></i>;
     }
@@ -121,16 +151,59 @@ export default function MainMenu() {
       {/* Navigation */}
       <nav className="main-navbar">
         <div className="main-nav-container">
-          <div className="main-nav-logo">
-            <img src="/icons/knight_icon.png" alt="Knight Icon" className="main-logo-icon" />
-            <span className="main-logo-text">
-              Dev <span className="main-highlight">Vanguard</span>
-            </span>
-          </div>
-          <div className="main-nav-center">
-            <h1 className="main-nav-title">Knight's Academy</h1>
+          <div className="main-nav-left">
+            <a className="logo-link" onClick={() => navigate("/main-menu")}>
+                <div className="main-nav-logo">
+                <img
+                    src="/icons/knight_icon.png"
+                    alt="Knight Icon"
+                    className="main-logo-icon"
+                />
+                <span className="main-logo-text">
+                    Dev <span className="main-highlight">Vanguard</span>
+                </span>
+                </div>
+            </a>
+
+            <ul className="main-nav-links">
+              <li className="nav-item-dropdown">
+                {" "}
+                {/* Thêm class để dễ style */}
+                <a onClick={toggleLearnMenu}>
+                  {" "}
+                  {/* Dùng onClick thay cho href */}
+                  Available Quests <i className="fas fa-chevron-down"></i>
+                </a>
+                {isLearnMenuOpen && (
+                  <div className="dropdown-menu">
+                    {courses.map((course) => (
+                      <a
+                        key={course.id}
+                        href={`/course/${course.id}`}
+                        className="dropdown-item"
+                        onClick={() => navigate(`/course/${course.id}`)} // Điều hướng khi click
+                      >
+                        {course.title}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </li>
+              <li>
+                <a href="/practice">
+                  Practice <i className="fas fa-chevron-down"></i>
+                </a>
+              </li>
+              <li>
+                <a href="/build">Build</a>
+              </li>
+              <li>
+                <a href="/leaderboards" className="nav-button">Leaderboards</a>
+              </li>
+            </ul>
           </div>
           <div className="main-nav-right">
+            <button className="avatar-btn" onClick={handleAvatarClick}>
             <img 
               src={user.avatar} 
               alt="User Avatar" 
@@ -139,6 +212,7 @@ export default function MainMenu() {
                 e.target.src = "/icons/knight_icon.png";
               }}
             />
+          </button>
             <button className="logout-btn" onClick={handleLogout}>
               <i className="fas fa-sign-out-alt"></i> Logout
             </button>
@@ -161,11 +235,13 @@ export default function MainMenu() {
             <div className="xp-display">
               <div className="xp-label">
                 <span>Experience</span>
-                <span>{user.currentXP}/{user.nextLevelXP} XP</span>
+                <span>
+                  {user.currentXP}/{user.nextLevelXP} XP
+                </span>
               </div>
               <div className="xp-bar">
-                <div 
-                  className="xp-fill" 
+                <div
+                  className="xp-fill"
                   style={{ width: `${xpPercentage}%` }}
                 ></div>
               </div>
@@ -200,7 +276,8 @@ export default function MainMenu() {
           <section className="welcome-section">
             <h1 className="welcome-title">Welcome Back, {user.name}!</h1>
             <p className="welcome-subtitle">
-              Your coding adventure continues! Choose a quest to advance your skills and grow stronger as a Code Knight.
+              Your coding adventure continues! Choose a quest to advance your
+              skills and grow stronger as a Code Knight.
             </p>
           </section>
 
@@ -212,14 +289,14 @@ export default function MainMenu() {
 
             <div className="courses-grid">
               {courses.map((course) => (
-                <div 
-                  key={course.id} 
+                <div
+                  key={course.id}
                   className="course-card"
                   onClick={() => handleCourseClick(course.id)}
                 >
                   <h3 className="course-title">{course.title}</h3>
                   <p className="course-description">{course.description}</p>
-                  
+
                   <div className="course-meta">
                     <div className="course-level">
                       {getLevelIcon(course.level)}
@@ -237,8 +314,8 @@ export default function MainMenu() {
                         <span>{course.progress}%</span>
                       </div>
                       <div className="progress-bar">
-                        <div 
-                          className="progress-fill" 
+                        <div
+                          className="progress-fill"
                           style={{ width: `${course.progress}%` }}
                         ></div>
                       </div>

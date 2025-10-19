@@ -1,616 +1,822 @@
 /* ===== MAIN MENU FANTASY STYLING ===== */
 
 :root {
-    --primary-gold: #d4af37;
-    --secondary-gold: #b8941f;
-    --dark-blue: #1a1a2e;
-    --medium-blue: #16213e;
-    --light-blue: #0f3460;
-    --accent-purple: #533483;
-    --text-light: #e8e8e8;
-    --text-gold: #f4e4bc;
-    --shadow-dark: rgba(0, 0, 0, 0.5);
-    --glow-gold: rgba(212, 175, 55, 0.3);
-    --glow-blue: rgba(15, 52, 96, 0.4);
-    --success-green: #4caf50;
-    --streak-orange: #ff9800;
+  --primary-gold: #d4af37;
+  --secondary-gold: #b8941f;
+  --dark-blue: #1a1a2e;
+  --medium-blue: #16213e;
+  --light-blue: #0f3460;
+  --accent-purple: #533483;
+  --text-light: #e8e8e8;
+  --text-gold: #f4e4bc;
+  --shadow-dark: rgba(0, 0, 0, 0.5);
+  --glow-gold: rgba(212, 175, 55, 0.3);
+  --glow-blue: rgba(15, 52, 96, 0.4);
+  --success-green: #4caf50;
+  --streak-orange: #ff9800;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Cinzel', serif;
-    background: linear-gradient(135deg, var(--dark-blue) 0%, var(--medium-blue) 50%, var(--light-blue) 100%);
-    min-height: 100vh;
-    overflow-x: hidden;
-    color: var(--text-light);
+  font-family: "Cinzel", serif;
+  background: linear-gradient(
+    135deg,
+    var(--dark-blue) 0%,
+    var(--medium-blue) 50%,
+    var(--light-blue) 100%
+  );
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--text-light);
 }
 
 /* ===== MAIN MENU CONTAINER ===== */
 .main-menu-container {
-    position: relative;
-    min-height: 100vh;
-    background: 
-        radial-gradient(circle at 20% 80%, var(--glow-gold) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--glow-blue) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(83, 52, 131, 0.2) 0%, transparent 50%);
+  position: relative;
+  min-height: 100vh;
+  background: radial-gradient(
+      circle at 20% 80%,
+      var(--glow-gold) 0%,
+      transparent 50%
+    ),
+    radial-gradient(circle at 80% 20%, var(--glow-blue) 0%, transparent 50%),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(83, 52, 131, 0.2) 0%,
+      transparent 50%
+    );
 }
 
 .main-menu-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('/images/background.jpg');
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.4) contrast(1.2);
-    z-index: -1;
-    will-change: transform;
-    animation: backgroundShift 30s ease-in-out infinite;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/images/background.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.4) contrast(1.2);
+  z-index: -1;
+  will-change: transform;
+  animation: backgroundShift 30s ease-in-out infinite;
 }
 
 @keyframes backgroundShift {
-    0%, 100% { transform: scale(1) translateZ(0); }
-    50% { transform: scale(1.05) translateZ(0); }
+  0%,
+  100% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.05) translateZ(0);
+  }
 }
 
 /* ===== NAVIGATION BAR ===== */
 .main-navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(26, 26, 46, 0.95);
-    backdrop-filter: blur(15px);
-    border-bottom: 2px solid var(--primary-gold);
-    z-index: 1000;
-    padding: 15px 0;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(26, 26, 46, 0.95);
+  backdrop-filter: blur(15px);
+  border-bottom: 2px solid var(--primary-gold);
+  z-index: 1000;
+  padding: 15px 0;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
 }
 
 .main-nav-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* <<< ĐÂY LÀ DÒNG QUAN TRỌNG NHẤT */
+  padding: 0 20px;
+  
 }
 
+.main-nav-left {
+  display: flex; /* Quan trọng: Dàn logo và menu trên một hàng */
+  align-items: center; /* Căn giữa chúng theo chiều dọc */
+  gap: 50px; /* Tạo khoảng cách 50px giữa logo và menu */
+}
 .main-nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .main-logo-icon {
-    width: 40px;
-    height: 40px;
-    filter: drop-shadow(0 0 10px var(--primary-gold));
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 10px var(--primary-gold));
 }
 
 .main-logo-text {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1.5rem;
-    color: var(--text-gold);
-    text-shadow: 2px 2px 4px var(--shadow-dark);
+  font-family: "MedievalSharp", cursive;
+  font-size: 1.5rem;
+  color: var(--text-gold);
+  text-shadow: 2px 2px 4px var(--shadow-dark);
 }
 
 .main-highlight {
-    color: var(--primary-gold);
+  color: var(--primary-gold);
 }
 
 .main-nav-center {
-    flex: 1;
-    display: flex;
-    justify-content: center;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.main-nav-links {
+  display: flex; /* Dàn các mục menu trên một hàng */
+  list-style: none; /* Bỏ dấu chấm đầu dòng */
+  margin: 0;
+  padding: 0;
+  gap: 40px; /* Tạo khoảng cách giữa các mục menu */
+  align-items: center;
+}
+
+.main-nav-links a {
+  color: #e0e0e0; /* Màu chữ hơi xám */
+  text-decoration: none; /* Bỏ gạch chân */
+  font-family: "MedievalSharp", cursive;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 0;
+  transition: color 0.3s ease; /* Hiệu ứng chuyển màu mượt mà */
+}
+
+.main-nav-links a:hover {
+  color: var(--primary-gold, #f7b731); /* Dùng màu vàng gold nhấn mạnh */
+}
+
+/* Định dạng cho icon mũi tên xuống */
+.main-nav-links a i {
+  font-size: 0.7em;
+  margin-left: 6px;
+  opacity: 0.7;
 }
 
 .main-nav-title {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1.8rem;
-    color: var(--text-gold);
-    text-shadow: 2px 2px 4px var(--shadow-dark);
+  font-family: "MedievalSharp", cursive;
+  font-size: 1.8rem;
+  color: var(--text-gold);
+  text-shadow: 2px 2px 4px var(--shadow-dark);
 }
 
 .main-nav-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar-btn {
+  display: flex;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  align-items: center;     /* Căn giữa theo chiều dọc */
+
+  /* 2. Giữ nguyên các thuộc tính khung tròn */
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-gold);
+  overflow: hidden;
+
+  /* 3. Xóa style mặc định của nút */
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  
+  /* 4. Giữ nguyên hiệu ứng */
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 8px var(--glow-gold));
+}
+
+.avatar-btn:hover {
+  transform: scale(1.1);
+  border-color: var(--secondary-gold);
+  filter: drop-shadow(0 0 15px var(--glow-gold));
 }
 
 .user-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: 2px solid var(--primary-gold);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    filter: drop-shadow(0 0 8px var(--glow-gold));
+  /* Cho ảnh lấp đầy 100% nút tròn cha của nó */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  /* Chúng ta không cần border, border-radius hay clip-path ở đây nữa */
 }
 
 .user-avatar:hover {
-    transform: scale(1.1);
-    border-color: var(--secondary-gold);
-    filter: drop-shadow(0 0 15px var(--glow-gold));
+  transform: scale(1.1);
+  border-color: var(--secondary-gold);
+  filter: drop-shadow(0 0 15px var(--glow-gold));
 }
 
 .logout-btn {
-    padding: 8px 16px;
-    background: transparent;
-    border: 2px solid var(--primary-gold);
-    color: var(--primary-gold);
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-weight: 600;
-    transition: all 0.3s ease;
+  padding: 8px 16px;
+  background: transparent;
+  border: 2px solid var(--primary-gold);
+  color: var(--primary-gold);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-    background: var(--primary-gold);
-    color: var(--dark-blue);
-    box-shadow: 0 0 15px var(--glow-gold);
+  background: var(--primary-gold);
+  color: var(--dark-blue);
+  box-shadow: 0 0 15px var(--glow-gold);
 }
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
-    padding-top: 100px;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 50px;
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 40px;
+  padding-top: 100px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 50px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 40px;
 }
 
 /* ===== USER STATS SIDEBAR ===== */
 .user-stats-sidebar {
-    position: sticky;
-    top: 120px;
-    height: fit-content;
+  position: sticky;
+  top: 120px;
+  height: fit-content;
 }
 
 .stats-card {
-    background: rgba(26, 26, 46, 0.8);
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 20px;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(26, 26, 46, 0.8);
+  border-radius: 20px;
+  padding: 25px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 .stats-title {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1.3rem;
-    color: var(--text-gold);
-    margin-bottom: 20px;
-    text-align: center;
-    text-shadow: 1px 1px 2px var(--shadow-dark);
+  font-family: "MedievalSharp", cursive;
+  font-size: 1.3rem;
+  color: var(--text-gold);
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 1px 1px 2px var(--shadow-dark);
 }
 
 .streak-display {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .streak-number {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--streak-orange);
-    text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
-    display: block;
-    font-family: 'MedievalSharp', cursive;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--streak-orange);
+  text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+  display: block;
+  font-family: "MedievalSharp", cursive;
 }
 
 .streak-label {
-    color: var(--text-light);
-    font-size: 1rem;
-    margin-top: 5px;
+  color: var(--text-light);
+  font-size: 1rem;
+  margin-top: 5px;
 }
 
 .streak-fire {
-    font-size: 2rem;
-    margin: 10px 0;
-    will-change: transform;
-    animation: fireFlicker 3s ease-in-out infinite;
+  font-size: 2rem;
+  margin: 10px 0;
+  will-change: transform;
+  animation: fireFlicker 3s ease-in-out infinite;
 }
 
 @keyframes fireFlicker {
-    0%, 100% { transform: scale(1) translateZ(0); }
-    50% { transform: scale(1.05) translateZ(0); }
+  0%,
+  100% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.05) translateZ(0);
+  }
 }
 
 .user-level {
-    text-align: center;
-    margin-bottom: 15px;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
 .level-badge {
-    background: linear-gradient(45deg, var(--primary-gold), var(--secondary-gold));
-    color: var(--dark-blue);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  background: linear-gradient(
+    45deg,
+    var(--primary-gold),
+    var(--secondary-gold)
+  );
+  color: var(--dark-blue);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .xp-display {
-    margin: 15px 0;
+  margin: 15px 0;
 }
 
 .xp-label {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: var(--text-light);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--text-light);
 }
 
 .xp-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(15, 52, 96, 0.5);
-    border-radius: 4px;
-    overflow: hidden;
+  width: 100%;
+  height: 8px;
+  background: rgba(15, 52, 96, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .xp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--success-green), #66bb6a);
-    border-radius: 4px;
-    transition: width 0.8s ease;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+  height: 100%;
+  background: linear-gradient(90deg, var(--success-green), #66bb6a);
+  border-radius: 4px;
+  transition: width 0.8s ease;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
 }
 
 .daily-advice {
-    background: rgba(83, 52, 131, 0.3);
-    border-radius: 15px;
-    padding: 20px;
-    margin-top: 20px;
-    text-align: center;
-    border: 1px solid rgba(83, 52, 131, 0.5);
+  background: rgba(83, 52, 131, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 20px;
+  text-align: center;
+  border: 1px solid rgba(83, 52, 131, 0.5);
 }
 
 .advice-title {
-    font-family: 'MedievalSharp', cursive;
-    color: var(--text-gold);
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+  font-family: "MedievalSharp", cursive;
+  color: var(--text-gold);
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .advice-text {
-    color: var(--text-light);
-    font-style: italic;
-    line-height: 1.5;
-    font-size: 0.9rem;
+  color: var(--text-light);
+  font-style: italic;
+  line-height: 1.5;
+  font-size: 0.9rem;
 }
 
 .course-card:hover::before {
-    opacity: 1;
+  opacity: 1;
 }
 
 /* ===== COURSES SECTION ===== */
 .courses-main {
-    animation: fadeInRight 0.8s ease-out;
+  animation: fadeInRight 0.8s ease-out;
 }
 
 .welcome-section {
-    margin-bottom: 40px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 20px;
-    padding: 25px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 40px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .welcome-title {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 2.5rem;
-    color: var(--text-gold);
-    margin-bottom: 15px;
-    text-shadow: 
-        3px 3px 6px rgba(0, 0, 0, 0.8),
-        0 0 15px rgba(212, 175, 55, 0.4);
+  font-family: "MedievalSharp", cursive;
+  font-size: 2.5rem;
+  color: var(--text-gold);
+  margin-bottom: 15px;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.4);
 }
 
 .welcome-subtitle {
-    font-size: 1.2rem;
-    color: var(--text-light);
-    margin-bottom: 30px;
-    line-height: 1.6;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  font-size: 1.2rem;
+  color: var(--text-light);
+  margin-bottom: 30px;
+  line-height: 1.6;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .courses-header {
-    margin-bottom: 30px;
-    text-align: center;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .courses-section {
-    background: url('/images/quest_background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 25px;
-    padding: 30px;
-    margin-bottom: 60px;
-    position: relative;
-    overflow: hidden;
+  background: url("/images/quest_background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 25px;
+  padding: 30px;
+  margin-bottom: 60px;
+  position: relative;
+  overflow: hidden;
 }
 
 .courses-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 25px;
-    z-index: 1;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  z-index: 1;
 }
 
 .courses-section > * {
-    position: relative;
-    z-index: 2;
+  position: relative;
+  z-index: 2;
 }
 
 .courses-title {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 2rem;
-    color: var(--text-gold);
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px var(--shadow-dark);
+  font-family: "MedievalSharp", cursive;
+  font-size: 2rem;
+  color: var(--text-gold);
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px var(--shadow-dark);
 }
 
 .courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
-    padding: 20px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  padding: 20px 0;
 }
 
 .course-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 25px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    backdrop-filter: blur(20px);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    will-change: transform;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease,
+    border-color 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  will-change: transform;
 }
 
 .course-card:hover {
-    transform: translateY(-10px);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.3),
-        0 0 30px rgba(212, 175, 55, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border-color: rgba(212, 175, 55, 0.4);
+  transform: translateY(-10px);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(212, 175, 55, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: rgba(212, 175, 55, 0.4);
 }
 
 .course-title {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1.5rem;
-    color: var(--text-gold);
-    margin-bottom: 12px;
-    text-shadow: 
-        2px 2px 4px rgba(0, 0, 0, 0.8),
-        0 0 10px rgba(212, 175, 55, 0.3);
-    position: relative;
-    z-index: 2;
+  font-family: "MedievalSharp", cursive;
+  font-size: 1.5rem;
+  color: var(--text-gold);
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(212, 175, 55, 0.3);
+  position: relative;
+  z-index: 2;
 }
 
 .course-description {
-    color: var(--text-light);
-    margin-bottom: 20px;
-    line-height: 1.5;
-    font-size: 0.95rem;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-    position: relative;
-    z-index: 2;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  position: relative;
+  z-index: 2;
 }
 
 .course-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .course-level {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-shadow: 
-        2px 2px 4px rgba(0, 0, 0, 0.8),
-        0 0 8px rgba(0, 0, 0, 0.6);
-    background: rgba(0, 0, 0, 0.4);
-    padding: 4px 8px;
-    border-radius: 12px;
-    backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
 }
 
 .course-lessons {
-    color: #ffffff;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-shadow: 
-        1px 1px 3px rgba(0, 0, 0, 0.8),
-        0 0 6px rgba(0, 0, 0, 0.6);
-    background: rgba(0, 0, 0, 0.3);
-    padding: 4px 8px;
-    border-radius: 10px;
-    backdrop-filter: blur(3px);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 10px;
+  backdrop-filter: blur(3px);
 }
 
 .course-progress {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .progress-label {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: var(--text-light);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--text-light);
 }
 
 .progress-bar {
-    width: 100%;
-    height: 6px;
-    background: rgba(15, 52, 96, 0.5);
-    border-radius: 3px;
-    overflow: hidden;
+  width: 100%;
+  height: 6px;
+  background: rgba(15, 52, 96, 0.5);
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-gold), var(--secondary-gold));
-    border-radius: 3px;
-    transition: width 0.3s ease;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--primary-gold),
+    var(--secondary-gold)
+  );
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
 .course-action {
-    text-align: center;
+  text-align: center;
 }
 
 .start-course-btn,
 .continue-course-btn {
-    padding: 10px 20px;
-    background: linear-gradient(45deg, var(--primary-gold), var(--secondary-gold));
-    border: none;
-    border-radius: 8px;
-    color: var(--dark-blue);
-    font-family: 'Cinzel', serif;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
+  padding: 10px 20px;
+  background: linear-gradient(
+    45deg,
+    var(--primary-gold),
+    var(--secondary-gold)
+  );
+  border: none;
+  border-radius: 8px;
+  color: var(--dark-blue);
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .continue-course-btn {
-    background: linear-gradient(45deg, var(--accent-purple), var(--light-blue));
-    color: var(--text-light);
+  background: linear-gradient(45deg, var(--accent-purple), var(--light-blue));
+  color: var(--text-light);
 }
 
 .start-course-btn:hover,
 .continue-course-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
 }
 
 /* ===== ANIMATIONS ===== */
 @keyframes fadeInRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px) translateZ(0);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0) translateZ(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(20px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateZ(0);
+  }
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
-    .main-content {
-        grid-template-columns: 280px 1fr;
-        gap: 30px;
-    }
+  .main-content {
+    grid-template-columns: 280px 1fr;
+    gap: 30px;
+  }
 }
 
 @media (max-width: 968px) {
-    .main-content {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .user-stats-sidebar {
-        position: static;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-    }
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .user-stats-sidebar {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
 }
 
 @media (max-width: 768px) {
-    .main-nav-container {
-        padding: 0 15px;
-    }
-    
-    .main-nav-title {
-        font-size: 1.4rem;
-    }
-    
-    .main-logo-text {
-        font-size: 1.2rem;
-    }
-    
-    .welcome-title {
-        font-size: 2rem;
-    }
-    
-    .courses-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-card {
-        padding: 20px;
-    }
-    
-    .main-nav-right {
-        gap: 15px;
-    }
-    
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-    }
+  .main-nav-container {
+    padding: 0 15px;
+  }
+
+  .main-nav-title {
+    font-size: 1.4rem;
+  }
+
+  .main-logo-text {
+    font-size: 1.2rem;
+  }
+
+  .welcome-title {
+    font-size: 2rem;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-card {
+    padding: 20px;
+  }
+
+  .main-nav-right {
+    gap: 15px;
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 @media (max-width: 480px) {
-    .main-content {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-    
-    .welcome-title {
-        font-size: 1.8rem;
-    }
-    
-    .course-card {
-        padding: 20px;
-    }
-    
-    .main-nav-center {
-        display: none;
-    }
+  .main-content {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .welcome-title {
+    font-size: 1.8rem;
+  }
+
+  .course-card {
+    padding: 20px;
+  }
+
+  .main-nav-center {
+    display: none;
+  }
 }
+.dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 120%; /* Đặt menu con ngay dưới link cha, tạo khoảng hở nhỏ */
+  left: 0;
+
+  /* Cải tiến giao diện */
+  background-color: rgba(44, 44, 62, 0.9); /* Nền tối hơn và hơi trong suốt */
+  backdrop-filter: blur(10px); /* Hiệu ứng kính mờ (rất đẹp) */
+  border: 1px solid var(--primary-gold); /* Thêm viền vàng đồng bộ */
+  border-radius: 8px; /* Bo tròn góc mềm mại hơn */
+  padding: 8px; /* Thêm padding bên trong khung */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Đổ bóng tạo chiều sâu */
+  min-width: 220px; /* Tăng độ rộng tối thiểu một chút */
+  z-index: 1000;
+
+  /* Hiệu ứng xuất hiện mượt mà */
+  animation: fadeIn 0.3s ease-out;
+}
+
+.main-nav-links a.dropdown-item {
+  color: var(--text-light);
+  padding: 10px 15px; /* QUAN TRỌNG: 15px đệm trái/phải */
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.main-nav-links a.dropdown-item:hover {
+  background-color: var(--primary-gold);
+  color: var(--dark-blue); /* Quy tắc này giờ đã đủ mạnh để được áp dụng */
+}
+
+.nav-item-dropdown {
+  position: relative;
+  cursor: pointer;
+}
+.nav-link-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Khoảng cách giữa chữ và icon mũi tên */
+  
+  /* Sao chép các thuộc tính từ .main-nav-links a */
+  color: #e0e0e0;
+  font-family: inherit; /* Kế thừa font từ thẻ cha */
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 0;
+  transition: color 0.3s ease;
+}
+
+.nav-link-button:hover {
+  color: var(--primary-gold);
+}
+.logo-link {
+  text-decoration: none; /* Bỏ gạch chân */
+  color: inherit;        /* Giữ nguyên màu chữ gốc */
+  cursor: pointer;
+}
+
+.main-nav-links a {
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  
+  /* Xóa padding ở đây để nó không gây nhiễu */
+  /* padding: 10px 0; */ 
+}
+
+/* ▼▼▼ THAY THẾ BẰNG CÁC QUY TẮC CỤ THỂ HƠN NÀY ▼▼▼ */
+/* Style mới cho các nút nhấn */
+.main-nav-links .nav-button {
+  display: inline-block;
+  padding: 8px 20px; /* Tạo kích thước cho nút */
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-light);
+  font-family: "MedievalSharp", cursive;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Hiệu ứng khi di chuột vào hoặc khi nút đang active */
+.main-nav-links .nav-button:hover {
+  background-color: transparent;    /* 1. Giữ nền trong suốt */
+  color: var(--primary-gold);     /* 2. Đổi màu chữ thành vàng */
+  /* border-color: var(--primary-gold);  
+  
+
+  box-shadow: 0 0 15px var(--glow-gold);
+  transform: translateY(-2px); */
+}
+
+/* .nav-button {
+  display: inline-block;
+  padding: 8px 20px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-light);
+  font-family: "MedievalSharp", cursive;
+  font-size: 1.8rem;
+  transition: all 0.3s ease;
+  cursor: pointer; 
+}
+
+
+.nav-button:hover {
+  background-color: var(--primary-gold);
+  color: var(--dark-blue);
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 15px var(--glow-gold);
+  transform: translateY(-2px);
+} */
