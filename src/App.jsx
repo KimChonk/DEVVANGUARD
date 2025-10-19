@@ -6,6 +6,8 @@ import ForgotPassword from "./pages/Account/ForgotPassword";
 import MainMenu from "./pages/Menu/MainMenu";
 import CourseScreen from "./pages/Course/CourseScreen";
 import LessonScreen from "./pages/Lesson/LessonScreen";
+import ProfileScreen from "./pages/Profile/ProfileScreen";
+import LeaderboardScreen from "./pages/Leaderboard/LeaderboardScreen";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/main-menu" element={<MainMenu />} />
         <Route path="/course/:courseId" element={<CourseScreen />} />
         <Route path="/lesson/:lessonId" element={<LessonScreen />} />
+        <Route path="/profile" element={<ProfileScreen />} />
+        <Route path="/leaderboards" element={<LeaderboardScreen />} />
       </Routes>
     </BrowserRouter>
   );
