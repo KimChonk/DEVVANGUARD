@@ -1,8 +1,8 @@
 // src/pages/Lesson/LessonScreen.jsx
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "../../assets/CSS/lessonscreen.css"; // Dùng file CSS cuối cùng ở Bước 2
+import "../../assets/CSS/lessonscreen.css"; // Dùng file CSS đã cập nhật ở Bước 2
 
 export default function LessonScreen() {
   const navigate = useNavigate();
@@ -14,6 +14,12 @@ export default function LessonScreen() {
 
   // State cho Mobile View
   const [activeMobileTab, setActiveMobileTab] = useState('learn'); // 'learn', 'code', 'output'
+  const [isLessonMobileMenuOpen, setLessonMobileMenuOpen] = useState(false); // State cho menu hamburger
+  const [lessonMobileMenuView, setLessonMobileMenuView] = useState('main');
+
+
+  const [isAvatarMenuOpen, setAvatarMenuOpen] = useState(false); // State cho avatar dropdown
+  const avatarMenuRef = useRef(null); // Ref cho avatar dropdown
 
   // Logic tải dữ liệu lesson (thay thế bằng API thật nếu cần)
   const [lesson] = useState(() => {
@@ -84,6 +90,7 @@ export default function LessonScreen() {
     setShowHint(false);
     setCurrentHintIndex(0);
     setActiveMobileTab('learn'); // Reset về tab learn
+    setLessonMobileMenuView('main'); // Reset menu hamburger
   }, [lesson.initialCode, lesson.id]); // Phụ thuộc vào lesson.id
 
   // useEffect cho timer khóa
@@ -104,6 +111,26 @@ export default function LessonScreen() {
     }
     return () => clearInterval(timer); // Cleanup
   }, [isLocked, lockTimeRemaining]);
+
+  useEffect(() => {
+    function updateBodyLock() {
+      const isMobile = window.innerWidth <= 768;
+      const overlayOpen = isLessonMobileMenuOpen || activeMobileTab === 'code' || activeMobileTab === 'output'|| activeMobileTab === 'learn';
+      if (isMobile && overlayOpen) {
+        document.body.classList.add('no-scroll');
+      } else {
+        document.body.classList.remove('no-scroll');
+      }
+    }
+
+    // run once and on resize
+    updateBodyLock();
+    window.addEventListener('resize', updateBodyLock);
+    return () => {
+      window.removeEventListener('resize', updateBodyLock);
+      document.body.classList.remove('no-scroll');
+    };
+  }, [isLessonMobileMenuOpen, activeMobileTab]);
 
   // Các hàm callback
   const handleBackToCourse = useCallback(() => navigate("/main-menu"), [navigate]);
@@ -216,6 +243,47 @@ export default function LessonScreen() {
     }
   };
 
+  
+  // const handleAvatarNav = (path) => {
+  //     navigate(path);
+  //     setAvatarMenuOpen(false);
+  // }
+
+  // useEffect(() => {
+  //   function handleClickOutside(event) {
+  //     if (avatarMenuRef.current && !avatarMenuRef.current.contains(event.target) && !event.target.closest('.mobile-avatar-btn')) {
+  //        setAvatarMenuOpen(false);
+  //     }
+  //   }
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, [avatarMenuRef]);
+
+
+  const toggleLessonMobileMenu = useCallback(() => {
+    setLessonMobileMenuOpen(prev => !prev);
+    // Reset to main view when opening/closing
+    if (!isLessonMobileMenuOpen) {
+        setLessonMobileMenuView('main');
+    }
+  }, [isLessonMobileMenuOpen]);
+
+  const showAccountView = useCallback(() => setLessonMobileMenuView('account'), []);
+  const showMainMenuView = useCallback(() => setLessonMobileMenuView('main'), []);
+
+  // Navigation (closes the entire side menu)
+  const handleLessonMobileNav = useCallback((path) => {
+      navigate(path);
+      setLessonMobileMenuOpen(false);
+  }, [navigate]);
+
+   // Logout (closes the entire side menu)
+   const handleLogout = useCallback(() => {
+    setLessonMobileMenuOpen(false);
+    // Add token/session clearing logic if needed
+    navigate("/login");
+  }, [navigate]);
+  
   return (
     <div className="lesson-screen-container">
       <div className="lesson-background"></div>
@@ -229,8 +297,13 @@ export default function LessonScreen() {
           <h1 className="lesson-nav-title">{lesson.title}</h1>
           <div className="lesson-nav-right">
             <img
-              src={user.avatar} alt="User Avatar" className="user-avatar"
+              src={user.avatar}
+              alt="User Avatar"
+              className="user-avatar clickable-avatar"
               onError={(e) => { e.target.src = "/icons/knight_icon.png"; }}
+              onClick={() => navigate('/profile')}
+              role="button"
+              aria-label="Go to profile"
             />
           </div>
         </div>
@@ -239,7 +312,7 @@ export default function LessonScreen() {
       {/* ===== Navbar Mobile (Chỉ hiện trên mobile) ===== */}
       <nav className="mobile-lesson-navbar mobile-only">
         <div className="mobile-nav-left">
-          <div className="mobile-logo">
+          <div className="mobile-logo" onClick={() => navigate('/main-menu')} style={{ cursor: 'pointer' }}>
              <img src="/icons/knight_icon.png" alt="Logo" style={{ width: '30px', height: '30px' }} />
           </div>
         </div>
@@ -249,18 +322,33 @@ export default function LessonScreen() {
           <button className={`mobile-tab ${activeMobileTab === 'output' ? 'active' : ''}`} onClick={() => setActiveMobileTab('output')}>Output</button>
         </div>
         <div className="mobile-nav-right">
-          <button className="mobile-hamburger"><i className="fas fa-bars"></i></button>
+          {/* <div className="avatar-menu-container mobile-avatar-container" ref={avatarMenuRef}>
+             <button className="avatar-btn mobile-avatar-btn" onClick={toggleAvatarMenu}>
+               <img src={user.avatar} alt="User Avatar" className="user-avatar"/>
+             </button>
+             {isAvatarMenuOpen && (
+              <div className="avatar-dropdown-menu">
+                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile')}>
+                  <i className="fas fa-user-circle icon-padding"></i> Profile
+                </button>
+                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile/edit')}>
+                   <i className="fas fa-cog icon-padding"></i> Account
+                </button>
+              </div>
+             )}
+          </div> */}
+          <button className="mobile-hamburger" onClick={toggleLessonMobileMenu}>
+            <i className="fas fa-bars"></i>
+          </button>
         </div>
       </nav>
 
       {/* ===== Nội dung chính ===== */}
       <div className="lesson-main-content">
 
-        {/* --- PANEL HỌC (Luôn thấy trên desktop, tab trên mobile) --- */}
-        <div className={`lesson-learn-panel ${activeMobileTab !== 'learn' ? 'mobile-hidden' : ''}`}>
-           {/* Mobile subheader */}
+        {/* --- PANEL HỌC --- */}
+        <div className={`lesson-learn-panel ${activeMobileTab === 'learn' ? 'active-mobile-panel' : ''}`}>
            <div className="mobile-only mobile-lesson-subheader"><span>Exercise</span></div>
-           {/* Desktop header */}
            <div className="lesson-header desktop-only">
              <h1 className="lesson-title">{lesson.title}</h1>
              <div className="lesson-difficulty">
@@ -268,36 +356,22 @@ export default function LessonScreen() {
                <div className="lesson-tags">{lesson.tags.map((tag, index) => <span key={index} className="lesson-tag">{tag}</span>)}</div>
              </div>
            </div>
-           {/* Khu vực nội dung cuộn được */}
            <div className="lesson-content">
-             {/* Mobile Title */}
              <h2 className="mobile-only mobile-lesson-title">{lesson.id}. {lesson.title}</h2>
              <p className="mobile-only mobile-lesson-language"># {lesson.tags.includes("Python Basics") ? "Python" : (lesson.tags.includes("Java") ? "Java" : "Code")}</p>
-             {/* Problem Description */}
              <div className="lesson-section">
                <h3 className="section-title desktop-only">📜 Problem Description</h3>
                <p className="lesson-description desktop-only">{lesson.problem}</p>
                <p className="lesson-description mobile-only">{lesson.description} 🚀</p>
-               {/* <img src="/images/java_example.png" alt="Java Coffee" className="mobile-only lesson-illustration"/> */}
              </div>
-             {/* Test Cases & Hints chỉ trên Desktop */}
              <div className="lesson-section desktop-only">
                <h3 className="section-title">🧪 Test Cases</h3>
                {lesson.testCases.map((testCase) => {
                  const result = testResults.find(r => r.id === testCase.id);
                  return (
                    <div key={testCase.id} className={`test-case-box ${result ? (result.passed ? 'test-passed' : 'test-failed') : 'test-pending'}`}>
-                     <div className="test-case-header">
-                       <span className="test-case-name">{testCase.name}</span>
-                       <span className={`test-status ${result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'}`}>{result ? (result.passed ? '✅' : '❌') : '⏳'}</span>
-                     </div>
-                     <div className="test-details">
-                       <p className="test-case-description">{testCase.description}</p>
-                       <div className="test-case-output">
-                         <div className="expected-output"><strong>Expected:</strong> <code>{testCase.expectedOutput}</code></div>
-                         {result && (<div className={`actual-output ${result.passed ? 'output-correct' : 'output-incorrect'}`}><strong>Your output:</strong> <code>{result.actualOutput || 'No output'}</code></div>)}
-                       </div>
-                     </div>
+                     <div className="test-case-header"><span className="test-case-name">{testCase.name}</span><span className={`test-status ${result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'}`}>{result ? (result.passed ? '✅' : '❌') : '⏳'}</span></div>
+                     <div className="test-details"><p className="test-case-description">{testCase.description}</p><div className="test-case-output"><div className="expected-output"><strong>Expected:</strong> <code>{testCase.expectedOutput}</code></div>{result && (<div className={`actual-output ${result.passed ? 'output-correct' : 'output-incorrect'}`}><strong>Your output:</strong> <code>{result.actualOutput || 'No output'}</code></div>)}</div></div>
                    </div>
                  );
                })}
@@ -306,130 +380,67 @@ export default function LessonScreen() {
                <div className="lesson-section hint-section desktop-only">
                  <h3 className="section-title">💡 Knight's Assistant</h3>
                  <div className="hint-box">
-                   <div className="hint-header">
-                     <span className="hint-title">Need some guidance?</span>
-                     <span className="lockout-timer">🔒 {lockTimeRemaining}s</span>
-                   </div>
+                   <div className="hint-header"><span className="hint-title">Need some guidance?</span><span className="lockout-timer">🔒 {lockTimeRemaining}s</span></div>
                    <p className="hint-text">{lesson.hints[currentHintIndex]}</p>
-                   <div className="hint-navigation">
-                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}>← Prev</button>
-                     <span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span>
-                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}>Next →</button>
-                   </div>
+                   <div className="hint-navigation"><button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}>← Prev</button><span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span><button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}>Next →</button></div>
                  </div>
                </div>
              )}
-             {/* Nút "Start Coding" cho mobile */}
              <button className="mobile-only start-coding-btn" onClick={() => setActiveMobileTab('code')}>
                <i className="fas fa-code"></i> Start coding
              </button>
            </div>
         </div>
 
-        {/* === THẺ BAO BỌC CHO PHẦN BÊN PHẢI DESKTOP === */}
+        {/* --- THẺ BAO BỌC BÊN PHẢI DESKTOP --- */}
         <div className="lesson-right-wrapper desktop-only-flex">
-            {/* --- PANEL CODE (Một phần bên phải desktop) --- */}
             <div className="lesson-code-panel">
                 <div className="editor-header">
-                     <div className="editor-tabs">
-                       <div className="editor-tab active"><i className="fas fa-code"></i> Solution.{lesson.tags.includes("Python Basics") ? 'py' : 'java'}</div>
-                     </div>
+                     <div className="editor-tabs"><div className="editor-tab active"><i className="fas fa-code"></i> Solution.{lesson.tags.includes("Python Basics") ? 'py' : 'java'}</div></div>
                      <div className="editor-actions">
-                        <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}>
-                           <i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
-                           <span className="desktop-only">{isRunning ? 'Running...' : 'Run Code'}</span>
-                           {/* Mobile text handled in CSS */}
-                        </button>
-                        <button className="submit-btn" onClick={submitCode} disabled={isLocked || isRunning}>
-                           <i className="fas fa-check"></i>
-                           <span className="desktop-only">{isLocked ? `Locked (${lockTimeRemaining}s)` : 'Submit'}</span>
-                           {/* Mobile text handled in CSS */}
-                        </button>
-                        <button className="reset-btn" onClick={resetCode} disabled={isLocked}>
-                           <i className="fas fa-undo"></i> <span className="desktop-only">Reset</span>
-                        </button>
+                        <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}><i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i><span className="desktop-only">{isRunning ? 'Running...' : 'Run Code'}</span></button>
+                        <button className="submit-btn" onClick={submitCode} disabled={isLocked || isRunning}><i className="fas fa-check"></i><span className="desktop-only">{isLocked ? `Locked (${lockTimeRemaining}s)` : 'Submit'}</span></button>
+                        <button className="reset-btn" onClick={resetCode} disabled={isLocked}><i className="fas fa-undo"></i> <span className="desktop-only">Reset</span></button>
                      </div>
                 </div>
                 <div className="editor-content">
-                     <textarea
-                       className={`code-editor ${isLocked ? 'editor-locked' : ''}`}
-                       value={code}
-                       onChange={(e) => setCode(e.target.value)}
-                       placeholder="Write your code here..."
-                       spellCheck={false}
-                       disabled={isLocked}
-                     />
+                     <textarea className={`code-editor ${isLocked ? 'editor-locked' : ''}`} value={code} onChange={(e) => setCode(e.target.value)} placeholder="Write your code here..." spellCheck={false} disabled={isLocked} />
                 </div>
             </div>
-            {/* --- PANEL OUTPUT (Một phần bên phải desktop) --- */}
             <div className="lesson-output-panel">
                 <div className="console-section">
-                    <div className="console-header">
-                        <h3 className="console-title">🖥️ Console Output</h3>
-                        <button className="clear-console-btn" onClick={clearConsole}><i className="fas fa-trash"></i> <span className="desktop-only">Clear</span></button>
-                    </div>
-                    <div className="console-output">
-                        {consoleOutput.length === 0 ? ( <div className="console-empty">Click "Run Code" to see output...</div> )
-                         : ( consoleOutput.map((line, index) => ( <div key={index} className={`console-line ${line.type}`}><span className="console-timestamp">[{line.timestamp}]</span> {line.message}</div> )))}
-                    </div>
+                    <div className="console-header"><h3 className="console-title">🖥️ Console Output</h3><button className="clear-console-btn" onClick={clearConsole}><i className="fas fa-trash"></i> <span className="desktop-only">Clear</span></button></div>
+                    <div className="console-output">{consoleOutput.length === 0 ? ( <div className="console-empty">Click "Run Code" to see output...</div> ) : ( consoleOutput.map((line, index) => ( <div key={index} className={`console-line ${line.type}`}><span className="console-timestamp">[{line.timestamp}]</span> {line.message}</div> )))}</div>
                 </div>
             </div>
         </div>
 
-        {/* --- CÁC PANEL CHỈ DÀNH CHO MOBILE (Hiển thị riêng lẻ) --- */}
-         <div className={`lesson-code-panel mobile-only-flex ${activeMobileTab !== 'code' ? 'mobile-hidden' : ''}`}>
+        {/* --- CÁC PANEL CHỈ DÀNH CHO MOBILE --- */}
+         <div className={`lesson-code-panel mobile-panel ${activeMobileTab === 'code' ? 'active-mobile-panel' : ''}`}>
              <div className="editor-header">
                  <div className="editor-actions">
-                    <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}>
-                       <i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
-                       <span className="mobile-only">Run</span>
-                    </button>
-                    <button className="submit-btn" onClick={submitCode} disabled={isLocked || isRunning}>
-                       <i className="fas fa-check"></i>
-                       <span className="mobile-only">{isLocked ? `(${lockTimeRemaining}s)` : 'Submit'}</span>
-                    </button>
-                    <button className="reset-btn" onClick={resetCode} disabled={isLocked}>
-                       <i className="fas fa-undo"></i> {/* Chỉ icon */}
-                    </button>
+                    <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}><i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i><span className="mobile-only">Run</span></button>
+                    <button className="submit-btn" onClick={submitCode} disabled={isLocked || isRunning}><i className="fas fa-check"></i><span className="mobile-only">{isLocked ? `(${lockTimeRemaining}s)` : 'Submit'}</span></button>
+                    <button className="reset-btn" onClick={resetCode} disabled={isLocked}><i className="fas fa-undo"></i></button>
                  </div>
              </div>
              <div className="editor-content">
-                 <textarea
-                   className={`code-editor ${isLocked ? 'editor-locked' : ''}`}
-                   value={code} onChange={(e) => setCode(e.target.value)}
-                   placeholder="Write your code here..." spellCheck={false} disabled={isLocked}
-                 />
+                 <textarea className={`code-editor ${isLocked ? 'editor-locked' : ''}`} value={code} onChange={(e) => setCode(e.target.value)} placeholder="Write your code here..." spellCheck={false} disabled={isLocked}/>
              </div>
          </div>
-         <div className={`lesson-output-panel mobile-only-flex ${activeMobileTab !== 'output' ? 'mobile-hidden' : ''}`}>
+         <div className={`lesson-output-panel mobile-panel ${activeMobileTab === 'output' ? 'active-mobile-panel' : ''}`}>
              <div className="console-section">
-                 <div className="console-header">
-                    <h3 className="console-title">🖥️ Console Output</h3>
-                    <button className="clear-console-btn" onClick={clearConsole}><i className="fas fa-trash"></i></button>
-                 </div>
-                 <div className="console-output">
-                    {consoleOutput.length === 0 ? ( <div className="console-empty">Click "Run Code" to see output...</div> )
-                         : ( consoleOutput.map((line, index) => ( <div key={index} className={`console-line ${line.type}`}><span className="console-timestamp">[{line.timestamp}]</span> {line.message}</div> )))}
-                 </div>
+                 <div className="console-header"><h3 className="console-title">🖥️ Console Output</h3><button className="clear-console-btn" onClick={clearConsole}><i className="fas fa-trash"></i></button></div>
+                 <div className="console-output">{consoleOutput.length === 0 ? ( <div className="console-empty">Click "Run Code" to see output...</div> ) : ( consoleOutput.map((line, index) => ( <div key={index} className={`console-line ${line.type}`}><span className="console-timestamp">[{line.timestamp}]</span> {line.message}</div> )))}</div>
              </div>
-             {/* Test cases và Hints chỉ hiển thị ở đây trên mobile */}
              <div className="lesson-section mobile-test-cases">
                  <h3 className="section-title">🧪 Test Cases</h3>
                  {lesson.testCases.map((testCase) => {
                      const result = testResults.find(r => r.id === testCase.id);
                       return (
                        <div key={testCase.id} className={`test-case-box ${result ? (result.passed ? 'test-passed' : 'test-failed') : 'test-pending'}`}>
-                         <div className="test-case-header">
-                           <span className="test-case-name">{testCase.name}</span>
-                           <span className={`test-status ${result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'}`}>{result ? (result.passed ? '✅' : '❌') : '⏳'}</span>
-                         </div>
-                         <div className="test-details">
-                           <p className="test-case-description">{testCase.description}</p>
-                           <div className="test-case-output">
-                             <div className="expected-output"><strong>Expected:</strong> <code>{testCase.expectedOutput}</code></div>
-                             {result && (<div className={`actual-output ${result.passed ? 'output-correct' : 'output-incorrect'}`}><strong>Your output:</strong> <code>{result.actualOutput || 'No output'}</code></div>)}
-                           </div>
-                         </div>
+                         <div className="test-case-header"><span className="test-case-name">{testCase.name}</span><span className={`test-status ${result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'}`}>{result ? (result.passed ? '✅' : '❌') : '⏳'}</span></div>
+                         <div className="test-details"><p className="test-case-description">{testCase.description}</p><div className="test-case-output"><div className="expected-output"><strong>Expected:</strong> <code>{testCase.expectedOutput}</code></div>{result && (<div className={`actual-output ${result.passed ? 'output-correct' : 'output-incorrect'}`}><strong>Your output:</strong> <code>{result.actualOutput || 'No output'}</code></div>)}</div></div>
                        </div>
                      );
                  })}
@@ -438,16 +449,9 @@ export default function LessonScreen() {
                <div className="lesson-section hint-section mobile-hint">
                  <h3 className="section-title">💡 Knight's Assistant</h3>
                  <div className="hint-box">
-                   <div className="hint-header">
-                     <span className="hint-title">Need some guidance?</span>
-                     <span className="lockout-timer">🔒 {lockTimeRemaining}s</span>
-                   </div>
+                   <div className="hint-header"><span className="hint-title">Need some guidance?</span><span className="lockout-timer">🔒 {lockTimeRemaining}s</span></div>
                    <p className="hint-text">{lesson.hints[currentHintIndex]}</p>
-                   <div className="hint-navigation">
-                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}>← Prev</button>
-                     <span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span>
-                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}>Next →</button>
-                   </div>
+                   <div className="hint-navigation"><button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}>← Prev</button><span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span><button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}>Next →</button></div>
                  </div>
                </div>
              )}
@@ -455,8 +459,91 @@ export default function LessonScreen() {
 
       </div> {/* Kết thúc lesson-main-content */}
 
+      {/* ===== Menu Hamburger Mobile ===== */}
+      <div className={`lesson-mobile-side-menu mobile-only ${isLessonMobileMenuOpen ? 'open' : ''}`}>
+          {/* === CONDITIONAL RENDERING BASED ON VIEW === */}
+
+          {/* --- Main Menu View --- */}
+          {lessonMobileMenuView === 'main' && (
+              <>
+                <div className="mobile-menu-header">
+                    <button className="mobile-menu-close" onClick={toggleLessonMobileMenu}><i className="fas fa-times"></i></button>
+                    <span>Menu</span>
+                </div>
+                <ul className="mobile-menu-list">
+                    {/* Account Button */}
+                    <li>
+                        <a onClick={showAccountView} className="menu-section-link"> {/* Add class for styling */}
+                            <span>
+                                {/* Thay bằng thẻ img */}
+                                <img 
+                                  src={user.avatar} 
+                                  alt="Avatar" 
+                                  className="menu-avatar mobile-only"
+                                  onError={(e) => { e.target.src = "/icons/knight_icon.png"; }} // Dự phòng nếu ảnh lỗi
+                                />
+                                Account
+                            </span>
+                            <i className="fas fa-chevron-right arrow-right"></i> {/* Right arrow */}
+                        </a>
+                    </li>
+                    <hr className="mobile-divider" />
+                    {/* Other Links */}
+                    <li><a onClick={() => handleLessonMobileNav('/main-menu')}><i className="fas fa-scroll icon-padding"></i> Quests</a></li>
+                    <li><a onClick={() => handleLessonMobileNav('/practice')}><i className="fas fa-dumbbell icon-padding"></i> Practice</a></li>
+                    <li><a onClick={() => handleLessonMobileNav('/build')}><i className="fas fa-hammer icon-padding"></i> Build</a></li>
+                    <li><a onClick={() => handleLessonMobileNav('/leaderboards')}><i className="fas fa-trophy icon-padding"></i> Leaderboards</a></li>
+                    {/* Logout can stay here or move to account menu */}
+                    {/* <hr className="mobile-divider" />
+                    <li><a onClick={handleLogout}><i className="fas fa-sign-out-alt icon-padding"></i> Logout</a></li> */}
+                </ul>
+              </>
+          )}
+
+          {/* --- Account Submenu View --- */}
+          {lessonMobileMenuView === 'account' && (
+              <div className="mobile-submenu"> {/* Use a wrapper */}
+                  <div className="submenu-header"> {/* Reusable header style */}
+                      <button onClick={showMainMenuView} className="back-to-menu-btn">
+                          <i className="fas fa-chevron-left"></i> Back to menu
+                      </button>
+                      {/* Optional: Add Title */}
+                      {/* <h2>Account</h2> */}
+                  </div>
+                  <ul className="mobile-menu-list submenu-list"> {/* Reusable list style */}
+                      <li>
+                          <a onClick={() => handleLessonMobileNav('/profile')}>
+                              <i className="fas fa-user-circle icon-padding"></i> Profile
+                          </a>
+                      </li>
+                      <li>
+                           {/* Using cog icon for Settings/Edit Profile */}
+                          <a onClick={() => handleLessonMobileNav('/profile/edit')}>
+                              <i className="fas fa-cog icon-padding"></i> Settings
+                          </a>
+                      </li>
+                      
+                      <hr className="mobile-divider" />
+                      <li>
+                          <a onClick={handleLogout}>
+                              <i className="fas fa-sign-out-alt icon-padding"></i> Sign out
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          )}
+          {/* ======================================= */}
+      </div>
+
+
       {/* Floating elements (Chỉ desktop) */}
-       <div className="floating-elements desktop-only">{/* ... Nội dung floating elements ... */}</div>
+       <div className="floating-elements desktop-only">
+            {/* Thêm các div rỗng hoặc nội dung cho floating elements */}
+            <div className="floating-sword"></div>
+            <div className="floating-shield"></div>
+            <div className="floating-gem"></div>
+            <div className="floating-scroll"></div>
+       </div>
     </div>
   );
 }

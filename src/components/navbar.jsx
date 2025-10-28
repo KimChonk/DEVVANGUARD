@@ -12,6 +12,14 @@ export default function navbar() {
     avatar: "/images/default-avatar.jpg",
   });
 
+  // detect mobile breakpoint to change avatar behavior
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 1064 : false);
+  useEffect(() => {
+    function onResize() { setIsMobile(window.innerWidth <= 1064); }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   const [courses] = useState([
     { id: 1, title: "Python Mastery" },
     { id: 2, title: "HTML & CSS Foundations" },
@@ -32,6 +40,7 @@ export default function navbar() {
   const handleMenuLeave = useCallback(() => setLearnMenuOpen(false), []);
   const showQuestsView = useCallback(() => setMobileMenuView("quests"), []);
   const showMainView = useCallback(() => setMobileMenuView("main"), []);
+  const showAccountView = useCallback(() => setMobileMenuView("account"), []);
   const toggleMobileMenu = useCallback(() => setMobileMenuOpen((p) => !p), []);
 
   const handleCourseClick = useCallback(
@@ -143,62 +152,113 @@ export default function navbar() {
         
         <div className="main-nav-right">
           <div className="avatar-menu-container" ref={avatarMenuRef}> {/* Thêm thẻ div và ref */}
-            <button className="avatar-btn" onClick={handleAvatarClick}> {/* onClick đã được sửa */}
-              <img
-                src={user.avatar}
-                alt="User Avatar"
-                className="user-avatar"
-              />
-            </button>
-
-            {/* === THÊM MỚI: Avatar Dropdown Menu === */}
-            {isAvatarMenuOpen && (
-              <div className="avatar-dropdown-menu">
-                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile')}>
-                  <i className="fas fa-user-circle icon-padding"></i> Profile
-                </button>
-                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile/edit')}>
-                   <i className="fas fa-cog icon-padding"></i> Account {/* Hoặc dùng icon khác */}
-                </button>
-                 {/* Bạn có thể thêm nút Logout vào đây nếu muốn */}
-                 {/* <hr className="dropdown-divider" />
-                 <button className="avatar-dropdown-item logout" onClick={handleLogout}>
-                   <i className="fas fa-sign-out-alt icon-padding"></i> Logout
-                 </button> */}
-              </div>
+            {/* Avatar only on desktop; on mobile we open the hamburger menu via .mobile-hamburger */}
+            {!isMobile && (
+              <button
+                className="avatar-btn"
+                onClick={handleAvatarClick}
+              >
+                <img src={user.avatar} alt="User Avatar" className="user-avatar" />
+              </button>
             )}
-            {/* ================================== */}
-          </div>
+ 
+             {/* Desktop avatar dropdown only */}
+             {isAvatarMenuOpen && !isMobile && (
+               <div className="avatar-dropdown-menu">
+                 <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile')}>
+                   <i className="fas fa-user-circle icon-padding"></i> Profile
+                 </button>
+                 <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile/edit')}>
+                    <i className="fas fa-cog icon-padding"></i> Settings
+                 </button>
+               </div>
+             )}
+              {/* ================================== */}
+           </div>
           <button className="logout-btn" onClick={handleLogout}>
             <i className="fas fa-sign-out-alt"></i>
             <span>Logout</span>
           </button>
           
-          <button className="hamburger-btn" onClick={toggleMobileMenu}>
-            <i
-              className={`fas ${isMobileMenuOpen ? "fa-times" : "fa-bars"}`}
-            ></i>
-          </button>
+          {/* Mobile hamburger: chỉ render trên mobile */}
+          {isMobile && (
+            <button className="mobile-hamburger" onClick={toggleMobileMenu} aria-label="Toggle menu">
+              <i className={`fas ${isMobileMenuOpen ? "fa-times" : "fa-bars"}`}></i>
+            </button>
+          )}
         </div>
       </div>
 
       
-      <div className={`mobile-menu ${isMobileMenuOpen ? "open" : ""}`}>
+      {/* Mobile overlay menu (behaviour like LessonScreen) */}
+      <div className={`lesson-mobile-side-menu mobile-only ${isMobileMenuOpen ? "open" : ""}`}>
         {mobileMenuView === "main" && (
-          <ul className="mobile-nav-links">
-            <li>
-              <button onClick={showQuestsView} className="menu-section-link">
-                <i className="fas fa-scroll icon-padding"></i> Available Quests <i className="fas fa-chevron-right arrow-right"></i>
+          <>
+            <div className="mobile-menu-header">
+              <button className="mobile-menu-close" onClick={toggleMobileMenu} aria-label="Close menu">
+                <i className="fas fa-times"></i>
               </button>
-            </li>
-            <hr className="mobile-divider" />
-            <li><button onClick={() => handleMobileNav("/practice")}><i className="fas fa-dumbbell icon-padding"></i> Practice<i></i></button></li>
-            <li><button onClick={() => handleMobileNav("/build")}><i className="fas fa-hammer icon-padding"></i> Build<i></i></button></li>
-            <li><button onClick={() => handleMobileNav("/leaderboards")}><i className="fas fa-trophy icon-padding"></i> Leaderboards<i></i></button></li>
-            <li><button onClick={handleLogout}><i className="fas fa-sign-out-alt icon-padding"></i> Logout<i></i></button></li>
-          </ul>
+              <span>Menu</span>
+            </div>
+
+            <ul className="mobile-menu-list">
+              <li>
+                <a onClick={showQuestsView} className="menu-section-link">
+                  <span><i className="fas fa-scroll icon-padding"></i> Available Quests</span>
+                  <i className="fas fa-chevron-right arrow-right"></i>
+                </a>
+              </li>
+              
+              <li><a onClick={() => handleMobileNav('/practice')}><i className="fas fa-dumbbell icon-padding"></i> Practice</a></li>
+              <li><a onClick={() => handleMobileNav('/build')}><i className="fas fa-hammer icon-padding"></i> Build</a></li>
+              <li><a onClick={() => handleMobileNav('/leaderboards')}><i className="fas fa-trophy icon-padding"></i> Leaderboards</a></li>
+              <li>
+                <button className="menu-section-link account-row" onClick={showAccountView} aria-label="Account">
+                  <span className="account-row-left">
+                    <img src={user.avatar} alt="avatar" className="menu-account-avatar" />
+                    <span className="account-row-label">Account</span>
+                  </span>
+                  <i className="fas fa-chevron-right arrow-right"></i>
+                </button>
+              </li>
+            </ul>
+          </>
         )}
 
+        {/* Account detail view: avatar lớn + action list (Profile / Settings / Sign out) */}
+        {mobileMenuView === "account" && (
+          <div className="mobile-account-view">
+            <div className="submenu-header">
+              <button onClick={showMainView} className="back-to-menu-btn">
+                <i className="fas fa-chevron-left"></i> Back to menu
+              </button>
+              <h2>Account</h2>
+            </div>
+
+            {/* <div className="account-card">
+              <div className="account-avatar-wrap">
+                <div className="account-avatar-border">
+                  <img src={user.avatar} alt="avatar" className="account-avatar-large" />
+                </div>
+              </div>
+              <div className="account-meta">
+                <div className="account-name">Knight Coder</div>
+              </div>
+            </div> */}
+
+            <ul className="account-action-list">
+              <li className="account-action-item" onClick={() => { navigate('/profile'); setMobileMenuOpen(false); }}>
+                <i className="fas fa-user-circle icon-padding"></i> Profile
+              </li>
+              <li className="account-action-item" onClick={() => { navigate('/profile/edit'); setMobileMenuOpen(false); }}>
+                <i className="fas fa-cog icon-padding"></i> Settings
+              </li>
+              <li className="account-action-item" onClick={() => { handleLogout(); }}>
+                <i className="fas fa-sign-out-alt icon-padding"></i> Sign out
+              </li>
+            </ul>
+          </div>
+        )}
         {mobileMenuView === "quests" && (
           <div className="mobile-submenu">
             <div className="submenu-header">
@@ -207,13 +267,9 @@ export default function navbar() {
               </button>
               <h2>Available Quests</h2>
             </div>
-            <ul className="mobile-nav-links submenu-list">
+            <ul className="mobile-menu-list submenu-list">
               {courses.map((course) => (
-                <li key={course.id}>
-                  <button onClick={() => handleCourseClick(course.id)}>
-                    {course.title}
-                  </button>
-                </li>
+                <li key={course.id}><a onClick={() => handleCourseClick(course.id)}>{course.title}</a></li>
               ))}
             </ul>
           </div>
