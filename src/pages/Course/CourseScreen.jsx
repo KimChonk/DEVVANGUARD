@@ -204,7 +204,9 @@ export default function CourseScreen() {
   //     });
   //   };
   // }, []);
-
+  const handleAvatarClick = () => {
+    navigate("/profile");
+  }
   const handleBackToMenu = () => {
     navigate("/main-menu");
   };
@@ -249,10 +251,11 @@ export default function CourseScreen() {
       <nav className="course-navbar">
         <div className="course-nav-container">
           <button className="back-btn" onClick={handleBackToMenu}>
-            <i className="fas fa-arrow-left"></i> Back to Academy
+            <i className="fas fa-arrow-left"></i> <span>Back to Academy</span>
           </button>
           <h1 className="course-nav-title">{course.title}</h1>
           <div className="course-nav-right">
+            <button className="avatar-btn" onClick={handleAvatarClick}>
             <img 
               src={user.avatar} 
               alt="User Avatar" 
@@ -261,6 +264,7 @@ export default function CourseScreen() {
                 e.target.src = "/icons/knight_icon.png";
               }}
             />
+          </button>
           </div>
         </div>
       </nav>

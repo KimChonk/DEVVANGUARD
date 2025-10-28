@@ -1,127 +1,70 @@
+// src/pages/Lesson/LessonScreen.jsx
+
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "../../assets/CSS/lessonscreen.css";
+import "../../assets/CSS/lessonscreen.css"; // Dùng file CSS cuối cùng ở Bước 2
 
 export default function LessonScreen() {
   const navigate = useNavigate();
   const { lessonId } = useParams();
   const [user] = useState({
     name: "Knight Coder",
-    avatar: "/images/default-avatar.jpg"
+    avatar: "/images/default-avatar.jpg",
   });
 
-  // Sample lesson data based on lessonId with test cases
-  const [lesson] = useState({
-    1: {
-      id: 1,
-      title: "Python Variables & Data Types",
-      difficulty: "Easy",
-      tags: ["Variables", "Data Types", "Python Basics"],
-      description: "Learn how to declare variables and work with different data types in Python. Master the fundamental building blocks of any Python program.",
-      problem: "Create variables of different types and perform basic operations. Your code should define specific variables and print them in the expected format.",
-      testCases: [
-        {
-          id: 1,
-          name: "Test Case 1: Variable Declaration",
-          description: "Your code should create a variable 'name' with value 'Knight' and print it",
-          expectedOutput: "Knight",
-          hint: "Remember to create a variable called 'name' and assign it the string 'Knight', then use print() to display it."
-        },
-        {
-          id: 2,
-          name: "Test Case 2: Number Operations",
-          description: "Create variables 'a = 10' and 'b = 5', then print their sum",
-          expectedOutput: "15",
-          hint: "Create two variables a=10 and b=5, then calculate a+b and print the result."
-        },
-        {
-          id: 3,
-          name: "Test Case 3: Boolean Values",
-          description: "Create a boolean variable 'is_knight = True' and print it",
-          expectedOutput: "True",
-          hint: "Create a boolean variable called 'is_knight' with value True and print it."
-        }
-      ],
-      initialCode: `# Knight's Python Challenge!
-# Complete the tasks below to pass all test cases
+  // State cho Mobile View
+  const [activeMobileTab, setActiveMobileTab] = useState('learn'); // 'learn', 'code', 'output'
 
-# Write your code here:
-
-`,
-      hints: [
-        "💡 Start by creating variables with meaningful names",
-        "⚔️ Use print() function to display your results",
-        "🏰 Remember Python is case-sensitive",
-        "✨ Check your variable assignments carefully"
-      ]
-    },
-    2: {
-      id: 2,
-      title: "Control Flow with If Statements",
-      difficulty: "Medium",
-      tags: ["If Statements", "Control Flow", "Conditions"],
-      description: "Master the art of decision making in Python using if, elif, and else statements.",
-      problem: "Create a decision system that determines a knight's action based on different conditions.",
-      testCases: [
-        {
-          id: 1,
-          name: "Test Case 1: High Health with Sword",
-          description: "With health=90 and has_sword=True, should print 'Attack!'",
-          expectedOutput: "Attack!",
-          hint: "Check if health > 80 AND has_sword is True, then print 'Attack!'"
-        },
-        {
-          id: 2,
-          name: "Test Case 2: Low Health",
-          description: "With health=20, should print 'Retreat!'",
-          expectedOutput: "Retreat!",
-          hint: "When health is less than 30, the knight should retreat for safety."
-        },
-        {
-          id: 3,
-          name: "Test Case 3: Medium Health",
-          description: "With health=50 and has_sword=False, should print 'Defend!'",
-          expectedOutput: "Defend!",
-          hint: "For medium health without a sword, the best strategy is to defend."
-        }
-      ],
-      initialCode: `# Knight's Decision System
-# Create conditional logic for the knight's actions
-
-# Test variables (your code should work for any values)
-health = 90
-has_sword = True
-
-# Write your if-elif-else logic here:
-
-`,
-      hints: [
-        "🗡️ Use 'and' to combine multiple conditions",
-        "🛡️ Remember to check health levels first",
-        "⚔️ Use elif for multiple conditions",
-        "🏰 Always include an else clause for safety"
-      ]
-    }
-  }[lessonId] || {
-    id: 1,
-    title: "Lesson Not Found",
-    difficulty: "Easy",
-    tags: ["Error"],
-    description: "The requested lesson could not be found.",
-    problem: "This lesson is not available. Please select a valid lesson.",
-    testCases: [
-      {
+  // Logic tải dữ liệu lesson (thay thế bằng API thật nếu cần)
+  const [lesson] = useState(() => {
+     const lessonsData = {
+      1: {
         id: 1,
-        name: "Test Case 1: Error",
-        description: "No test available",
-        expectedOutput: "Error",
-        hint: "Please select a valid lesson"
+        title: "Python Variables & Data Types",
+        difficulty: "Easy",
+        tags: ["Variables", "Data Types", "Python Basics"],
+        description: "Learn how to declare variables and work with different data types in Python. Master the fundamental building blocks of any Python program.",
+        problem: "Create variables of different types and perform basic operations. Your code should define specific variables and print them in the expected format.",
+        testCases: [
+          { id: 1, name: "Test Case 1: Variable Declaration", description: "Create 'name' = 'Knight' and print it", expectedOutput: "Knight", hint: "Use print(name)." },
+          { id: 2, name: "Test Case 2: Number Operations", description: "Create 'a = 10', 'b = 5', print their sum", expectedOutput: "15", hint: "Calculate a+b." },
+          { id: 3, name: "Test Case 3: Boolean Values", description: "Create 'is_knight = True' and print it", expectedOutput: "True", hint: "Booleans are True or False." }
+        ],
+        initialCode: `# Knight's Python Challenge!\n# Complete the tasks below\n\n# Write your code here:\n\n`,
+        hints: ["💡 Use meaningful names", "⚔️ Use print()", "🏰 Case-sensitive", "✨ Check assignments"]
+      },
+      2: {
+        id: 2,
+        title: "Control Flow with If Statements",
+        difficulty: "Medium",
+        tags: ["If Statements", "Control Flow", "Conditions"],
+        description: "Master decision making in Python using if, elif, and else statements.",
+        problem: "Create a system determining a knight's action based on conditions.",
+        testCases: [
+          { id: 1, name: "Test Case 1: High Health with Sword", description: "health=90, has_sword=True -> 'Attack!'", expectedOutput: "Attack!", hint: "Check health > 80 AND has_sword." },
+          { id: 2, name: "Test Case 2: Low Health", description: "health=20 -> 'Retreat!'", expectedOutput: "Retreat!", hint: "Check health < 30." },
+          { id: 3, name: "Test Case 3: Medium Health", description: "health=50, has_sword=False -> 'Defend!'", expectedOutput: "Defend!", hint: "Use an else or elif." }
+        ],
+        initialCode: `# Knight's Decision System\n\n# Test variables\nhealth = 90\nhas_sword = True\n\n# Write your if-elif-else logic here:\n\n`,
+        hints: ["🗡️ Use 'and'", "🛡️ Check health first", "⚔️ Use elif", "🏰 Include an else"]
       }
-    ],
-    initialCode: "# Lesson not found",
-    hints: ["Please go back and select a valid lesson"]
+      // Thêm các bài học khác nếu cần
+    };
+
+    return lessonsData[lessonId] || {
+      id: 0,
+      title: "Lesson Not Found",
+      difficulty: "Easy",
+      tags: ["Error"],
+      description: "The requested lesson could not be found.",
+      problem: "This lesson is not available.",
+      testCases: [{ id: 1, name: "Error", description: "No test", expectedOutput: "Error", hint: "Select a valid lesson" }],
+      initialCode: "# Lesson not found",
+      hints: ["Go back and select a valid lesson"]
+    };
   });
 
+  // Các state khác
   const [code, setCode] = useState(lesson.initialCode);
   const [consoleOutput, setConsoleOutput] = useState([]);
   const [testResults, setTestResults] = useState([]);
@@ -131,22 +74,26 @@ has_sword = True
   const [currentHintIndex, setCurrentHintIndex] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
-  // Initialize code when lesson changes
+  // useEffect để reset state khi lesson thay đổi
   useEffect(() => {
     setCode(lesson.initialCode);
     setConsoleOutput([]);
     setTestResults([]);
     setIsLocked(false);
+    setLockTimeRemaining(0);
     setShowHint(false);
-  }, [lesson.initialCode]);
+    setCurrentHintIndex(0);
+    setActiveMobileTab('learn'); // Reset về tab learn
+  }, [lesson.initialCode, lesson.id]); // Phụ thuộc vào lesson.id
 
-  // Lock timer effect
+  // useEffect cho timer khóa
   useEffect(() => {
     let timer;
     if (isLocked && lockTimeRemaining > 0) {
       timer = setInterval(() => {
         setLockTimeRemaining(prev => {
           if (prev <= 1) {
+            clearInterval(timer);
             setIsLocked(false);
             setShowHint(false);
             return 0;
@@ -155,177 +102,117 @@ has_sword = True
         });
       }, 1000);
     }
-    return () => clearInterval(timer);
+    return () => clearInterval(timer); // Cleanup
   }, [isLocked, lockTimeRemaining]);
 
-  const handleBackToCourse = useCallback(() => {
-    navigate("/course/1"); // Navigate back to course - you can make this dynamic
-  }, [navigate]);
-
-  const clearConsole = useCallback(() => {
-    setConsoleOutput([]);
-  }, []);
-
+  // Các hàm callback
+  const handleBackToCourse = useCallback(() => navigate("/main-menu"), [navigate]);
+  const clearConsole = useCallback(() => setConsoleOutput([]), []);
   const addToConsole = useCallback((message, type = 'output') => {
-    const timestamp = new Date().toLocaleTimeString();
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit'});
     setConsoleOutput(prev => [...prev, { message, type, timestamp }]);
   }, []);
 
+  // Mô phỏng chạy code (nên thay bằng gọi backend)
   const runCode = useCallback(async () => {
     if (isLocked) {
       addToConsole(`Code editor is locked for ${lockTimeRemaining} more seconds`, 'warning');
       return;
     }
-
     setIsRunning(true);
     clearConsole();
-    
+    setActiveMobileTab('output'); // Chuyển sang tab output trên mobile
     try {
       addToConsole('Running your code...', 'output');
-      
-      // Simulate code execution
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Simple Python code simulation
-      const outputs = [];
-      if (code.includes('print(')) {
-        const printMatches = code.match(/print\([^)]*\)/g);
-        if (printMatches) {
-          printMatches.forEach(printStatement => {
-            // Simple simulation - extract content between quotes or variable names
-            let output = printStatement.replace(/print\(|\)/g, '');
-            
-            // Handle f-strings and simple variables
-            if (output.includes('"')) {
-              output = output.match(/"([^"]*)"/)?.[1] || output;
-            } else if (output.includes("'")) {
-              output = output.match(/'([^']*)'/)?.[1] || output;
-            }
-            
-            outputs.push(output);
-            addToConsole(output, 'output');
-          });
-        }
-        
-        addToConsole('Code executed successfully! ✨', 'success');
-      } else {
-        addToConsole('No output to display. Add some print statements!', 'warning');
-      }
-      
-    } catch (error) {
-      addToConsole(`Error: ${error.message}`, 'error');
-    } finally {
-      setIsRunning(false);
-    }
-  }, [code, addToConsole, clearConsole, isLocked, lockTimeRemaining]);
+      // *** THAY BẰNG GỌI BACKEND ĐỂ CHẠY CODE ***
+      await new Promise(resolve => setTimeout(resolve, 800)); // Mô phỏng độ trễ
+      // (Logic mô phỏng output đơn giản)
+      let simulatedOutput = "Simulated output based on code:\n"; // Default
+      if (lesson.id === 1 && code.includes('print(name)')) simulatedOutput += "Knight\n";
+      if (lesson.id === 1 && code.includes('print(a + b)')) simulatedOutput += "15\n";
+      if (lesson.id === 1 && code.includes('print(is_knight)')) simulatedOutput += "True\n";
+      if (lesson.id === 2 && code.includes('print("Attack!")')) simulatedOutput += "Attack!\n"; // Simplified
+      // Add more simulation logic or parse print statements
 
+      if (simulatedOutput !== "Simulated output based on code:\n") {
+           addToConsole(simulatedOutput.trim(), 'output');
+           addToConsole('Code executed successfully! ✨', 'success');
+      } else {
+         addToConsole('No output generated or simulation not matched. Did you use print()?', 'warning');
+      }
+    } catch (error) { addToConsole(`Execution Error: ${error.message}`, 'error');
+    } finally { setIsRunning(false); }
+  }, [code, lesson.id, addToConsole, clearConsole, isLocked, lockTimeRemaining]); // Added lesson.id dependency
+
+  // Mô phỏng kiểm tra code (nên thay bằng kết quả từ backend)
   const validateCode = useCallback(() => {
-    const results = lesson.testCases.map(testCase => {
-      // Simple validation logic - in real implementation, you'd execute the code
+    // *** THAY BẰNG KẾT QUẢ TỪ BACKEND ***
+     const results = lesson.testCases.map(testCase => {
       let passed = false;
-      let actualOutput = '';
-      
-      // Basic validation based on test case requirements
-      if (testCase.id === 1 && lesson.id === 1) {
-        // Check for name variable and Knight value
-        if (code.includes('name') && code.includes('Knight') && code.includes('print')) {
-          passed = true;
-          actualOutput = 'Knight';
-        } else {
-          actualOutput = 'No output or incorrect variable';
-        }
-      } else if (testCase.id === 2 && lesson.id === 1) {
-        // Check for a=10, b=5, and sum calculation
-        if (code.includes('a = 10') && code.includes('b = 5') && code.includes('a + b')) {
-          passed = true;
-          actualOutput = '15';
-        } else {
-          actualOutput = 'Incorrect calculation or missing variables';
-        }
-      } else if (testCase.id === 3 && lesson.id === 1) {
-        // Check for boolean variable
-        if (code.includes('is_knight') && code.includes('True') && code.includes('print')) {
-          passed = true;
-          actualOutput = 'True';
-        } else {
-          actualOutput = 'Missing boolean variable or print statement';
-        }
+      let actualOutput = 'Simulation Error'; // Default error
+
+      // Lesson 1 Simulation
+      if (lesson.id === 1) {
+          if (testCase.id === 1 && code.includes('name = "Knight"') && code.includes('print(name)')) { passed = true; actualOutput = 'Knight'; }
+          else if (testCase.id === 2 && code.includes('a = 10') && code.includes('b = 5') && code.includes('print(a + b)')) { passed = true; actualOutput = '15'; }
+          else if (testCase.id === 3 && code.includes('is_knight = True') && code.includes('print(is_knight)')) { passed = true; actualOutput = 'True'; }
+          else { actualOutput = 'Code does not match expected pattern.';} // Catch-all for failed
       }
-      
-      // For lesson 2 (if statements)
-      if (lesson.id === 2) {
-        if (testCase.id === 1 && code.includes('if') && code.includes('health > 80') && code.includes('Attack!')) {
-          passed = true;
-          actualOutput = 'Attack!';
-        } else if (testCase.id === 2 && code.includes('health') && code.includes('< 30') && code.includes('Retreat!')) {
-          passed = true;
-          actualOutput = 'Retreat!';
-        } else if (testCase.id === 3 && code.includes('else') && code.includes('Defend!')) {
-          passed = true;
-          actualOutput = 'Defend!';
-        }
+      // Lesson 2 Simulation
+      else if (lesson.id === 2) {
+           // Basic check for keywords, actual output simulation is hard here
+           if (testCase.id === 1 && code.includes('if health > 80 and has_sword') && code.includes('print("Attack!")')) { passed = true; actualOutput = 'Attack!'; }
+           else if (testCase.id === 2 && code.includes('elif health < 30') && code.includes('print("Retreat!")')) { passed = true; actualOutput = 'Retreat!'; }
+           else if (testCase.id === 3 && code.includes('else') && code.includes('print("Defend!")')) { passed = true; actualOutput = 'Defend!'; }
+           else { actualOutput = 'Conditional logic simulation failed.'; }
       }
-      
-      return {
-        ...testCase,
-        passed,
-        actualOutput
-      };
+
+      return { ...testCase, passed, actualOutput };
     });
-    
     setTestResults(results);
     return results;
   }, [code, lesson]);
 
+  // Submit code (nên gọi backend)
   const submitCode = useCallback(() => {
-    if (isLocked) {
-      addToConsole(`Submission locked for ${lockTimeRemaining} more seconds`, 'warning');
-      return;
-    }
-
+    if (isLocked) { addToConsole(`Submission locked for ${lockTimeRemaining} more seconds`, 'warning'); return; }
+    setIsRunning(true);
     clearConsole();
     addToConsole('Validating your solution...', 'output');
-    
-    setTimeout(() => {
+    setActiveMobileTab('output');
+    // *** THAY BẰNG GỌI BACKEND ***
+    setTimeout(() => { // Mô phỏng độ trễ API
       const results = validateCode();
       const passedCount = results.filter(r => r.passed).length;
       const totalCount = results.length;
-      
       if (passedCount === totalCount) {
-        addToConsole(`🏆 Excellent! All ${totalCount} test cases passed!`, 'success');
-        addToConsole('You have earned 100 XP for completing this lesson!', 'success');
-        addToConsole('Ready to advance to the next challenge!', 'success');
+          addToConsole(`🏆 Excellent! All ${totalCount} test cases passed!`, 'success');
+          addToConsole('You earned 100 XP!', 'success');
       } else {
-        addToConsole(`❌ ${passedCount}/${totalCount} test cases passed`, 'error');
-        addToConsole('Code editor locked for 10 seconds. Check the hint!', 'warning');
-        
-        // Lock the editor and show hint
-        setIsLocked(true);
-        setLockTimeRemaining(10);
-        setShowHint(true);
-        
-        // Cycle through hints
-        setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length);
+          addToConsole(`❌ ${passedCount}/${totalCount} test cases passed`, 'error');
+          addToConsole('Editor locked for 10 seconds. Check hints!', 'warning');
+          setIsLocked(true); setLockTimeRemaining(10); setShowHint(true);
+          setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length);
       }
+      setIsRunning(false);
     }, 1200);
   }, [isLocked, lockTimeRemaining, addToConsole, clearConsole, validateCode, lesson.hints.length]);
 
+  // Reset code
   const resetCode = useCallback(() => {
-    setCode(lesson.initialCode);
-    clearConsole();
-    addToConsole('Code reset to initial state.', 'output');
+    if(window.confirm("Are you sure you want to reset your code?")){
+        setCode(lesson.initialCode); clearConsole(); setTestResults([]);
+        addToConsole('Code reset to initial state.', 'output');
+    }
   }, [lesson.initialCode, clearConsole, addToConsole]);
 
+  // Hàm helper cho class difficulty
   const getDifficultyClass = (difficulty) => {
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return 'difficulty-easy';
-      case 'medium':
-        return 'difficulty-medium';
-      case 'hard':
-        return 'difficulty-hard';
-      default:
-        return 'difficulty-easy';
+    switch (difficulty?.toLowerCase()) {
+      case 'easy': return 'difficulty-easy';
+      case 'medium': return 'difficulty-medium';
+      case 'hard': return 'difficulty-hard';
+      default: return 'difficulty-easy';
     }
   };
 
@@ -333,184 +220,243 @@ has_sword = True
     <div className="lesson-screen-container">
       <div className="lesson-background"></div>
 
-      {/* Navigation */}
-      <nav className="lesson-navbar">
+      {/* ===== Navbar Desktop (Chỉ hiện trên desktop) ===== */}
+      <nav className="lesson-navbar desktop-only">
         <div className="lesson-nav-container">
           <button className="back-btn" onClick={handleBackToCourse}>
-            <i className="fas fa-arrow-left"></i> Back to Course
+            <i className="fas fa-arrow-left"></i> <span>Back to Course</span>
           </button>
           <h1 className="lesson-nav-title">{lesson.title}</h1>
           <div className="lesson-nav-right">
-            <div className="lesson-progress-indicator">
-              <span className="progress-text">Lesson {lesson.id}</span>
-            </div>
-            <img 
-              src={user.avatar} 
-              alt="User Avatar" 
-              className="user-avatar"
-              onError={(e) => {
-                e.target.src = "/icons/knight_icon.png";
-              }}
+            <img
+              src={user.avatar} alt="User Avatar" className="user-avatar"
+              onError={(e) => { e.target.src = "/icons/knight_icon.png"; }}
             />
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
+      {/* ===== Navbar Mobile (Chỉ hiện trên mobile) ===== */}
+      <nav className="mobile-lesson-navbar mobile-only">
+        <div className="mobile-nav-left">
+          <div className="mobile-logo">
+             <img src="/icons/knight_icon.png" alt="Logo" style={{ width: '30px', height: '30px' }} />
+          </div>
+        </div>
+        <div className="mobile-tabs">
+          <button className={`mobile-tab ${activeMobileTab === 'learn' ? 'active' : ''}`} onClick={() => setActiveMobileTab('learn')}>Learn</button>
+          <button className={`mobile-tab ${activeMobileTab === 'code' ? 'active' : ''}`} onClick={() => setActiveMobileTab('code')}>Code</button>
+          <button className={`mobile-tab ${activeMobileTab === 'output' ? 'active' : ''}`} onClick={() => setActiveMobileTab('output')}>Output</button>
+        </div>
+        <div className="mobile-nav-right">
+          <button className="mobile-hamburger"><i className="fas fa-bars"></i></button>
+        </div>
+      </nav>
+
+      {/* ===== Nội dung chính ===== */}
       <div className="lesson-main-content">
-        {/* Left Panel - Problem Description & Test Cases */}
-        <div className="lesson-left-panel">
-          <div className="lesson-header">
-            <h1 className="lesson-title">{lesson.title}</h1>
-            <div className="lesson-difficulty">
-              <span className={`difficulty-badge ${getDifficultyClass(lesson.difficulty)}`}>
-                {lesson.difficulty}
-              </span>
-              <div className="lesson-tags">
-                {lesson.tags.map((tag, index) => (
-                  <span key={index} className="lesson-tag">{tag}</span>
-                ))}
-              </div>
-            </div>
-          </div>
 
-          <div className="lesson-content">
-            <div className="lesson-section">
-              <h3 className="section-title">📜 Problem Description</h3>
-              <p className="lesson-description">{lesson.problem}</p>
-            </div>
-
-            <div className="lesson-section">
-              <h3 className="section-title">🧪 Test Cases</h3>
-              {lesson.testCases.map((testCase, index) => {
-                const result = testResults.find(r => r.id === testCase.id);
-                return (
-                  <div key={index} className={`test-case-box ${
-                    result ? (result.passed ? 'test-passed' : 'test-failed') : 'test-pending'
-                  }`}>
-                    <div className="test-case-header">
-                      <span className="test-case-name">{testCase.name}</span>
-                      <span className={`test-status ${
-                        result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'
-                      }`}>
-                        {result ? (result.passed ? '✅' : '❌') : '⏳'}
-                      </span>
-                    </div>
-                    <p className="test-case-description">{testCase.description}</p>
-                    <div className="test-case-output">
-                      <div className="expected-output">
-                        <strong>Expected:</strong> <code>{testCase.expectedOutput}</code>
-                      </div>
-                      {result && (
-                        <div className={`actual-output ${
-                          result.passed ? 'output-correct' : 'output-incorrect'
-                        }`}>
-                          <strong>Your output:</strong> <code>{result.actualOutput}</code>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Hint Section */}
-            {showHint && (
-              <div className="lesson-section hint-section">
-                <h3 className="section-title">💡 Knight's Assistant</h3>
-                <div className="hint-box">
-                  <div className="hint-header">
-                    <span className="hint-title">Need some guidance, brave knight?</span>
-                    <span className="lockout-timer">🔒 {lockTimeRemaining}s</span>
-                  </div>
-                  <p className="hint-text">{lesson.hints[currentHintIndex]}</p>
-                  <div className="hint-navigation">
-                    <button 
-                      className="hint-nav-btn" 
-                      onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}
-                    >
-                      ← Previous
-                    </button>
-                    <span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span>
-                    <button 
-                      className="hint-nav-btn" 
-                      onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}
-                    >
-                      Next →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* --- PANEL HỌC (Luôn thấy trên desktop, tab trên mobile) --- */}
+        <div className={`lesson-learn-panel ${activeMobileTab !== 'learn' ? 'mobile-hidden' : ''}`}>
+           {/* Mobile subheader */}
+           <div className="mobile-only mobile-lesson-subheader"><span>Exercise</span></div>
+           {/* Desktop header */}
+           <div className="lesson-header desktop-only">
+             <h1 className="lesson-title">{lesson.title}</h1>
+             <div className="lesson-difficulty">
+               <span className={`difficulty-badge ${getDifficultyClass(lesson.difficulty)}`}>{lesson.difficulty}</span>
+               <div className="lesson-tags">{lesson.tags.map((tag, index) => <span key={index} className="lesson-tag">{tag}</span>)}</div>
+             </div>
+           </div>
+           {/* Khu vực nội dung cuộn được */}
+           <div className="lesson-content">
+             {/* Mobile Title */}
+             <h2 className="mobile-only mobile-lesson-title">{lesson.id}. {lesson.title}</h2>
+             <p className="mobile-only mobile-lesson-language"># {lesson.tags.includes("Python Basics") ? "Python" : (lesson.tags.includes("Java") ? "Java" : "Code")}</p>
+             {/* Problem Description */}
+             <div className="lesson-section">
+               <h3 className="section-title desktop-only">📜 Problem Description</h3>
+               <p className="lesson-description desktop-only">{lesson.problem}</p>
+               <p className="lesson-description mobile-only">{lesson.description} 🚀</p>
+               {/* <img src="/images/java_example.png" alt="Java Coffee" className="mobile-only lesson-illustration"/> */}
+             </div>
+             {/* Test Cases & Hints chỉ trên Desktop */}
+             <div className="lesson-section desktop-only">
+               <h3 className="section-title">🧪 Test Cases</h3>
+               {lesson.testCases.map((testCase) => {
+                 const result = testResults.find(r => r.id === testCase.id);
+                 return (
+                   <div key={testCase.id} className={`test-case-box ${result ? (result.passed ? 'test-passed' : 'test-failed') : 'test-pending'}`}>
+                     <div className="test-case-header">
+                       <span className="test-case-name">{testCase.name}</span>
+                       <span className={`test-status ${result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'}`}>{result ? (result.passed ? '✅' : '❌') : '⏳'}</span>
+                     </div>
+                     <div className="test-details">
+                       <p className="test-case-description">{testCase.description}</p>
+                       <div className="test-case-output">
+                         <div className="expected-output"><strong>Expected:</strong> <code>{testCase.expectedOutput}</code></div>
+                         {result && (<div className={`actual-output ${result.passed ? 'output-correct' : 'output-incorrect'}`}><strong>Your output:</strong> <code>{result.actualOutput || 'No output'}</code></div>)}
+                       </div>
+                     </div>
+                   </div>
+                 );
+               })}
+             </div>
+             {showHint && (
+               <div className="lesson-section hint-section desktop-only">
+                 <h3 className="section-title">💡 Knight's Assistant</h3>
+                 <div className="hint-box">
+                   <div className="hint-header">
+                     <span className="hint-title">Need some guidance?</span>
+                     <span className="lockout-timer">🔒 {lockTimeRemaining}s</span>
+                   </div>
+                   <p className="hint-text">{lesson.hints[currentHintIndex]}</p>
+                   <div className="hint-navigation">
+                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}>← Prev</button>
+                     <span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span>
+                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}>Next →</button>
+                   </div>
+                 </div>
+               </div>
+             )}
+             {/* Nút "Start Coding" cho mobile */}
+             <button className="mobile-only start-coding-btn" onClick={() => setActiveMobileTab('code')}>
+               <i className="fas fa-code"></i> Start coding
+             </button>
+           </div>
         </div>
 
-        {/* Right Panel - Code Editor */}
-        <div className="lesson-right-panel">
-          <div className="editor-header">
-            <div className="editor-tabs">
-              <div className="editor-tab active">
-                <i className="fas fa-code"></i> Solution.py
-              </div>
-            </div>
-            <div className="editor-actions">
-              <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}>
-                <i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
-                {isRunning ? 'Running...' : 'Run Code'}
-              </button>
-              <button className="submit-btn" onClick={submitCode} disabled={isLocked}>
-                <i className="fas fa-check"></i> 
-                {isLocked ? `Locked (${lockTimeRemaining}s)` : 'Submit'}
-              </button>
-              <button className="reset-btn" onClick={resetCode} disabled={isLocked}>
-                <i className="fas fa-undo"></i> Reset
-              </button>
-            </div>
-          </div>
-
-          <div className="editor-content">
-            <textarea
-              className={`code-editor ${isLocked ? 'editor-locked' : ''}`}
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="Write your Python code here..."
-              spellCheck={false}
-              disabled={isLocked}
-            />
-          </div>
-
-          {/* Console Output */}
-          <div className="console-section">
-            <div className="console-header">
-              <h3 className="console-title">🖥️ Console Output</h3>
-              <button className="clear-console-btn" onClick={clearConsole}>
-                <i className="fas fa-trash"></i> Clear
-              </button>
-            </div>
-            <div className="console-output">
-              {consoleOutput.length === 0 ? (
-                <div className="console-empty">
-                  Click "Run Code" to see your output here...
+        {/* === THẺ BAO BỌC CHO PHẦN BÊN PHẢI DESKTOP === */}
+        <div className="lesson-right-wrapper desktop-only-flex">
+            {/* --- PANEL CODE (Một phần bên phải desktop) --- */}
+            <div className="lesson-code-panel">
+                <div className="editor-header">
+                     <div className="editor-tabs">
+                       <div className="editor-tab active"><i className="fas fa-code"></i> Solution.{lesson.tags.includes("Python Basics") ? 'py' : 'java'}</div>
+                     </div>
+                     <div className="editor-actions">
+                        <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}>
+                           <i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
+                           <span className="desktop-only">{isRunning ? 'Running...' : 'Run Code'}</span>
+                           {/* Mobile text handled in CSS */}
+                        </button>
+                        <button className="submit-btn" onClick={submitCode} disabled={isLocked || isRunning}>
+                           <i className="fas fa-check"></i>
+                           <span className="desktop-only">{isLocked ? `Locked (${lockTimeRemaining}s)` : 'Submit'}</span>
+                           {/* Mobile text handled in CSS */}
+                        </button>
+                        <button className="reset-btn" onClick={resetCode} disabled={isLocked}>
+                           <i className="fas fa-undo"></i> <span className="desktop-only">Reset</span>
+                        </button>
+                     </div>
                 </div>
-              ) : (
-                consoleOutput.map((line, index) => (
-                  <div key={index} className={`console-line ${line.type}`}>
-                    <span style={{ opacity: 0.7, fontSize: '0.8em' }}>[{line.timestamp}]</span> {line.message}
-                  </div>
-                ))
-              )}
+                <div className="editor-content">
+                     <textarea
+                       className={`code-editor ${isLocked ? 'editor-locked' : ''}`}
+                       value={code}
+                       onChange={(e) => setCode(e.target.value)}
+                       placeholder="Write your code here..."
+                       spellCheck={false}
+                       disabled={isLocked}
+                     />
+                </div>
             </div>
-          </div>
+            {/* --- PANEL OUTPUT (Một phần bên phải desktop) --- */}
+            <div className="lesson-output-panel">
+                <div className="console-section">
+                    <div className="console-header">
+                        <h3 className="console-title">🖥️ Console Output</h3>
+                        <button className="clear-console-btn" onClick={clearConsole}><i className="fas fa-trash"></i> <span className="desktop-only">Clear</span></button>
+                    </div>
+                    <div className="console-output">
+                        {consoleOutput.length === 0 ? ( <div className="console-empty">Click "Run Code" to see output...</div> )
+                         : ( consoleOutput.map((line, index) => ( <div key={index} className={`console-line ${line.type}`}><span className="console-timestamp">[{line.timestamp}]</span> {line.message}</div> )))}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
 
-      {/* Floating Elements */}
-      <div className="floating-elements">
-        <div className="floating-sword"></div>
-        <div className="floating-shield"></div>
-        <div className="floating-gem"></div>
-        <div className="floating-scroll"></div>
-      </div>
+        {/* --- CÁC PANEL CHỈ DÀNH CHO MOBILE (Hiển thị riêng lẻ) --- */}
+         <div className={`lesson-code-panel mobile-only-flex ${activeMobileTab !== 'code' ? 'mobile-hidden' : ''}`}>
+             <div className="editor-header">
+                 <div className="editor-actions">
+                    <button className="run-btn" onClick={runCode} disabled={isRunning || isLocked}>
+                       <i className={`fas ${isRunning ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
+                       <span className="mobile-only">Run</span>
+                    </button>
+                    <button className="submit-btn" onClick={submitCode} disabled={isLocked || isRunning}>
+                       <i className="fas fa-check"></i>
+                       <span className="mobile-only">{isLocked ? `(${lockTimeRemaining}s)` : 'Submit'}</span>
+                    </button>
+                    <button className="reset-btn" onClick={resetCode} disabled={isLocked}>
+                       <i className="fas fa-undo"></i> {/* Chỉ icon */}
+                    </button>
+                 </div>
+             </div>
+             <div className="editor-content">
+                 <textarea
+                   className={`code-editor ${isLocked ? 'editor-locked' : ''}`}
+                   value={code} onChange={(e) => setCode(e.target.value)}
+                   placeholder="Write your code here..." spellCheck={false} disabled={isLocked}
+                 />
+             </div>
+         </div>
+         <div className={`lesson-output-panel mobile-only-flex ${activeMobileTab !== 'output' ? 'mobile-hidden' : ''}`}>
+             <div className="console-section">
+                 <div className="console-header">
+                    <h3 className="console-title">🖥️ Console Output</h3>
+                    <button className="clear-console-btn" onClick={clearConsole}><i className="fas fa-trash"></i></button>
+                 </div>
+                 <div className="console-output">
+                    {consoleOutput.length === 0 ? ( <div className="console-empty">Click "Run Code" to see output...</div> )
+                         : ( consoleOutput.map((line, index) => ( <div key={index} className={`console-line ${line.type}`}><span className="console-timestamp">[{line.timestamp}]</span> {line.message}</div> )))}
+                 </div>
+             </div>
+             {/* Test cases và Hints chỉ hiển thị ở đây trên mobile */}
+             <div className="lesson-section mobile-test-cases">
+                 <h3 className="section-title">🧪 Test Cases</h3>
+                 {lesson.testCases.map((testCase) => {
+                     const result = testResults.find(r => r.id === testCase.id);
+                      return (
+                       <div key={testCase.id} className={`test-case-box ${result ? (result.passed ? 'test-passed' : 'test-failed') : 'test-pending'}`}>
+                         <div className="test-case-header">
+                           <span className="test-case-name">{testCase.name}</span>
+                           <span className={`test-status ${result ? (result.passed ? 'status-passed' : 'status-failed') : 'status-pending'}`}>{result ? (result.passed ? '✅' : '❌') : '⏳'}</span>
+                         </div>
+                         <div className="test-details">
+                           <p className="test-case-description">{testCase.description}</p>
+                           <div className="test-case-output">
+                             <div className="expected-output"><strong>Expected:</strong> <code>{testCase.expectedOutput}</code></div>
+                             {result && (<div className={`actual-output ${result.passed ? 'output-correct' : 'output-incorrect'}`}><strong>Your output:</strong> <code>{result.actualOutput || 'No output'}</code></div>)}
+                           </div>
+                         </div>
+                       </div>
+                     );
+                 })}
+             </div>
+             {showHint && (
+               <div className="lesson-section hint-section mobile-hint">
+                 <h3 className="section-title">💡 Knight's Assistant</h3>
+                 <div className="hint-box">
+                   <div className="hint-header">
+                     <span className="hint-title">Need some guidance?</span>
+                     <span className="lockout-timer">🔒 {lockTimeRemaining}s</span>
+                   </div>
+                   <p className="hint-text">{lesson.hints[currentHintIndex]}</p>
+                   <div className="hint-navigation">
+                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => prev > 0 ? prev - 1 : lesson.hints.length - 1)}>← Prev</button>
+                     <span className="hint-counter">{currentHintIndex + 1}/{lesson.hints.length}</span>
+                     <button className="hint-nav-btn" onClick={() => setCurrentHintIndex(prev => (prev + 1) % lesson.hints.length)}>Next →</button>
+                   </div>
+                 </div>
+               </div>
+             )}
+         </div>
+
+      </div> {/* Kết thúc lesson-main-content */}
+
+      {/* Floating elements (Chỉ desktop) */}
+       <div className="floating-elements desktop-only">{/* ... Nội dung floating elements ... */}</div>
     </div>
   );
 }

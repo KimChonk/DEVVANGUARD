@@ -8,6 +8,7 @@ import CourseScreen from "./pages/Course/CourseScreen";
 import LessonScreen from "./pages/Lesson/LessonScreen";
 import ProfileScreen from "./pages/Profile/ProfileScreen";
 import LeaderboardScreen from "./pages/Leaderboard/LeaderboardScreen";
+import EditProfile from "./pages/Profile/EditProfile";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/lesson/:lessonId" element={<LessonScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
         <Route path="/leaderboards" element={<LeaderboardScreen />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
       </Routes>
     </BrowserRouter>
   );
