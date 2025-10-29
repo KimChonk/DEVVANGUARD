@@ -1,6 +1,6 @@
 // src/components/Navbar.jsx
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/CSS/mainmenu.css"; 
 
@@ -67,6 +67,38 @@ export default function navbar() {
     [navigate]
   );
 
+  // Search state
+  const [isSearchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
+  const searchPanelRef = useRef(null);
+
+  const toggleSearch = useCallback(() => {
+    setSearchOpen(s => {
+      const next = !s;
+      if (!next) setSearchQuery("");
+      return next;
+    });
+  }, []);
+
+  const filteredCourses = useMemo(() => {
+    if (!searchQuery) return courses;
+    const q = searchQuery.trim().toLowerCase();
+    return courses.filter(c => c.title.toLowerCase().includes(q));
+  }, [searchQuery, courses]);
+
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      setTimeout(() => searchInputRef.current.focus(), 80);
+    }
+  }, [isSearchOpen]);
+
+  const handleSelectCourseFromSearch = useCallback((id) => {
+    navigate(`/course/${id}`);
+    setSearchOpen(false);
+    setMobileMenuOpen(false);
+  }, [navigate]);
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (avatarMenuRef.current && !avatarMenuRef.current.contains(event.target)) {
@@ -88,6 +120,16 @@ export default function navbar() {
       navigate(path);
       setAvatarMenuOpen(false); // Đóng menu sau khi click
   }
+
+  useEffect(() => {
+    function handleClickOutsideSearch(e) {
+      if (isSearchOpen && searchPanelRef.current && !searchPanelRef.current.contains(e.target) && !e.target.closest('.nav-search-btn')) {
+        setSearchOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutsideSearch);
+    return () => document.removeEventListener('mousedown', handleClickOutsideSearch);
+  }, [isSearchOpen]);
 
   return (
     <nav className="main-navbar">
@@ -151,6 +193,11 @@ export default function navbar() {
 
         
         <div className="main-nav-right">
+          {/* Search button */} 
+          <button className="nav-search-btn" onClick={toggleSearch} aria-label="Search courses" >
+            <i className="fas fa-search"></i>
+          </button>
+           
           <div className="avatar-menu-container" ref={avatarMenuRef}> {/* Thêm thẻ div và ref */}
             {/* Avatar only on desktop; on mobile we open the hamburger menu via .mobile-hamburger */}
             {!isMobile && (
@@ -189,6 +236,95 @@ export default function navbar() {
         </div>
       </div>
 
+      {/* Search overlay/panel - desktop */}
+      {!isMobile && (
+        <div className={`courses-search-overlay ${isSearchOpen ? "open" : ""}`} aria-hidden={!isSearchOpen}>
+          <div className="search-panel" ref={searchPanelRef}>
+            <div className="search-header">
+              <div className="search-input-wrap">
+                <input
+                  ref={searchInputRef}
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search courses, e.g. Python, React..."
+                  aria-label="Search courses"
+                />
+                {searchQuery && (
+                  <button className="search-clear" onClick={() => setSearchQuery("")} aria-label="Clear">
+                    <i className="fas fa-times"></i>
+                  </button>
+                )}
+              </div>
+              <button className="search-close" onClick={toggleSearch} aria-label="Close search">
+                <i className="fas fa-times-circle"></i>
+              </button>
+            </div>
+
+            <div className="search-body">
+              <h4 className="search-section-title">Courses</h4>
+              <ul className="search-results">
+                {filteredCourses.length === 0 ? (
+                  <li className="search-empty">No courses found</li>
+                ) : (
+                  filteredCourses.slice(0, 3).map(c => (
+                    <li key={c.id} className="search-item" onClick={() => handleSelectCourseFromSearch(c.id)}>
+                      <div className="search-item-title">{c.title}</div>
+                      <i className="fas fa-chevron-right"></i>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: full-screen search modal with input at top and results immediately under it */}
+      {isMobile && isSearchOpen && (
+        <div
+          className="mobile-search-modal open"
+          onClick={(e) => { if (e.target.classList.contains('mobile-search-modal')) setSearchOpen(false); }}
+        >
+          <div className="mobile-search-panel" ref={searchPanelRef}>
+            <div className="mobile-search-header">
+              <div className="search-input-wrap">
+                <input
+                  ref={searchInputRef}
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search courses, e.g. Python, React..."
+                  aria-label="Search courses"
+                />
+                {searchQuery && (
+                  <button className="search-clear" onClick={() => setSearchQuery("")} aria-label="Clear">
+                    <i className="fas fa-times"></i>
+                  </button>
+                )}
+              </div>
+              <button className="search-close" onClick={toggleSearch} aria-label="Close search">
+                <i className="fas fa-times-circle"></i>
+              </button>
+            </div>
+
+            <div className="mobile-search-results">
+              {filteredCourses.length === 0 ? (
+                <div className="search-empty">No courses found</div>
+              ) : (
+                filteredCourses.slice(0, 3).map(c => (
+                  <div key={c.id} className="mobile-search-item" onClick={() => handleSelectCourseFromSearch(c.id)}>
+                    <div className="mobile-search-title">{c.title}</div>
+                    <i className="fas fa-chevron-right"></i>
+                  </div>
+                ))
+              )}
+            
+            </div>
+          </div>
+        </div>
+      )}
+      
       
       {/* Mobile overlay menu (behaviour like LessonScreen) */}
       <div className={`lesson-mobile-side-menu mobile-only ${isMobileMenuOpen ? "open" : ""}`}>
