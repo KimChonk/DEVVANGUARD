@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { lessonService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
-import NPCGuide from "../../components/NPCGuide";
+import NPCChat from "../../components/NPCChat";
+import CodeEditor from "../../components/CodeEditor";
 import "../../assets/CSS/lessongame.css";
 
 // NPC feedback for different lesson types
@@ -40,6 +41,7 @@ export default function LessonScreen() {
   const [output, setOutput] = useState("Kết quả sẽ hiển thị ở đây...");
   const [isRunning, setIsRunning] = useState(false);
   const [testResults, setTestResults] = useState(null);
+  const [executionTime, setExecutionTime] = useState(0);
   
   // NPC Guide states
   const [npcMessage, setNpcMessage] = useState("");
@@ -113,6 +115,7 @@ export default function LessonScreen() {
     setIsRunning(true);
     setOutput("⏳ Đang chạy code...");
     setTestResults(null);
+    setExecutionTime(0);
     setNpcStatus("thinking");
     setShowNpc(true);
     
@@ -125,6 +128,9 @@ export default function LessonScreen() {
 
       // Execute code and validate
       const result = await executeAndValidate(language, code, testCases);
+
+      // Store execution time
+      setExecutionTime(result.execution.executionTime || 0);
 
       // Show output
       if (result.execution.success) {
@@ -199,47 +205,6 @@ export default function LessonScreen() {
 
   const testCases = getTestCases();
 
-  
-  // const handleAvatarNav = (path) => {
-  //     navigate(path);
-  //     setAvatarMenuOpen(false);
-  // }
-
-  // useEffect(() => {
-  //   function handleClickOutside(event) {
-  //     if (avatarMenuRef.current && !avatarMenuRef.current.contains(event.target) && !event.target.closest('.mobile-avatar-btn')) {
-  //        setAvatarMenuOpen(false);
-  //     }
-  //   }
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, [avatarMenuRef]);
-
-
-  const toggleLessonMobileMenu = useCallback(() => {
-    setLessonMobileMenuOpen(prev => !prev);
-    // Reset to main view when opening/closing
-    if (!isLessonMobileMenuOpen) {
-        setLessonMobileMenuView('main');
-    }
-  }, [isLessonMobileMenuOpen]);
-
-  const showAccountView = useCallback(() => setLessonMobileMenuView('account'), []);
-  const showMainMenuView = useCallback(() => setLessonMobileMenuView('main'), []);
-
-  // Navigation (closes the entire side menu)
-  const handleLessonMobileNav = useCallback((path) => {
-      navigate(path);
-      setLessonMobileMenuOpen(false);
-  }, [navigate]);
-
-   // Logout (closes the entire side menu)
-   const handleLogout = useCallback(() => {
-    setLessonMobileMenuOpen(false);
-    // Add token/session clearing logic if needed
-    navigate("/login");
-  }, [navigate]);
-  
   return (
     <div className="lesson-game-container">
       {/* Background Effects */}
@@ -288,33 +253,6 @@ export default function LessonScreen() {
               <p>Không có mô tả đề bài</p>
             )}
           </div>
-        </div>
-        <div className="mobile-tabs">
-          <button className={`mobile-tab ${activeMobileTab === 'learn' ? 'active' : ''}`} onClick={() => setActiveMobileTab('learn')}>Learn</button>
-          <button className={`mobile-tab ${activeMobileTab === 'code' ? 'active' : ''}`} onClick={() => setActiveMobileTab('code')}>Code</button>
-          <button className={`mobile-tab ${activeMobileTab === 'output' ? 'active' : ''}`} onClick={() => setActiveMobileTab('output')}>Output</button>
-        </div>
-        <div className="mobile-nav-right">
-          {/* <div className="avatar-menu-container mobile-avatar-container" ref={avatarMenuRef}>
-             <button className="avatar-btn mobile-avatar-btn" onClick={toggleAvatarMenu}>
-               <img src={user.avatar} alt="User Avatar" className="user-avatar"/>
-             </button>
-             {isAvatarMenuOpen && (
-              <div className="avatar-dropdown-menu">
-                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile')}>
-                  <i className="fas fa-user-circle icon-padding"></i> Profile
-                </button>
-                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile/edit')}>
-                   <i className="fas fa-cog icon-padding"></i> Account
-                </button>
-              </div>
-             )}
-          </div> */}
-          <button className="mobile-hamburger" onClick={toggleLessonMobileMenu}>
-            <i className="fas fa-bars"></i>
-          </button>
-        </div>
-      </nav>
 
           {/* Test Cases Preview */}
           {testCases.length > 0 && (
@@ -345,6 +283,12 @@ export default function LessonScreen() {
               </div>
             </div>
           )}
+
+          {/* NPC Chat - Fixed in Quest Panel */}
+          <NPCChat 
+            feedback={npcMessage}
+            status={npcStatus}
+          />
         </section>
 
         {/* Right Panel - Code Editor */}
@@ -354,14 +298,15 @@ export default function LessonScreen() {
             <span className="editor-hint">Python 3.10</span>
           </div>
 
-          <textarea
-            className="code-arena"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Viết code của bạn ở đây..."
-            disabled={isRunning}
-            spellCheck="false"
-          />
+          <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+            <CodeEditor 
+              code={code}
+              onChange={setCode}
+              language="python"
+              disabled={isRunning}
+              onSave={handleRunCode}
+            />
+          </div>
 
           {/* Output Console */}
           <div className="output-console">
@@ -370,6 +315,9 @@ export default function LessonScreen() {
               <span className={`console-status ${isRunning ? 'running' : 'idle'}`}>
                 {isRunning ? "⏳ Đang chạy..." : "✓ Ready"}
               </span>
+              {executionTime > 0 && (
+                <span className="execution-time">⏱️ {executionTime}ms</span>
+              )}
             </div>
             <pre className="console-output">{output}</pre>
           </div>
@@ -446,13 +394,6 @@ export default function LessonScreen() {
           )}
         </section>
       </div>
-
-      {/* NPC Guide */}
-      <NPCGuide 
-        lessonTitle={lesson?.lessonTitle}
-        feedback={npcMessage}
-        status={npcStatus}
-      />
 
       {/* Loading State */}
       {loading && (

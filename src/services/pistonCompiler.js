@@ -32,11 +32,12 @@ const LANGUAGE_MAP = {
  * @param {string} language - Programming language
  * @param {string} code - Code to execute
  * @param {string} input - Optional input to stdin
- * @returns {Promise} Object with { stdout, stderr, exitCode }
+ * @returns {Promise} Object with { stdout, stderr, exitCode, executionTime }
  */
 export async function executeCode(language, code, input = "") {
   try {
     console.log(`🚀 Executing ${language} code via Piston API...`);
+    const startTime = performance.now();
 
     const pistonLang = LANGUAGE_MAP[language] || language;
     const version = LANGUAGE_VERSIONS[language] || "*";
@@ -66,6 +67,8 @@ export async function executeCode(language, code, input = "") {
     }
 
     const result = await response.json();
+    const endTime = performance.now();
+    const executionTime = Math.round(endTime - startTime);
 
     console.log("✅ Piston API Response:", result);
 
@@ -82,6 +85,7 @@ export async function executeCode(language, code, input = "") {
         stderr: stderr,
         exitCode: exitCode,
         output: stderr,
+        executionTime: executionTime,
       };
     }
 
@@ -91,6 +95,7 @@ export async function executeCode(language, code, input = "") {
       stderr: stderr,
       exitCode: exitCode,
       output: stdout || "(No output)",
+      executionTime: executionTime,
     };
   } catch (error) {
     console.error("❌ Piston API Error:", error);
@@ -100,6 +105,7 @@ export async function executeCode(language, code, input = "") {
       stderr: error.message,
       exitCode: 1,
       output: `Error: ${error.message}`,
+      executionTime: 0,
     };
   }
 }

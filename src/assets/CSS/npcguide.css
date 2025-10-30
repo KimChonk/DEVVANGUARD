@@ -1,4 +1,4 @@
-/* ===== NPC GUIDE V2 - TYPING ANIMATION ===== */
+/* ===== NPC GUIDE V2 - FANTASY THEME ===== */
 
 :root {
     --speech-bubble-bg: rgba(20, 20, 35, 0.95);
@@ -12,11 +12,11 @@
 .npc-guide-v2 {
     position: fixed;
     bottom: 30px;
-    right: 30px;
+    left: 30px;
     z-index: 999;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 10px;
 }
 
@@ -24,13 +24,14 @@
     display: flex;
     gap: 15px;
     align-items: flex-end;
-    animation: slideIn 0.5s ease-out;
+    flex-direction: row-reverse;
+    animation: slideInLeft 0.5s ease-out;
 }
 
-@keyframes slideIn {
+@keyframes slideInLeft {
     from {
         opacity: 0;
-        transform: translateY(50px) translateX(50px);
+        transform: translateY(50px) translateX(-50px);
     }
     to {
         opacity: 1;
@@ -38,16 +39,36 @@
     }
 }
 
+/* ===== NPC AVATAR SECTION WITH NAME ===== */
+.npc-avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.npc-name {
+    font-family: 'MedievalSharp', cursive;
+    color: var(--speech-border);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
 /* ===== NPC AVATAR ===== */
 .npc-avatar-v2 {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
+    background: linear-gradient(135deg, #8b4789 0%, #d4af37 50%, #8b4789 100%);
     padding: 3px;
     box-shadow: 
-        0 4px 20px rgba(255, 107, 107, 0.3),
-        inset 0 2px 5px rgba(255, 255, 255, 0.2);
+        0 4px 20px rgba(212, 175, 55, 0.4),
+        inset 0 2px 5px rgba(255, 255, 255, 0.1),
+        0 0 30px rgba(139, 71, 137, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,7 +89,7 @@
     display: none;
 }
 
-/* Border animation */
+/* Border animation - Mystical glow */
 .npc-avatar-v2::after {
     content: '';
     position: absolute;
@@ -78,21 +99,22 @@
     bottom: 0;
     border-radius: 50%;
     border: 3px solid var(--speech-border);
-    animation: borderGlow 2s ease-in-out infinite;
+    animation: mysticalGlow 3s ease-in-out infinite;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
 }
 
-@keyframes borderGlow {
+@keyframes mysticalGlow {
     0%, 100% {
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 0 25px rgba(139, 71, 137, 0.3);
     }
     50% {
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.9), 0 0 40px rgba(139, 71, 137, 0.5);
     }
 }
 
-/* ===== SPEECH BUBBLE ===== */
+/* ===== SPEECH BUBBLE - FANTASY STYLE ===== */
 .speech-bubble-v2 {
-    background: var(--speech-bubble-bg);
+    background: linear-gradient(135deg, rgba(20, 20, 35, 0.95) 0%, rgba(40, 25, 60, 0.9) 100%);
     border: 2px solid var(--speech-border);
     border-radius: 16px;
     padding: 16px 20px;
@@ -101,8 +123,9 @@
     position: relative;
     backdrop-filter: blur(15px);
     box-shadow: 
-        0 8px 32px rgba(212, 175, 55, 0.2),
-        0 0 30px rgba(212, 175, 55, 0.1);
+        0 8px 32px rgba(212, 175, 55, 0.25),
+        0 0 30px rgba(212, 175, 55, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     animation: bubbleAppear 0.4s ease-out;
 }
 
@@ -122,11 +145,12 @@
     position: absolute;
     width: 0;
     height: 0;
-    border-left: 15px solid transparent;
-    border-top: 15px solid var(--speech-border);
     border-right: 15px solid transparent;
+    border-top: 15px solid var(--speech-border);
+    border-left: 15px solid transparent;
     bottom: -15px;
-    right: 40px;
+    left: 40px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .bubble-pointer-v2::after {
@@ -134,17 +158,17 @@
     position: absolute;
     width: 0;
     height: 0;
-    border-left: 13px solid transparent;
-    border-top: 13px solid var(--speech-bubble-bg);
     border-right: 13px solid transparent;
+    border-top: 13px solid rgba(20, 20, 35, 0.95);
+    border-left: 13px solid transparent;
     bottom: 2px;
-    right: 2px;
+    left: 2px;
 }
 
 /* Status-specific bubble styling */
 .speech-bubble-v2.hint {
     border-color: var(--hint-color);
-    background: rgba(255, 215, 0, 0.1);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(40, 25, 60, 0.9) 100%);
 }
 
 .speech-bubble-v2.hint .bubble-pointer-v2 {
@@ -153,7 +177,7 @@
 
 .speech-bubble-v2.success {
     border-color: var(--success-color);
-    background: rgba(74, 222, 128, 0.1);
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.08) 0%, rgba(40, 25, 60, 0.9) 100%);
 }
 
 .speech-bubble-v2.success .bubble-pointer-v2 {
@@ -162,7 +186,7 @@
 
 .speech-bubble-v2.error {
     border-color: var(--error-color);
-    background: rgba(248, 113, 113, 0.1);
+    background: linear-gradient(135deg, rgba(248, 113, 113, 0.08) 0%, rgba(40, 25, 60, 0.9) 100%);
     animation: bubbleShake 0.5s ease-in-out;
 }
 
@@ -182,10 +206,10 @@
 
 @keyframes bubblePulse {
     0%, 100% {
-        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.25), 0 0 25px rgba(139, 71, 137, 0.1);
     }
     50% {
-        box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.5), 0 0 40px rgba(139, 71, 137, 0.3);
     }
 }
 
@@ -205,6 +229,7 @@
     margin: 0;
     word-wrap: break-word;
     flex: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .message-complete {
@@ -229,6 +254,7 @@
 .close-btn:hover {
     color: var(--text-light);
     transform: rotate(90deg);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
 }
 
 /* ===== TYPING INDICATOR ===== */
@@ -245,6 +271,7 @@
     border-radius: 50%;
     background: var(--speech-border);
     animation: typingBounce 1.4s infinite;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
 }
 
 .typing-indicator span:nth-child(2) {
@@ -270,12 +297,16 @@
 @media (max-width: 768px) {
     .npc-guide-v2 {
         bottom: 20px;
-        right: 20px;
+        left: 20px;
     }
 
     .npc-avatar-v2 {
         width: 100px;
         height: 100px;
+    }
+
+    .npc-name {
+        font-size: 0.85rem;
     }
 
     .speech-bubble-v2 {
@@ -293,7 +324,7 @@
 @media (max-width: 480px) {
     .npc-guide-v2 {
         bottom: 15px;
-        right: 15px;
+        left: 15px;
     }
 
     .npc-container {
@@ -305,6 +336,10 @@
     .npc-avatar-v2 {
         width: 80px;
         height: 80px;
+    }
+
+    .npc-name {
+        font-size: 0.75rem;
     }
 
     .speech-bubble-v2 {
@@ -320,9 +355,9 @@
     }
 
     .bubble-pointer-v2 {
-        border-left: 12px solid transparent;
-        border-top: 12px solid var(--speech-border);
         border-right: 12px solid transparent;
-        right: 30%;
+        border-top: 12px solid var(--speech-border);
+        border-left: 12px solid transparent;
+        left: 30%;
     }
 }

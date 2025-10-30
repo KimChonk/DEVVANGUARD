@@ -1,0 +1,265 @@
+/* ===== NPC CHAT - FIXED IN QUEST PANEL ===== */
+
+.npc-chat-container {
+    background: linear-gradient(135deg, rgba(20, 20, 35, 0.95) 0%, rgba(40, 25, 60, 0.9) 100%);
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 20px;
+    box-shadow: 
+        0 8px 32px rgba(212, 175, 55, 0.25),
+        0 0 30px rgba(212, 175, 55, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    animation: fadeIn 0.4s ease-out;
+    min-height: 120px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== NPC HEADER ===== */
+.npc-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.npc-avatar-small {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b4789 0%, #d4af37 50%, #8b4789 100%);
+    padding: 2px;
+    box-shadow: 
+        0 0 15px rgba(212, 175, 55, 0.4),
+        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.npc-avatar-small::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    border: 2px solid #d4af37;
+    animation: avatarGlow 2s ease-in-out infinite;
+}
+
+@keyframes avatarGlow {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(212, 175, 55, 0.4), 0 0 15px rgba(139, 71, 137, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 0 25px rgba(139, 71, 137, 0.3);
+    }
+}
+
+.npc-image-small {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.npc-fallback-small {
+    font-size: 1.8rem;
+    display: none;
+}
+
+.npc-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.npc-title {
+    font-family: 'MedievalSharp', cursive;
+    color: #d4af37;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.npc-status {
+    font-family: 'Cinzel', serif;
+    color: #b4b4b4;
+    font-size: 0.75rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== MESSAGE AREA ===== */
+.npc-message {
+    background: rgba(10, 10, 20, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.npc-message.success {
+    background: rgba(74, 222, 128, 0.05);
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.npc-message.error {
+    background: rgba(248, 113, 113, 0.05);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+.npc-message.hint {
+    background: rgba(255, 215, 0, 0.05);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.npc-message.thinking {
+    animation: messagePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes messagePulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+}
+
+.npc-text {
+    color: #e8e8e8;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+    word-wrap: break-word;
+    flex: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.npc-placeholder {
+    color: #7d8590;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    margin: 0;
+    font-style: italic;
+}
+
+/* ===== TYPING INDICATOR ===== */
+.typing-dots {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d4af37;
+    animation: dotBounce 1.4s infinite;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dotBounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+    30% {
+        transform: translateY(-6px);
+        opacity: 1;
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .npc-chat-container {
+        padding: 12px;
+        margin-top: 16px;
+    }
+
+    .npc-avatar-small {
+        width: 45px;
+        height: 45px;
+    }
+
+    .npc-title {
+        font-size: 0.85rem;
+    }
+
+    .npc-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .npc-chat-container {
+        padding: 10px;
+        margin-top: 12px;
+        border-radius: 10px;
+    }
+
+    .npc-chat-header {
+        gap: 10px;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+
+    .npc-avatar-small {
+        width: 40px;
+        height: 40px;
+    }
+
+    .npc-title {
+        font-size: 0.75rem;
+    }
+
+    .npc-text {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .npc-message {
+        min-height: 50px;
+        padding: 10px;
+        border-radius: 6px;
+    }
+}
