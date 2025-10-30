@@ -8,6 +8,9 @@ import CourseScreen from "./pages/Course/CourseScreen";
 import LessonScreen from "./pages/Lesson/LessonScreen";
 import ProfileScreen from "./pages/Profile/ProfileScreen";
 import LeaderboardScreen from "./pages/Leaderboard/LeaderboardScreen";
+import DashboardScreen from "./pages/Dashboard/DashboardScreen";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import BackToTop from "./components/BackToTop";
 
 function App() {
   return (
@@ -18,11 +21,14 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/main-menu" element={<MainMenu />} />
+        <Route path="/dashboard" element={<DashboardScreen />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/course/:courseId" element={<CourseScreen />} />
         <Route path="/lesson/:lessonId" element={<LessonScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
         <Route path="/leaderboards" element={<LeaderboardScreen />} />
       </Routes>
+      <BackToTop />
     </BrowserRouter>
   );
 }
