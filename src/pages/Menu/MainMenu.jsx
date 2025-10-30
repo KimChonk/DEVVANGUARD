@@ -191,6 +191,9 @@ export default function MainMenu() {
                 )}
               </li>
               <li>
+                <a onClick={() => navigate("/dashboard")}>Dashboard</a>
+              </li>
+              <li>
                 <a href="/practice">
                   Practice <i className="fas fa-chevron-down"></i>
                 </a>
