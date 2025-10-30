@@ -10,6 +10,7 @@ import CourseScreen from "./pages/Course/CourseScreen";
 import LessonScreen from "./pages/Lesson/LessonScreen";
 import ProfileScreen from "./pages/Profile/ProfileScreen";
 import LeaderboardScreen from "./pages/Leaderboard/LeaderboardScreen";
+import EditProfile from "./pages/Profile/EditProfile";
 
 function App() {
   return (

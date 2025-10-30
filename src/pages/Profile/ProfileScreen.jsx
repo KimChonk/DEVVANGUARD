@@ -1,19 +1,18 @@
 // src/pages/Profile/ProfileScreen.jsx
 
-// ▼▼▼ BẮT ĐẦU PHẦN SỬA LỖI IMPORT ▼▼▼
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-// ▲▲▲ KẾT THÚC PHẦN SỬA LỖI IMPORT ▲▲▲
+
 
 import "../../assets/CSS/mainmenu.css";
 import "../../assets/CSS/profilescreen.css";
+import Navbar from "../../components/navbar.jsx";
 
 
 export default function ProfileScreen() {
-  // Bây giờ useNavigate đã được import và có thể sử dụng
+
   const navigate = useNavigate();
 
-  // ----- BẮT ĐẦU LOGIC CỦA NAVBAR -----
   const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
   
   const [courses] = useState([
@@ -25,8 +24,12 @@ export default function ProfileScreen() {
     { id: 6, title: "Algorithm Arena" },
   ]);
 
-  const toggleLearnMenu = () => {
-    setLearnMenuOpen((prevState) => !prevState);
+  const handleMenuEnter = () => {
+    setLearnMenuOpen(true);
+  };
+
+  const handleMenuLeave = () => {
+    setLearnMenuOpen(false);
   };
 
   const handleCourseClick = useCallback((courseId) => {
@@ -40,85 +43,63 @@ export default function ProfileScreen() {
   const handleLogout = useCallback(() => {
     navigate("/login");
   }, [navigate]);
-  // ----- KẾT THÚC LOGIC CỦA NAVBAR -----
 
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuView, setMobileMenuView] = useState("main");
 
-  // ----- LOGIC CỦA PROFILE SCREEN -----
-  const [user] = useState({
-    name: "Knight Coder",
-    username: "knightcoder99",
-    level: "Lv1",
-    joinedDate: "Oct 16, 2025",
-    avatar: "/images/default-avatar.jpg"
+  // OPTIMIZATION: Wrapped in useCallback
+  const showQuestsView = useCallback(() => {
+    setMobileMenuView("quests");
+  }, []);
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const showMainView = useCallback(() => {
+    setMobileMenuView("main");
+  }, []);
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen((prevState) => !prevState);
+  }, []);
+  
+  // OPTIMIZATION: Wrapped in useCallback
+  const handleMobileNav = useCallback(
+    (path) => {
+      navigate(path);
+      setMobileMenuOpen(false); // Đóng menu mobile
+    },
+    [navigate]
+  );
+
+  const handleEditProfile = () => {
+    navigate('/profile/edit'); // Điều hướng đến trang edit
+  };
+  
+  const [user] = useState(() => {
+    const storedUser = JSON.parse(localStorage.getItem('devVanguardUser')) || {};
+    
+    const defaultSkills = {
+      html: false, css: false, javascript: false, python: false,
+      java: false, cpp: false, sql: false, commandline: false,
+      react: false, github: false, numpy: false, typescript: false,
+    };
+
+    return {
+      name: storedUser.name || 'Knight Coder',
+      username: storedUser.username || 'knightcoder99',
+      avatar: storedUser.avatar || '/images/default-avatar.jpg',
+      level: storedUser.level || 'Lv1',
+      joinedDate: storedUser.joinedDate || 'Oct 16, 2025', // Giữ lại ngày tham gia
+      bio: storedUser.bio || "You don't have anything in your bio.",
+      skills: { ...defaultSkills, ...storedUser.skills },
+    };
   });
 
   return (
     <>
-      {/* ==================================================== */}
-      {/* ========= BẮT ĐẦU PHẦN CODE NAVBAR ĐÃ GỘP ========= */}
-      {/* ==================================================== */}
-      <nav className="main-navbar">
-        
-        <div className="main-nav-container">
-          <div className="main-nav-left">
-            <a className="logo-link" onClick={() => navigate("/main-menu")}>
-                <div className="main-nav-logo">
-                <img
-                    src="/icons/knight_icon.png"
-                    alt="Knight Icon"
-                    className="main-logo-icon"
-                />
-                <span className="main-logo-text">
-                    Dev <span className="main-highlight">Vanguard</span>
-                </span>
-                </div>
-            </a>
-            <ul className="main-nav-links">
-              <li className="nav-item-dropdown">
-                <button className="nav-link-button" onClick={toggleLearnMenu}>
-                  <span>Available Quests</span>
-                  <i className="fas fa-chevron-down"></i>
-                </button>
-                {isLearnMenuOpen && (
-                  <div className="dropdown-menu">
-                    {courses.map((course) => (
-                      <a
-                        key={course.id}
-                        className="dropdown-item"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleCourseClick(course.id);
-                        }}
-                      >
-                        {course.title}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </li>
-              <li><a href="/practice">Practice <i className="fas fa-chevron-down"></i></a></li>
-              <li><a href="/build">Build</a></li>
-              <li><a href="/leaderboards">Leaderboards</a></li>
-            </ul>
-          </div>
-          <div className="main-nav-right">
-            <button className="avatar-btn" onClick={handleAvatarClick}>
-              <img
-                src={user.avatar}
-                alt="User Avatar"
-                className="user-avatar"
-              />
-            </button>
-            <button className="logout-btn" onClick={handleLogout}>
-              <i className="fas fa-sign-out-alt"></i> Logout
-            </button>
-          </div>
-        </div>
-      </nav>
 
-      {/* ==================================================== */}
-      {/* =========== BẮT ĐẦU PHẦN PROFILE CONTENT =========== */}
-      {/* ==================================================== */}
+      <Navbar />
+
       <div className="profile-background"></div>
       <div className="profile-container">
         <div className="profile-header">
@@ -127,32 +108,48 @@ export default function ProfileScreen() {
             <h1>{user.name}</h1>
             <p>@{user.username}</p>
           </div>
+          <button className="edit-profile-btn" onClick={handleEditProfile}>
+            <i></i> 
+            <span>Edit Profile</span> {/* Bọc text trong <span> */}
+          </button>
         </div>
 
         <div className="profile-content">
           <div className="profile-sidebar">
             <div className="bio-card">
               <h2>Bio</h2>
-              <p className="level-badge">{user.level}</p>
-              <p>You don't have anything in your bio. Go to account and edit profile to add something cool about yourself!</p>
+              {/* <p className="level-badge">{user.level}</p> */}
+              <p>{user.bio}</p>
               <p>Joined {user.joinedDate}</p>
             </div>
             <div className="skills-card">
               <h2>Skills</h2>
-              <p>Add skills from account settings.</p>
-            </div>
+                <div className="skills-list">
+                  {/* Lọc ra các skill mà user đã check (value = true) */}
+                  {Object.keys(user.skills).filter(skill => user.skills[skill]).length > 0 ? (
+                    Object.keys(user.skills)
+                      .filter(skill => user.skills[skill])
+                      .map(skill => (
+                        <span key={skill} className="skill-tag">
+                          {skill.charAt(0).toUpperCase() + skill.slice(1).replace('cpp', 'C++').replace('github', 'Git & GitHub')}
+                        </span>
+                      ))
+                  ) : (
+                    <p>Add skills from settings.</p> /* Hiển thị nếu không có skill */
+                  )}
+                </div>
+              </div>
           </div>
 
           <div className="profile-main">
-            <div className="pinned-card">
+            {/* <div className="pinned-card">
               <h2>Pinned</h2>
               <div className="empty-state">Pin a project.</div>
-            </div>
+            </div> */}
 
-            <div className="stats-card"> {/* 1. Dùng một thẻ card chung */}
-                <h2>Stats</h2> {/* 2. Đặt H2 ở đây */}
+            <div className="stats-card"> 
+                <h2>Stats</h2> 
                 
-                {/* 3. Div này BÂY GIỜ chỉ chứa các mục stat */}
                 <div className="stats-grid"> 
                 <div className="stat-item"><h3>0</h3><p>Exercises</p></div>
                 <div className="stat-item"><h3>0</h3><p>Total XP</p></div>

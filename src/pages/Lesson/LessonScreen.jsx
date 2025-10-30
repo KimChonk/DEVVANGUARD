@@ -199,6 +199,47 @@ export default function LessonScreen() {
 
   const testCases = getTestCases();
 
+  
+  // const handleAvatarNav = (path) => {
+  //     navigate(path);
+  //     setAvatarMenuOpen(false);
+  // }
+
+  // useEffect(() => {
+  //   function handleClickOutside(event) {
+  //     if (avatarMenuRef.current && !avatarMenuRef.current.contains(event.target) && !event.target.closest('.mobile-avatar-btn')) {
+  //        setAvatarMenuOpen(false);
+  //     }
+  //   }
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, [avatarMenuRef]);
+
+
+  const toggleLessonMobileMenu = useCallback(() => {
+    setLessonMobileMenuOpen(prev => !prev);
+    // Reset to main view when opening/closing
+    if (!isLessonMobileMenuOpen) {
+        setLessonMobileMenuView('main');
+    }
+  }, [isLessonMobileMenuOpen]);
+
+  const showAccountView = useCallback(() => setLessonMobileMenuView('account'), []);
+  const showMainMenuView = useCallback(() => setLessonMobileMenuView('main'), []);
+
+  // Navigation (closes the entire side menu)
+  const handleLessonMobileNav = useCallback((path) => {
+      navigate(path);
+      setLessonMobileMenuOpen(false);
+  }, [navigate]);
+
+   // Logout (closes the entire side menu)
+   const handleLogout = useCallback(() => {
+    setLessonMobileMenuOpen(false);
+    // Add token/session clearing logic if needed
+    navigate("/login");
+  }, [navigate]);
+  
   return (
     <div className="lesson-game-container">
       {/* Background Effects */}
@@ -247,6 +288,33 @@ export default function LessonScreen() {
               <p>Không có mô tả đề bài</p>
             )}
           </div>
+        </div>
+        <div className="mobile-tabs">
+          <button className={`mobile-tab ${activeMobileTab === 'learn' ? 'active' : ''}`} onClick={() => setActiveMobileTab('learn')}>Learn</button>
+          <button className={`mobile-tab ${activeMobileTab === 'code' ? 'active' : ''}`} onClick={() => setActiveMobileTab('code')}>Code</button>
+          <button className={`mobile-tab ${activeMobileTab === 'output' ? 'active' : ''}`} onClick={() => setActiveMobileTab('output')}>Output</button>
+        </div>
+        <div className="mobile-nav-right">
+          {/* <div className="avatar-menu-container mobile-avatar-container" ref={avatarMenuRef}>
+             <button className="avatar-btn mobile-avatar-btn" onClick={toggleAvatarMenu}>
+               <img src={user.avatar} alt="User Avatar" className="user-avatar"/>
+             </button>
+             {isAvatarMenuOpen && (
+              <div className="avatar-dropdown-menu">
+                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile')}>
+                  <i className="fas fa-user-circle icon-padding"></i> Profile
+                </button>
+                <button className="avatar-dropdown-item" onClick={() => handleAvatarNav('/profile/edit')}>
+                   <i className="fas fa-cog icon-padding"></i> Account
+                </button>
+              </div>
+             )}
+          </div> */}
+          <button className="mobile-hamburger" onClick={toggleLessonMobileMenu}>
+            <i className="fas fa-bars"></i>
+          </button>
+        </div>
+      </nav>
 
           {/* Test Cases Preview */}
           {testCases.length > 0 && (

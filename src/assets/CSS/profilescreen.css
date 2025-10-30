@@ -83,6 +83,7 @@
 }
 
 .profile-header {
+  position:   relative;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -201,6 +202,37 @@
   opacity: 0.9;
 }
 
+.edit-profile-btn {
+  /* 1. Di chuyển nút vào góc (ô đỏ) */
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  
+  /* 2. Style "Viền Vàng" cho đẹp */
+  background: transparent;
+  border: 2px solid var(--primary-gold);
+  color: var(--primary-gold);
+  
+  /* 3. Style chung */
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.edit-profile-btn i {
+  margin-right: 8px;
+}
+
+.edit-profile-btn:hover {
+  /* Hiệu ứng khi di chuột vào */
+  background: var(--primary-gold);
+  color: var(--dark-blue);
+  box-shadow: 0 0 15px var(--glow-gold);
+}
 
 /* Responsive Design cho Profile Page */
 @media (max-width: 992px) {
@@ -209,6 +241,11 @@
   }
   .profile-container {
     padding-top: 80px; /* Điều chỉnh padding top cho màn hình nhỏ hơn */
+  }
+  .edit-profile-btn {
+    position: static; /* Bỏ định vị tuyệt đối */
+    width: 100%;
+    margin-top: 20px;
   }
 }
 
@@ -227,10 +264,93 @@
     grid-template-columns: 1fr; /* Stack các stats trên mobile */
   }
 }
+@media (max-width: 480px) {
+
+  /* Sửa lại padding cho toàn bộ container */
+  .leaderboard-container {
+    /* Giảm padding ngang để có thêm không gian */
+    padding: 20px 15px; 
+  }
+
+  /* * Sửa lỗi "lệch" của header
+   * Cho icon cúp nằm trên, chữ nằm dưới 
+  */
+  .leaderboard-header {
+    flex-direction: column; /* Xếp chồng lên nhau */
+    align-items: center;    /* Căn giữa theo chiều ngang */
+    text-align: center;     /* Căn giữa chữ */
+    gap: 15px;              /* Giảm khoảng cách giữa cúp và chữ */
+  }
+
+  /* Thu nhỏ icon cúp */
+  .trophy-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* * Sửa lỗi chữ "Leaderboards" quá to 
+  */
+  .leaderboard-title {
+    font-size: 2.5rem; /* Giảm cỡ chữ (bạn có thể chỉnh 2.2rem, 2.8rem, v.v.) */
+  }
+
+  /* Thu nhỏ phụ đề */
+  .leaderboard-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  /* Tinh chỉnh lại các hàng cho gọn hơn */
+  .leaderboard-item {
+    padding: 10px 15px; /* Giảm padding trong mỗi hàng */
+  }
+
+  .leaderboard-item .avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .leaderboard-item .user-name {
+    font-size: 1rem;
+  }
+
+  .leaderboard-item .user-handle {
+    font-size: 0.8rem;
+  }
+
+  .leaderboard-item .xp {
+    font-size: 1rem;
+    min-width: auto; /* Bỏ min-width để nó co lại */
+    text-align: right;
+  }
+  /* .edit-profile-btn span {
+    display: none;} 
+   */
+  .edit-profile-btn i {
+    margin-right: 0; /* Bỏ khoảng cách */
+  }
+}
 
 .profile-main {
   display: flex;             /* 1. Kích hoạt Flexbox */
   flex-direction: column;    /* 2. Xếp các mục theo chiều dọc */
   gap: 20px; /* 3. Tạo khoảng cách 20px giữa các mục */
   align-self: start;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép các skill xuống hàng */
+  gap: 10px;
+}
+
+.skill-tag {
+  background-color: rgba(15, 52, 96, 0.7); /* Màu xanh từ theme */
+  border: 1px solid var(--primary-gold);
+  color: var(--text-gold);
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: "Cinzel", serif;
 }
