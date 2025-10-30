@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../assets/CSS/intro.css"; // Import CSS
 
 export default function Intro() {
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   useEffect(() => {
     // Scroll animation giống script trong HTML
     const links = document.querySelectorAll('a[href^="#"]');
@@ -56,18 +57,76 @@ export default function Intro() {
       <div className="hero">
         <div className="hero-bg"></div>
         <div className="overlay"></div>
+
         <nav className="navbar">
+          {/* 1. THANH NAVBAR (LOGO, LINKS DESKTOP, NÚT HAMBURGER) */}
           <div className="navbar-container">
             <a href="#" className="logo">
               <img src="/icons/knight_icon.png" alt="DevVanguard Knight" className="logo-icon" />
               Dev<span>Vanguard</span>
             </a>
+            
+            {/* 2. CÁC LINK CHO DESKTOP (Đây là phần bị thiếu) */}
             <div className="nav-links">
               <a href="#courses">Courses</a>
               <a href="#features">Features</a>
               <a href="#developers">Our Wizards</a>
               <a href="#stats">Kingdom Stats</a>
             </div>
+            
+            {/* 3. NÚT HAMBURGER (Chỉ hiện trên mobile) */}
+            <button 
+              className="hamburger-btn-intro" 
+              onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <i className="fas fa-bars"></i>
+            </button>
+          </div>
+
+          {/* 4. MENU TRƯỢT RA CHO MOBILE (Tách riêng ra) */}
+          <div className={`mobile-menu-intro ${isMobileMenuOpen ? 'open' : ''}`}>
+            
+            {/* Header của menu mobile */}
+            <div className="mobile-menu-header-intro">
+              <button className="mobile-menu-close-intro" onClick={() => setMobileMenuOpen(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+              <span>Menu</span>
+            </div>
+            
+            {/* Danh sách link của menu mobile */}
+            <ul className="mobile-menu-list-intro">
+              <li>
+                <a href="#courses" onClick={() => setMobileMenuOpen(false)}>
+                  <span><i className="fas fa-book-open icon-padding"></i> Courses</span>
+                  <i className="fas fa-chevron-right arrow-right"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#features" onClick={() => setMobileMenuOpen(false)}>
+                  <span><i className="fas fa-star icon-padding"></i> Features</span>
+                  <i className="fas fa-chevron-right arrow-right"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#developers" onClick={() => setMobileMenuOpen(false)}>
+                  <span><i className="fas fa-magic icon-padding"></i> Our Wizards</span>
+                  <i className="fas fa-chevron-right arrow-right"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#stats" onClick={() => setMobileMenuOpen(false)}>
+                  <span><i className="fas fa-chart-bar icon-padding"></i> Kingdom Stats</span>
+                  <i className="fas fa-chevron-right arrow-right"></i>
+                </a>
+              </li>
+              <hr className="mobile-divider-intro" />
+              <li>
+                <a href="/login">
+                  <span><i className="fas fa-sign-in-alt icon-padding"></i> Sign In</span>
+                </a>
+              </li>
+            </ul>
           </div>
         </nav>
 

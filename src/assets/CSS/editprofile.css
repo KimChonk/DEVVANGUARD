@@ -1,0 +1,251 @@
+/* src/assets/CSS/editprofile.css */
+
+/* * File này sử dụng các biến màu và font từ mainmenu.css
+ * (ví dụ: --primary-gold, --dark-blue, "Cinzel", "MedievalSharp")
+*/
+
+.edit-profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  padding-top: 100px; /* Dưới navbar */
+  color: var(--text-light);
+  font-family: "Cinzel", serif;
+  position: relative; /* Để nằm trên background */
+  z-index: 1;
+}
+
+.edit-profile-container h2 {
+  font-family: "MedievalSharp", cursive;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-gold);
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--primary-gold);
+  padding-bottom: 10px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.edit-profile-form {
+  width: 100%;
+}
+
+.edit-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Cột trái 1, Cột phải 2 */
+  gap: 40px;
+}
+
+/* --- CỘT BÊN TRÁI --- */
+.profile-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.avatar-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: rgba(26, 26, 46, 0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.avatar-preview-edit {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-gold);
+  object-fit: cover;
+}
+
+.avatar-upload-text p {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  opacity: 0.7;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* --- CỘT BÊN PHẢI & FORM CHUNG --- */
+.profile-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  width: 100%;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-gold);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  background-color: rgba(15, 52, 96, 0.5); /* Nền xanh đậm trong theme */
+  border: 1px solid var(--primary-gold);
+  border-radius: 8px;
+  padding: 12px 15px;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-family: "Cinzel", serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--secondary-gold);
+  box-shadow: 0 0 10px var(--glow-gold); /* Hiệu ứng phát sáng */
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-group .required {
+  color: #ff5555; /* Màu đỏ */
+}
+
+/* --- SKILLS SECTION --- */
+.skills-section {
+  background: rgba(26, 26, 46, 0.8);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.skills-section h3 {
+  font-family: "MedievalSharp", cursive;
+  color: var(--text-gold);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.skill-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* === SỬA LỖI: Sửa 'type_note' thành 'type' === */
+.skill-item input[type="checkbox"] {
+  /* Style checkbox cho hợp theme */
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background-color: rgba(15, 52, 96, 0.5);
+  border: 1px solid var(--primary-gold);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* === SỬA LỖI: Sửa 'type_note' thành 'type' === */
+.skill-item input[type="checkbox"]:checked {
+  background-color: var(--primary-gold);
+}
+
+/* === SỬA LỖI: Sửa 'type_note' thành 'type' === */
+.skill-item input[type="checkbox"]:checked::before {
+  content: '✔';
+  font-size: 12px;
+  color: var(--dark-blue);
+  position: absolute;
+  top: 0px;
+  left: 3px;
+}
+
+.skill-item label {
+  font-weight: 400;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+/* --- NÚT BẤM --- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.cancel-btn, .save-btn {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-family: "Cinzel", serif;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid var(--primary-gold);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  color: var(--primary-gold);
+}
+
+.cancel-btn:hover {
+  background-color: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 10px var(--glow-gold);
+}
+
+.save-btn {
+  background-color: var(--primary-gold);
+  color: var(--dark-blue);
+}
+
+.save-btn:hover {
+  background-color: var(--secondary-gold);
+  box-shadow: 0 0 15px var(--glow-gold);
+}
+
+/* --- RESPONSIVE CHO EDIT FORM --- */
+@media (max-width: 768px) {
+  .edit-profile-grid {
+    grid-template-columns: 1fr; /* 1 cột */
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 cột */
+  }
+}
+
+@media (max-width: 480px) {
+  .skills-grid {
+    grid-template-columns: 1fr; /* 1 cột */
+  }
+
+  .form-actions {
+    flex-direction: column-reverse; /* Xếp chồng nút, Save ở trên */
+    width: 100%;
+  }
+
+  .cancel-btn, .save-btn {
+    width: 100%;
+  }
+}
