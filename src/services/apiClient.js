@@ -198,6 +198,16 @@ export const userService = {
     }
   },
 
+  // Lấy profile của user theo ID (cho việc fetch role)
+  async getUserProfile(userId) {
+    try {
+      const user = await apiCall(`/user/${userId}`);
+      return { success: true, data: user };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
   // Tạo profile cho user hiện tại
   async createMyProfile(email, fullName) {
     try {

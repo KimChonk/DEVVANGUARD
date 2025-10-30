@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/supabaseClient";
+import { userService } from "../../services/apiClient";
 import "../../assets/CSS/auth.css";
 
 export default function Login() {
@@ -35,10 +36,29 @@ export default function Login() {
 
       if (result.success) {
         setSuccessMessage(result.message);
-        // Đợi 2 giây rồi điều hướng
-        setTimeout(() => {
-          navigate("/main-menu");
-        }, 2000);
+        
+        // Fetch user profile để kiểm tra role
+        try {
+          const session = await authService.getSession();
+          if (session?.user?.id) {
+            const userData = await userService.getUserProfile(session.user.id);
+            const role = userData?.data?.role || 'user';
+            
+            // Đợi 2 giây rồi điều hướng theo role
+            setTimeout(() => {
+              if (role === 'admin') {
+                navigate("/admin");
+              } else {
+                navigate("/main-menu");
+              }
+            }, 2000);
+          }
+        } catch (profileErr) {
+          console.warn("Could not fetch user role, redirecting to main menu:", profileErr);
+          setTimeout(() => {
+            navigate("/main-menu");
+          }, 2000);
+        }
       } else {
         setError(result.message);
       }
