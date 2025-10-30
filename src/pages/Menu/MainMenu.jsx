@@ -281,7 +281,7 @@ export default function MainMenu() {
                         <span>{course.language || "General"}</span>
                       </div>
                       <div className="course-lessons">
-                        {course.lessons || "0"} Lessons
+                        {Array.isArray(course.lessons) ? course.lessons.length : "0"} Lessons
                       </div>
                     </div>
 

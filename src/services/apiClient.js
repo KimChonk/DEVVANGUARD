@@ -43,8 +43,15 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
     console.log(`✅ Response Status: ${response.status}`);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `API error: ${response.status}`);
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `API error: ${response.status}`);
+      } catch (parseError) {
+        // Response không phải JSON (có thể là HTML exception page)
+        const errorText = await response.text();
+        console.error("❌ Error Response Text:", errorText.substring(0, 200));
+        throw new Error(`API error: ${response.status} - ${errorText.substring(0, 100)}`);
+      }
     }
 
     if (response.status === 204) {
