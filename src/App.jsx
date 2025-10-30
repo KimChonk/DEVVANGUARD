@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Intro from "./pages/intro";
 import Login from "./pages/Account/Login";
 import Register from "./pages/Account/Register";
@@ -12,20 +14,59 @@ import EditProfile from "./pages/Profile/EditProfile";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Intro />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/main-menu" element={<MainMenu />} />
-        <Route path="/course/:courseId" element={<CourseScreen />} />
-        <Route path="/lesson/:lessonId" element={<LessonScreen />} />
-        <Route path="/profile" element={<ProfileScreen />} />
-        <Route path="/leaderboards" element={<LeaderboardScreen />} />
-        <Route path="/profile/edit" element={<EditProfile />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Intro />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ForgotPassword />} />
+          
+          {/* Protected Routes */}
+          <Route 
+            path="/main-menu" 
+            element={
+              <ProtectedRoute>
+                <MainMenu />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/course/:courseId" 
+            element={
+              <ProtectedRoute>
+                <CourseScreen />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/lesson/:lessonId" 
+            element={
+              <ProtectedRoute>
+                <LessonScreen />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <ProfileScreen />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/leaderboards" 
+            element={
+              <ProtectedRoute>
+                <LeaderboardScreen />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

@@ -1,12 +1,18 @@
-import { useState, useMemo, useCallback } from "react";
-import Navbar from "../../components/navbar.jsx";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCourses } from "../../hooks/useCourses";
+import { useUserProfile, useUserStats } from "../../hooks/useUser";
+import { authService } from "../../services/supabaseClient";
 import "../../assets/CSS/mainmenu.css";
 
 
 export default function MainMenu() {
   const navigate = useNavigate();
-  const [user] = useState({
+  const { courses, loading: coursesLoading } = useCourses();
+  const { profile, loading: profileLoading } = useUserProfile();
+  const { stats, loading: statsLoading } = useUserStats();
+
+  const [user, setUser] = useState({
     name: "Knight Coder",
     avatar: "/images/default-avatar.jpg",
     level: "Code Knight",
@@ -14,6 +20,27 @@ export default function MainMenu() {
     nextLevelXP: 1000,
     dailyStreak: 7,
   });
+
+  // Update user info từ API
+  useEffect(() => {
+    if (profile) {
+      setUser((prev) => ({
+        ...prev,
+        name: profile.fullName || profile.email || prev.name,
+      }));
+    }
+  }, [profile]);
+
+  // Update XP từ stats
+  useEffect(() => {
+    if (stats) {
+      setUser((prev) => ({
+        ...prev,
+        currentXP: parseInt(stats.xp) || 0,
+        nextLevelXP: 1000,
+      }));
+    }
+  }, [stats]);
 
   // Random daily advice that changes each time page loads
   const dailyAdvices = [
@@ -33,85 +60,12 @@ export default function MainMenu() {
     return dailyAdvices[Math.floor(Math.random() * dailyAdvices.length)];
   });
 
-  // Sample courses data
-  const [courses] = useState([
-    {
-      id: 1,
-      title: "Python Mastery",
-      description:
-        "Master the ancient art of Python programming and unlock the secrets of data manipulation.",
-      level: "Beginner",
-      lessons: 24,
-      progress: 35,
-      status: "continue",
-    },
-    {
-      id: 2,
-      title: "HTML & CSS Foundations",
-      description:
-        "Build the foundation of web development with HTML structure and CSS styling magic.",
-      level: "Beginner",
-      lessons: 18,
-      progress: 100,
-      status: "completed",
-    },
-    {
-      id: 3,
-      title: "JavaScript Adventures",
-      description:
-        "Embark on dynamic adventures with JavaScript and bring your web pages to life.",
-      level: "Intermediate",
-      lessons: 32,
-      progress: 0,
-      status: "start",
-    },
-    // ... (other courses remain the same)
-    {
-      id: 4,
-      title: "React Kingdom",
-      description:
-        "Rule the React kingdom and build powerful, interactive user interfaces.",
-      level: "Advanced",
-      lessons: 28,
-      progress: 0,
-      status: "start",
-    },
-    {
-      id: 5,
-      title: "Database Dungeons",
-      description:
-        "Navigate through database dungeons and master the art of data storage and retrieval.",
-      level: "Intermediate",
-      lessons: 20,
-      progress: 60,
-      status: "continue",
-    },
-    {
-      id: 6,
-      title: "Algorithm Arena",
-      description:
-        "Battle in the algorithm arena and sharpen your problem-solving skills.",
-      level: "Advanced",
-      lessons: 25,
-      progress: 0,
-      status: "start",
-    },
-  ]);
-
   const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
-  // OPTIMIZATION: Removed unused 'isPracticeMenuOpen' state
-
-  // OPTIMIZATION: Wrapped in useCallback to prevent re-creation on re-renders
-  const handleMenuEnter = useCallback(() => {
-    setLearnMenuOpen(true);
-  }, []);
-
-  // OPTIMIZATION: Wrapped in useCallback
-  const handleMenuLeave = useCallback(() => {
-    setLearnMenuOpen(false);
-  }, []);
-
+  const [isPracticeMenuOpen, setPracticeMenuOpen] = useState(false);
   
+  const toggleLearnMenu = () => {
+    setLearnMenuOpen((prevState) => !prevState);
+  }; 
 
   const handleCourseClick = useCallback(
     (courseId) => {
@@ -126,8 +80,11 @@ export default function MainMenu() {
     navigate("/profile"); // This will navigate to the new profile page
   }, [navigate]);
 
-  const handleLogout = useCallback(() => {
-    navigate("/login");
+  const handleLogout = useCallback(async () => {
+    const result = await authService.signOut();
+    if (result.success) {
+      navigate("/login");
+    }
   }, [navigate]);
 
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -189,8 +146,81 @@ export default function MainMenu() {
     <div className="main-menu-container">
       <div className="main-menu-background"></div>
 
-      <Navbar />
-      
+      {/* Navigation */}
+      <nav className="main-navbar">
+        <div className="main-nav-container">
+          <div className="main-nav-left">
+            <a className="logo-link" onClick={() => navigate("/main-menu")}>
+                <div className="main-nav-logo">
+                <img
+                    src="/icons/knight_icon.png"
+                    alt="Knight Icon"
+                    className="main-logo-icon"
+                />
+                <span className="main-logo-text">
+                    Dev <span className="main-highlight">Vanguard</span>
+                </span>
+                </div>
+            </a>
+
+            <ul className="main-nav-links">
+              <li className="nav-item-dropdown">
+                {" "}
+                {/* Thêm class để dễ style */}
+                <a onClick={toggleLearnMenu}>
+                  {" "}
+                  {/* Dùng onClick thay cho href */}
+                  Available Quests <i className="fas fa-chevron-down"></i>
+                </a>
+                {isLearnMenuOpen && (
+                  <div className="dropdown-menu">
+                    {courses && courses.length > 0 ? (
+                      courses.map((course) => (
+                        <a
+                          key={course.courseId || course.id}
+                          className="dropdown-item"
+                          onClick={() => navigate(`/course/${course.courseId || course.id}`)}
+                        >
+                          {course.name || course.title}
+                        </a>
+                      ))
+                    ) : (
+                      <a className="dropdown-item">Đang tải...</a>
+                    )}
+                  </div>
+                )}
+              </li>
+              <li>
+                <a href="/practice">
+                  Practice <i className="fas fa-chevron-down"></i>
+                </a>
+              </li>
+              <li>
+                <a href="/build">Build</a>
+              </li>
+              <li>
+                <a href="/leaderboards" className="nav-button">Leaderboards</a>
+              </li>
+            </ul>
+          </div>
+          <div className="main-nav-right">
+            <button className="avatar-btn" onClick={handleAvatarClick}>
+            <img 
+              src={user.avatar} 
+              alt="User Avatar" 
+              className="user-avatar"
+              onError={(e) => {
+                e.target.src = "/icons/knight_icon.png";
+              }}
+            />
+          </button>
+            <button className="logout-btn" onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+
       {/* Main Content */}
       <div className="main-content">
         {/* User Stats Sidebar */}
@@ -259,61 +289,44 @@ export default function MainMenu() {
             </div>
 
             <div className="courses-grid">
-              {courses.map((course) => (
-                <div
-                  key={course.id}
-                  className="course-card"
-                  onClick={() => handleCourseClick(course.id)}
-                  role="button"
-                  tabIndex="0"
-                >
-                  <h3 className="course-title">{course.title}</h3>
-                  <p className="course-description">{course.description}</p>
+              {coursesLoading ? (
+                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
+                  <p>Đang tải các khóa học...</p>
+                </div>
+              ) : courses && courses.length > 0 ? (
+                courses.map((course) => (
+                  <div
+                    key={course.courseId || course.id}
+                    className="course-card"
+                    onClick={() => handleCourseClick(course.courseId || course.id)}
+                  >
+                    <h3 className="course-title">{course.name || course.title}</h3>
+                    <p className="course-description">
+                      {course.description || "Bài học chuyên biệt"}
+                    </p>
 
-                  <div className="course-meta">
-                    <div className="course-level">
-                      {getLevelIcon(course.level)}
-                      <span>{course.level}</span>
-                    </div>
-                    <div className="course-lessons">
-                      {course.lessons} Lessons
-                    </div>
-                  </div>
-
-                  {course.progress > 0 && (
-                    <div className="course-progress">
-                      <div className="progress-label">
-                        <span>Progress</span>
-                        <span>{course.progress}%</span>
+                    <div className="course-meta">
+                      <div className="course-level">
+                        <i className="fas fa-star"></i>
+                        <span>{course.language || "General"}</span>
                       </div>
-                      <div className="progress-bar">
-                        <div
-                          className="progress-fill"
-                          style={{ width: `${course.progress}%` }}
-                        ></div>
+                      <div className="course-lessons">
+                        {Array.isArray(course.lessons) ? course.lessons.length : "0"} Lessons
                       </div>
                     </div>
-                  )}
 
-                  <div className="course-action">
-                    {course.status === "start" && (
+                    <div className="course-action">
                       <button className="start-course-btn">
                         <i className="fas fa-play"></i> Start Quest
                       </button>
-                    )}
-                    {course.status === "continue" && (
-                      <button className="continue-course-btn">
-                        <i className="fas fa-arrow-right"></i> Continue Quest
-                      </button>
-                    )}
-                    {course.status === "completed" && (
-                      <button className="continue-course-btn">
-                        <i className="fas fa-check"></i> Review Quest
-                      </button>
-                    )}
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
+                  <p>Chưa có khóa học nào. Hãy quay lại sau!</p>
                 </div>
-              ))}
+              )}
             </div>
           </section>
         </div>
