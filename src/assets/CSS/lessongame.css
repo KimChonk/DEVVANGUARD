@@ -250,15 +250,23 @@ body {
     background: #0d1117;
     border: 1px solid #30363d;
     border-radius: 8px;
-    padding: 15px;
+    padding: 0;
     color: #c9d1d9;
-    font-family: 'Courier New', monospace;
+    font-family: 'Fira Code', 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.6;
     resize: none;
     outline: none;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-gold) transparent;
+    overflow: hidden;
+}
+
+/* Monaco Editor Container */
+.code-arena > div {
+    height: 100% !important;
+}
+
+.monaco-editor .overflow-guard {
+    border-radius: 6px;
 }
 
 .code-arena::-webkit-scrollbar {
@@ -319,6 +327,15 @@ body {
     color: var(--warning-orange);
     background: rgba(255, 152, 0, 0.2);
     animation: statusPulse 1s ease-in-out infinite;
+}
+
+.execution-time {
+    font-size: 0.8rem;
+    color: var(--text-gold);
+    background: rgba(212, 175, 55, 0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
 }
 
 @keyframes statusPulse {

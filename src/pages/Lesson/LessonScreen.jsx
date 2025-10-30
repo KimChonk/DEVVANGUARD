@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { lessonService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
-import NPCGuide from "../../components/NPCGuide";
+import NPCChat from "../../components/NPCChat";
+import CodeEditor from "../../components/CodeEditor";
 import "../../assets/CSS/lessongame.css";
 
 // NPC feedback for different lesson types
@@ -40,6 +41,7 @@ export default function LessonScreen() {
   const [output, setOutput] = useState("Kết quả sẽ hiển thị ở đây...");
   const [isRunning, setIsRunning] = useState(false);
   const [testResults, setTestResults] = useState(null);
+  const [executionTime, setExecutionTime] = useState(0);
   
   // NPC Guide states
   const [npcMessage, setNpcMessage] = useState("");
@@ -113,6 +115,7 @@ export default function LessonScreen() {
     setIsRunning(true);
     setOutput("⏳ Đang chạy code...");
     setTestResults(null);
+    setExecutionTime(0);
     setNpcStatus("thinking");
     setShowNpc(true);
     
@@ -125,6 +128,9 @@ export default function LessonScreen() {
 
       // Execute code and validate
       const result = await executeAndValidate(language, code, testCases);
+
+      // Store execution time
+      setExecutionTime(result.execution.executionTime || 0);
 
       // Show output
       if (result.execution.success) {
@@ -277,6 +283,12 @@ export default function LessonScreen() {
               </div>
             </div>
           )}
+
+          {/* NPC Chat - Fixed in Quest Panel */}
+          <NPCChat 
+            feedback={npcMessage}
+            status={npcStatus}
+          />
         </section>
 
         {/* Right Panel - Code Editor */}
@@ -286,14 +298,15 @@ export default function LessonScreen() {
             <span className="editor-hint">Python 3.10</span>
           </div>
 
-          <textarea
-            className="code-arena"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Viết code của bạn ở đây..."
-            disabled={isRunning}
-            spellCheck="false"
-          />
+          <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+            <CodeEditor 
+              code={code}
+              onChange={setCode}
+              language="python"
+              disabled={isRunning}
+              onSave={handleRunCode}
+            />
+          </div>
 
           {/* Output Console */}
           <div className="output-console">
@@ -302,6 +315,9 @@ export default function LessonScreen() {
               <span className={`console-status ${isRunning ? 'running' : 'idle'}`}>
                 {isRunning ? "⏳ Đang chạy..." : "✓ Ready"}
               </span>
+              {executionTime > 0 && (
+                <span className="execution-time">⏱️ {executionTime}ms</span>
+              )}
             </div>
             <pre className="console-output">{output}</pre>
           </div>
@@ -378,13 +394,6 @@ export default function LessonScreen() {
           )}
         </section>
       </div>
-
-      {/* NPC Guide */}
-      <NPCGuide 
-        lessonTitle={lesson?.lessonTitle}
-        feedback={npcMessage}
-        status={npcStatus}
-      />
 
       {/* Loading State */}
       {loading && (

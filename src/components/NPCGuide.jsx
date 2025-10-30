@@ -100,24 +100,25 @@ export default function NPCGuide({
     }
   }, [feedback, status]);
 
-  if (!isVisible) return null;
-
   return (
     <div className="npc-guide-v2">
       <div className="npc-container">
-        {/* NPC Avatar */}
-        <div className="npc-avatar-v2">
-          <img 
-            src="/icons/masterOogWay.png" 
-            alt="Master OogWay"
-            className="npc-image"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextElementSibling.style.display = 'block';
-            }}
-          />
-          {/* Fallback avatar if image not found */}
-          <div className="npc-fallback">🧙‍♂️</div>
+        {/* NPC Avatar with Name */}
+        <div className="npc-avatar-section">
+          <div className="npc-avatar-v2">
+            <img 
+              src="/icons/masterOogWay.png" 
+              alt="Mystery Wizard"
+              className="npc-image"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+            {/* Fallback avatar if image not found */}
+            <div className="npc-fallback">🧙‍♂️</div>
+          </div>
+          <div className="npc-name">Mystery Wizard</div>
         </div>
 
         {/* Speech Bubble */}
