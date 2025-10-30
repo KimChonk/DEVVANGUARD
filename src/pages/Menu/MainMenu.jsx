@@ -5,6 +5,7 @@ import { useUserProfile, useUserStats } from "../../hooks/useUser";
 import { authService } from "../../services/supabaseClient";
 import "../../assets/CSS/mainmenu.css";
 
+
 export default function MainMenu() {
   const navigate = useNavigate();
   const { courses, loading: coursesLoading } = useCourses();
@@ -69,13 +70,15 @@ export default function MainMenu() {
   const handleCourseClick = useCallback(
     (courseId) => {
       navigate(`/course/${courseId}`);
+      setMobileMenuOpen(false);
     },
     [navigate]
   );
 
-  const handleAvatarClick = () => {
+  // OPTIMIZATION: Wrapped in useCallback
+  const handleAvatarClick = useCallback(() => {
     navigate("/profile"); // This will navigate to the new profile page
-  };
+  }, [navigate]);
 
   const handleLogout = useCallback(async () => {
     const result = await authService.signOut();
@@ -83,6 +86,33 @@ export default function MainMenu() {
       navigate("/login");
     }
   }, [navigate]);
+
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuView, setMobileMenuView] = useState("main");
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const showQuestsView = useCallback(() => {
+    setMobileMenuView("quests");
+  }, []);
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const showMainView = useCallback(() => {
+    setMobileMenuView("main");
+  }, []);
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen((prevState) => !prevState);
+  }, []);
+  
+  // OPTIMIZATION: Wrapped in useCallback
+  const handleMobileNav = useCallback(
+    (path) => {
+      navigate(path);
+      setMobileMenuOpen(false); // Đóng menu mobile
+    },
+    [navigate]
+  );
 
   const getLevelIcon = useCallback((level) => {
     switch (level) {
