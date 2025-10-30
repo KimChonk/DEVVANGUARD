@@ -1,6 +1,8 @@
 import { useState, useMemo, useCallback } from "react";
+import Navbar from "../../components/navbar.jsx";
 import { useNavigate } from "react-router-dom";
 import "../../assets/CSS/mainmenu.css";
+
 
 export default function MainMenu() {
   const navigate = useNavigate();
@@ -63,6 +65,7 @@ export default function MainMenu() {
       progress: 0,
       status: "start",
     },
+    // ... (other courses remain the same)
     {
       id: 4,
       title: "React Kingdom",
@@ -95,26 +98,64 @@ export default function MainMenu() {
     },
   ]);
 
- const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
-  const [isPracticeMenuOpen, setPracticeMenuOpen] = useState(false);
-  const toggleLearnMenu = () => {
-    setLearnMenuOpen((prevState) => !prevState);
-  }; 
+  const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
+  // OPTIMIZATION: Removed unused 'isPracticeMenuOpen' state
+
+  // OPTIMIZATION: Wrapped in useCallback to prevent re-creation on re-renders
+  const handleMenuEnter = useCallback(() => {
+    setLearnMenuOpen(true);
+  }, []);
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const handleMenuLeave = useCallback(() => {
+    setLearnMenuOpen(false);
+  }, []);
+
+  
 
   const handleCourseClick = useCallback(
     (courseId) => {
       navigate(`/course/${courseId}`);
+      setMobileMenuOpen(false);
     },
     [navigate]
   );
 
-  const handleAvatarClick = () => {
+  // OPTIMIZATION: Wrapped in useCallback
+  const handleAvatarClick = useCallback(() => {
     navigate("/profile"); // This will navigate to the new profile page
-  };
+  }, [navigate]);
 
   const handleLogout = useCallback(() => {
     navigate("/login");
   }, [navigate]);
+
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuView, setMobileMenuView] = useState("main");
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const showQuestsView = useCallback(() => {
+    setMobileMenuView("quests");
+  }, []);
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const showMainView = useCallback(() => {
+    setMobileMenuView("main");
+  }, []);
+
+  // OPTIMIZATION: Wrapped in useCallback
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen((prevState) => !prevState);
+  }, []);
+  
+  // OPTIMIZATION: Wrapped in useCallback
+  const handleMobileNav = useCallback(
+    (path) => {
+      navigate(path);
+      setMobileMenuOpen(false); // Đóng menu mobile
+    },
+    [navigate]
+  );
 
   const getLevelIcon = useCallback((level) => {
     switch (level) {
@@ -148,78 +189,8 @@ export default function MainMenu() {
     <div className="main-menu-container">
       <div className="main-menu-background"></div>
 
-      {/* Navigation */}
-      <nav className="main-navbar">
-        <div className="main-nav-container">
-          <div className="main-nav-left">
-            <a className="logo-link" onClick={() => navigate("/main-menu")}>
-                <div className="main-nav-logo">
-                <img
-                    src="/icons/knight_icon.png"
-                    alt="Knight Icon"
-                    className="main-logo-icon"
-                />
-                <span className="main-logo-text">
-                    Dev <span className="main-highlight">Vanguard</span>
-                </span>
-                </div>
-            </a>
-
-            <ul className="main-nav-links">
-              <li className="nav-item-dropdown">
-                {" "}
-                {/* Thêm class để dễ style */}
-                <a onClick={toggleLearnMenu}>
-                  {" "}
-                  {/* Dùng onClick thay cho href */}
-                  Available Quests <i className="fas fa-chevron-down"></i>
-                </a>
-                {isLearnMenuOpen && (
-                  <div className="dropdown-menu">
-                    {courses.map((course) => (
-                      <a
-                        key={course.id}
-                        href={`/course/${course.id}`}
-                        className="dropdown-item"
-                        onClick={() => navigate(`/course/${course.id}`)} // Điều hướng khi click
-                      >
-                        {course.title}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </li>
-              <li>
-                <a href="/practice">
-                  Practice <i className="fas fa-chevron-down"></i>
-                </a>
-              </li>
-              <li>
-                <a href="/build">Build</a>
-              </li>
-              <li>
-                <a href="/leaderboards" className="nav-button">Leaderboards</a>
-              </li>
-            </ul>
-          </div>
-          <div className="main-nav-right">
-            <button className="avatar-btn" onClick={handleAvatarClick}>
-            <img 
-              src={user.avatar} 
-              alt="User Avatar" 
-              className="user-avatar"
-              onError={(e) => {
-                e.target.src = "/icons/knight_icon.png";
-              }}
-            />
-          </button>
-            <button className="logout-btn" onClick={handleLogout}>
-              <i className="fas fa-sign-out-alt"></i> Logout
-            </button>
-          </div>
-        </div>
-      </nav>
-
+      <Navbar />
+      
       {/* Main Content */}
       <div className="main-content">
         {/* User Stats Sidebar */}
@@ -293,6 +264,8 @@ export default function MainMenu() {
                   key={course.id}
                   className="course-card"
                   onClick={() => handleCourseClick(course.id)}
+                  role="button"
+                  tabIndex="0"
                 >
                   <h3 className="course-title">{course.title}</h3>
                   <p className="course-description">{course.description}</p>

@@ -96,7 +96,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 15px;
 }
 .course-nav-container .back-btn {
   position: absolute; /* Định vị tuyệt đối */
@@ -141,6 +141,12 @@ body {
   font-size: 1.8rem;
   color: var(--text-gold);
   text-shadow: 2px 2px 4px var(--shadow-dark);
+  grid-column: 2; /* Đặt vào cột giữa */
+  text-align: center;
+  margin: 0; /* Xóa mọi margin mặc định */
+  
+  /* QUAN TRỌNG: Xóa mọi margin-left bị xung đột */
+  margin-left: 0 !important;
 }
 
 .course-nav-right {
@@ -666,6 +672,12 @@ body {
 }
 
 @media (max-width: 480px) {
+  .back-btn span {
+    display: none;
+  }
+  .back-btn {
+    gap: 0;
+  }
   .course-content {
     padding-left: 15px;
     padding-right: 15px;
@@ -698,5 +710,24 @@ body {
   .back-btn {
     padding: 6px 12px;
     font-size: 0.9rem;
+  }
+}
+@media (max-width: 580px) {
+  /* Ẩn phần text "Back to Academy" */
+  .back-btn span {
+    display: none;
+  }
+
+  /* Bỏ khoảng cách khi text bị ẩn */
+  .back-btn {
+    gap: 0;
+  }
+  
+  /* (Tùy chọn) Điều chỉnh tiêu đề */
+  .course-nav-title {
+    font-size: 1.2rem;
+    flex-grow: 1;
+    text-align: center;
+    margin-left: -20px; 
   }
 }
