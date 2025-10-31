@@ -240,9 +240,9 @@ export default function LessonScreen() {
 
       {/* Main Game Area */}
       <div className="game-main">
-        {/* Left Panel - Quest Info */}
+        {/* Left Panel - Quest Display (60%) */}
         <section className="quest-panel">
-          {/* Container 1: Problem Description (60%) */}
+          {/* Container 1: Problem Description (40% of quest-panel) */}
           <div className="problem-container">
             <div className="quest-header">
               <h2>⚔️ Nhiệm Vụ</h2>
@@ -254,7 +254,7 @@ export default function LessonScreen() {
             </div>
           </div>
 
-          {/* Container 2: Test Cases (30%) */}
+          {/* Container 2: Test Cases (25% of quest-panel) */}
           <div className="testcases-container">
             {testCases.length > 0 && (
               <div className="test-cases-preview">
@@ -294,83 +294,85 @@ export default function LessonScreen() {
             )}
           </div>
 
-          {/* Container 3: NPC Chat (10%) */}
+          {/* Container 3: NPC Chat (35% of quest-panel) */}
           <div className="npc-container">
             <NPCChat 
               feedback={npcMessage}
               status={npcStatus}
+              problemDescription={lesson?.problemDescription || ''}
+              userCode={code}
             />
           </div>
         </section>
 
-        {/* Right Panel - Code Editor */}
+        {/* Right Panel - Code Editor (40%) */}
         <section className="editor-panel">
-          <div className="editor-header">
-            <h2>💻 Code Arena</h2>
-            <span className="editor-hint">Python 3.10</span>
-          </div>
+        <div className="editor-header">
+          <h2>💻 Code Arena</h2>
+          <span className="editor-hint">Python 3.10</span>
+        </div>
 
-          <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-            <CodeEditor 
-              code={code}
-              onChange={setCode}
-              language="python"
-              disabled={isRunning}
-              onSave={handleRunCode}
-            />
-          </div>
+        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+          <CodeEditor 
+            code={code}
+            onChange={setCode}
+            language="python"
+            disabled={isRunning}
+            onSave={handleRunCode}
+          />
+        </div>
 
-          {/* Output Console */}
-          <div className="output-console">
-            <div className="console-header">
-              <span className="console-label">📤 Output</span>
-              <span className={`console-status ${isRunning ? 'running' : 'idle'}`}>
-                {isRunning ? "⏳ Đang chạy..." : "✓ Ready"}
-              </span>
-              {executionTime > 0 && (
-                <span className="execution-time">⏱️ {executionTime}ms</span>
-              )}
-            </div>
-            <pre className="console-output">{output}</pre>
+        {/* Output Console */}
+        <div className="output-console">
+          <div className="console-header">
+            <span className="console-label">📤 Output</span>
+            <span className={`console-status ${isRunning ? 'running' : 'idle'}`}>
+              {isRunning ? "⏳ Đang chạy..." : "✓ Ready"}
+            </span>
+            {executionTime > 0 && (
+              <span className="execution-time">⏱️ {executionTime}ms</span>
+            )}
           </div>
+          <pre className="console-output">{output}</pre>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="action-buttons">
-            <button
-              className="btn btn-hint"
-              onClick={handleHint}
-              disabled={isRunning}
-            >
-              💡 Gợi Ý
-            </button>
-            
-            <button
-              className="btn btn-run"
-              onClick={handleRunCode}
-              disabled={isRunning}
-            >
-              {isRunning ? "⏳ Đang chạy..." : "▶️ Chạy Code"}
-            </button>
-            
-            <button
-              className="btn btn-submit"
-              onClick={() => {
-                if (!testResults?.success) {
-                  alert("⚠️ Vui lòng làm cho tất cả test cases pass trước khi nộp bài!");
-                  return;
-                }
-                alert("✅ Bạn đã hoàn thành bài học! Chúc mừng, Knight!");
-                navigate(-1);
-              }}
-              disabled={isRunning}
-            >
-              ✅ Nộp Bài
-            </button>
-          </div>
+        {/* Action Buttons */}
+        <div className="action-buttons">
+          <button
+            className="btn btn-hint"
+            onClick={handleHint}
+            disabled={isRunning}
+          >
+            💡 Gợi Ý
+          </button>
+          
+          <button
+            className="btn btn-run"
+            onClick={handleRunCode}
+            disabled={isRunning}
+          >
+            {isRunning ? "⏳ Đang chạy..." : "▶️ Chạy Code"}
+          </button>
+          
+          <button
+            className="btn btn-submit"
+            onClick={() => {
+              if (!testResults?.success) {
+                alert("⚠️ Vui lòng làm cho tất cả test cases pass trước khi nộp bài!");
+                return;
+              }
+              alert("✅ Bạn đã hoàn thành bài học! Chúc mừng, Knight!");
+              navigate(-1);
+            }}
+            disabled={isRunning}
+          >
+            ✅ Nộp Bài
+          </button>
+        </div>
 
-          {/* Test Results Card */}
-          {testResults && (
-            <div className={`results-card ${testResults.success ? 'success' : 'failure'}`}>
+        {/* Test Results Card */}
+        {testResults && (
+          <div className={`results-card ${testResults.success ? 'success' : 'failure'}`}>
               <div className="results-header">
                 <span className="results-icon">
                   {testResults.success ? "🎉" : "⚡"}
@@ -403,8 +405,8 @@ export default function LessonScreen() {
                 </div>
               )}
             </div>
-          )}
-        </section>
+        )}
+      </section>
       </div>
 
       {/* Loading State */}

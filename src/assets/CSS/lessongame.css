@@ -110,9 +110,9 @@ body {
     overflow: hidden;
 }
 
-/* ===== LEFT: QUEST DISPLAY (Battle Log / Problem) ===== */
+/* ===== LEFT: QUEST DISPLAY (60%) ===== */
 .quest-panel {
-    flex: 0 0 35%;
+    flex: 0 0 60%;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -130,7 +130,8 @@ body {
     flex: 0 0 40%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
 }
 
@@ -182,9 +183,9 @@ body {
     border-radius: 3px;
 }
 
-/* Container 2: Test Cases (30%) */
+/* Container 2: Test Cases (25%) */
 .testcases-container {
-    flex: 0 0 30%;
+    flex: 0 0 25%;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -207,9 +208,9 @@ body {
     border-radius: 3px;
 }
 
-/* Container 3: NPC Chat (30%) */
+/* Container 3: NPC Chat (35%) */
 .npc-container {
-    flex: 0 0 30%;
+    flex: 0 0 35%;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -296,7 +297,7 @@ body {
 
 /* ===== RIGHT: CODE & OUTPUT (Action Phase) ===== */
 .editor-panel {
-    flex: 0 0 65%;
+    flex: 0 0 40%;
     display: flex;
     flex-direction: column;
     gap: 12px;

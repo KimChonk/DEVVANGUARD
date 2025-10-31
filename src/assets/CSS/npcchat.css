@@ -263,3 +263,187 @@
         border-radius: 6px;
     }
 }
+
+/* ===== NPC AI CONTROLS (NEW) ===== */
+.npc-ai-controls {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.npc-quick-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.npc-btn-hint,
+.npc-btn-feedback {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 6px;
+    color: #d4af37;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.npc-btn-hint:hover:not(:disabled),
+.npc-btn-feedback:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-color: rgba(212, 175, 55, 0.6);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    transform: translateY(-2px);
+}
+
+.npc-btn-hint:disabled,
+.npc-btn-feedback:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.npc-input-area {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.npc-input {
+    flex: 1;
+    padding: 10px 12px;
+    background: rgba(10, 10, 20, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 6px;
+    color: #e8e8e8;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.npc-input:focus {
+    outline: none;
+    border-color: rgba(212, 175, 55, 0.7);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.3), inset 0 0 6px rgba(212, 175, 55, 0.1);
+    background: rgba(10, 10, 20, 0.8);
+}
+
+.npc-input::placeholder {
+    color: #666;
+}
+
+.npc-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.npc-send-btn {
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #d4af37 0%, #b4891f 100%);
+    border: 1px solid #8b6914;
+    border-radius: 6px;
+    color: #0a0a14;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+    flex-shrink: 0;
+}
+
+.npc-send-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e4bf57 0%, #c49a2f 100%);
+    box-shadow: 0 6px 16px rgba(212, 175, 55, 0.5);
+    transform: translateY(-2px);
+}
+
+.npc-send-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.npc-send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.npc-toggle-chat {
+    padding: 8px 12px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 6px;
+    color: #d4af37;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.npc-toggle-chat:hover {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+.npc-message.loading {
+    animation: messagePulse 1.5s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+    .npc-quick-actions {
+        gap: 6px;
+    }
+
+    .npc-btn-hint,
+    .npc-btn-feedback {
+        min-width: 80px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .npc-input-area {
+        gap: 6px;
+    }
+
+    .npc-input {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .npc-send-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .npc-quick-actions {
+        flex-direction: column;
+    }
+
+    .npc-btn-hint,
+    .npc-btn-feedback {
+        width: 100%;
+    }
+
+    .npc-input-area {
+        flex-direction: column;
+    }
+
+    .npc-send-btn {
+        width: 100%;
+    }
+}
