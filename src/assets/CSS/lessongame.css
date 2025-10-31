@@ -115,47 +115,120 @@ body {
     flex: 0 0 35%;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 0;
     background: rgba(26, 26, 46, 0.7);
     border: 2px solid var(--primary-gold);
     border-radius: 12px;
-    padding: 20px;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* ===== THREE CONTAINERS IN QUEST PANEL ===== */
+
+/* Container 1: Problem Description (40%) */
+.problem-container {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.quest-header {
+    background: rgba(212, 175, 55, 0.1);
+    border-bottom: 2px solid var(--primary-gold);
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.quest-header h2 {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.2rem;
+    color: var(--primary-gold);
+    margin: 0;
+    text-shadow: 2px 2px 4px var(--shadow-dark);
+}
+
+.quest-badge {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--primary-gold);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.quest-description {
+    flex: 1;
     overflow-y: auto;
+    padding: 15px;
     scrollbar-width: thin;
     scrollbar-color: var(--primary-gold) transparent;
 }
 
-.quest-panel::-webkit-scrollbar {
-    width: 8px;
+.quest-description::-webkit-scrollbar {
+    width: 6px;
 }
 
-.quest-panel::-webkit-scrollbar-track {
+.quest-description::-webkit-scrollbar-track {
     background: rgba(15, 52, 96, 0.2);
 }
 
-.quest-panel::-webkit-scrollbar-thumb {
+.quest-description::-webkit-scrollbar-thumb {
     background: var(--primary-gold);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
-.quest-title {
-    font-family: 'MedievalSharp', cursive;
-    color: var(--text-gold);
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px var(--shadow-dark);
-    border-bottom: 2px solid var(--primary-gold);
-    padding-bottom: 10px;
-}
-
-.quest-description {
-    background: rgba(15, 52, 96, 0.3);
-    border-left: 4px solid var(--primary-gold);
+/* Container 2: Test Cases (30%) */
+.testcases-container {
+    flex: 0 0 30%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
     padding: 15px;
-    border-radius: 8px;
-    color: var(--text-light);
-    line-height: 1.8;
-    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-gold) transparent;
+}
+
+.testcases-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.testcases-container::-webkit-scrollbar-track {
+    background: rgba(15, 52, 96, 0.2);
+}
+
+.testcases-container::-webkit-scrollbar-thumb {
+    background: var(--primary-gold);
+    border-radius: 3px;
+}
+
+/* Container 3: NPC Chat (30%) */
+.npc-container {
+    flex: 0 0 30%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 10px 15px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-gold) transparent;
+}
+
+.npc-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.npc-container::-webkit-scrollbar-track {
+    background: rgba(15, 52, 96, 0.2);
+}
+
+.npc-container::-webkit-scrollbar-thumb {
+    background: var(--primary-gold);
+    border-radius: 3px;
 }
 
 .description-html p {

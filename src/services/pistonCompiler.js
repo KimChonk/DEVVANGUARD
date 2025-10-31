@@ -127,6 +127,9 @@ export function validateTestCases(actualOutput, testCases) {
     };
   }
 
+  // Filter only public test cases (hidden: false or not hidden)
+  const publicTests = testCases.filter(tc => !tc.hidden);
+
   // Split output by lines
   const outputLines = actualOutput
     .trim()
@@ -137,8 +140,10 @@ export function validateTestCases(actualOutput, testCases) {
   let passedCount = 0;
   const results = [];
 
-  testCases.forEach((testCase, index) => {
+  publicTests.forEach((testCase, index) => {
+    // Support multiple field names for expected output
     const expected =
+      testCase.expected ||
       testCase.expected_output ||
       testCase.expectedOutput ||
       testCase.output ||
@@ -183,7 +188,7 @@ export function validateTestCases(actualOutput, testCases) {
 
   return {
     passed: passedCount,
-    total: testCases.length,
+    total: publicTests.length,
     results: results,
   };
 }
@@ -225,31 +230,110 @@ export function formatTestResults(validationResult) {
  * @returns {Promise} Object with execution and test results
  */
 export async function executeAndValidate(language, code, testCases = []) {
-  // Execute code
-  const execution = await executeCode(language, code);
+  // Filter only public test cases
+  const publicTests = testCases.filter(tc => !tc.hidden);
 
-  if (!execution.success) {
+  if (publicTests.length === 0) {
+    // No test cases to run
+    const execution = await executeCode(language, code);
     return {
       execution,
       validation: { passed: 0, total: 0, results: [] },
       passed: false,
-      message: `Execution Error: ${execution.stderr}`,
+      message: "No public test cases to run",
     };
   }
 
-  // Validate test cases
-  const validation = validateTestCases(execution.stdout, testCases);
+  // Execute each test case individually and collect results
+  const results = [];
+  let passedCount = 0;
+  let allOutputs = "";
 
-  const allPassed = validation.passed === validation.total;
+  for (let i = 0; i < publicTests.length; i++) {
+    const testCase = publicTests[i];
+    const input = testCase.input || "";
+    
+    // Execute code with this specific test input
+    const execution = await executeCode(language, code, input);
+    
+    if (!execution.success) {
+      console.error(`Test ${i + 1} execution failed:`, execution.stderr);
+      results.push({
+        id: testCase.id || i + 1,
+        name: testCase.name || `Test ${i + 1}`,
+        description: testCase.description || "",
+        expected: testCase.expected || testCase.expected_output || testCase.output || "",
+        actual: `(No output)`,
+        passed: false,
+        error: execution.stderr,
+      });
+      continue;
+    }
+
+    // Get expected output (support multiple field names)
+    const expected =
+      testCase.expected ||
+      testCase.expected_output ||
+      testCase.expectedOutput ||
+      testCase.output ||
+      "";
+
+    // Trim and compare outputs
+    const actualOutput = execution.stdout.trim();
+    const expectedOutput = expected.trim();
+    
+    // Multiple comparison strategies
+    let passed = false;
+
+    // Strategy 1: Exact match
+    if (actualOutput === expectedOutput) {
+      passed = true;
+    }
+
+    // Strategy 2: Normalize whitespace
+    if (!passed && actualOutput.replace(/\s+/g, " ") === expectedOutput.replace(/\s+/g, " ")) {
+      passed = true;
+    }
+
+    // Strategy 3: Line-by-line comparison (for multiple outputs)
+    if (!passed) {
+      const actualLines = actualOutput.split("\n").map(l => l.trim()).filter(l => l);
+      const expectedLines = expectedOutput.split("\n").map(l => l.trim()).filter(l => l);
+      if (actualLines.length === expectedLines.length && actualLines.every((line, idx) => line === expectedLines[idx])) {
+        passed = true;
+      }
+    }
+
+    if (passed) passedCount++;
+
+    results.push({
+      id: testCase.id || i + 1,
+      name: testCase.name || `Test ${i + 1}`,
+      description: testCase.description || "",
+      expected: expectedOutput,
+      actual: actualOutput || "(No output)",
+      passed: passed,
+    });
+
+    allOutputs += `\n--- Test ${i + 1} ---\n${actualOutput}`;
+  }
+
+  const allPassed = passedCount === publicTests.length;
+
+  const validation = {
+    passed: passedCount,
+    total: publicTests.length,
+    results: results,
+  };
 
   return {
-    execution,
+    execution: { success: true, stdout: allOutputs, stderr: "" },
     validation,
     passed: allPassed,
     message: allPassed
-      ? `🎉 All ${validation.total} tests passed!`
-      : `❌ ${validation.total - validation.passed} test(s) failed`,
-    output: execution.stdout,
+      ? `🎉 All ${publicTests.length} tests passed!`
+      : `❌ ${publicTests.length - passedCount} test(s) failed`,
+    output: allOutputs,
     formattedResults: formatTestResults(validation),
   };
 }

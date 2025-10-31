@@ -4,6 +4,7 @@ import { lessonService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
 import NPCChat from "../../components/NPCChat";
 import CodeEditor from "../../components/CodeEditor";
+import ProblemDescription from "../../components/ProblemDescription";
 import "../../assets/CSS/lessongame.css";
 
 // NPC feedback for different lesson types
@@ -241,54 +242,65 @@ export default function LessonScreen() {
       <div className="game-main">
         {/* Left Panel - Quest Info */}
         <section className="quest-panel">
-          <div className="quest-header">
-            <h2>� Nhiệm Vụ</h2>
-            <span className="quest-badge">Quest #{lesson?.lessonOrder}</span>
+          {/* Container 1: Problem Description (60%) */}
+          <div className="problem-container">
+            <div className="quest-header">
+              <h2>⚔️ Nhiệm Vụ</h2>
+              <span className="quest-badge">Quest #{lesson?.lessonOrder}</span>
+            </div>
+            
+            <div className="quest-description">
+              <ProblemDescription description={lesson?.problemDescription} />
+            </div>
           </div>
-          
-          <div className="quest-description">
-            {lesson?.problemDescription ? (
-              <div className="description-html" dangerouslySetInnerHTML={{ __html: lesson.problemDescription }} />
-            ) : (
-              <p>Không có mô tả đề bài</p>
+
+          {/* Container 2: Test Cases (30%) */}
+          <div className="testcases-container">
+            {testCases.length > 0 && (
+              <div className="test-cases-preview">
+                {(() => {
+                  const publicTests = testCases.filter(tc => !tc.hidden);
+                  const hiddenTests = testCases.filter(tc => tc.hidden);
+                  return (
+                    <>
+                      <h3>🧪 Test Cases ({publicTests.length} public, {hiddenTests.length} hidden)</h3>
+                      <div className="test-cases-grid">
+                        {publicTests.slice(0, 3).map((tc, idx) => (
+                          <div 
+                            key={idx} 
+                            className={`test-case-card ${testResults?.results?.[idx]?.passed ? 'passed' : ''}`}
+                          >
+                            <div className="test-badge">Test {idx + 1}</div>
+                            <div className="test-input">
+                              <span className="label">Input:</span>
+                              <code>{tc.input || "N/A"}</code>
+                            </div>
+                            <div className="test-output">
+                              <span className="label">Expected:</span>
+                              <code>{tc.expected || tc.expected_output || "N/A"}</code>
+                            </div>
+                            {testResults?.results?.[idx] && (
+                              <div className={`test-result ${testResults.results[idx].passed ? 'success' : 'fail'}`}>
+                                {testResults.results[idx].passed ? "✅ PASSED" : "❌ FAILED"}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
             )}
           </div>
 
-          {/* Test Cases Preview */}
-          {testCases.length > 0 && (
-            <div className="test-cases-preview">
-              <h3>🧪 Test Cases ({testCases.length})</h3>
-              <div className="test-cases-grid">
-                {testCases.slice(0, 3).map((tc, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`test-case-card ${testResults?.results?.[idx]?.passed ? 'passed' : ''}`}
-                  >
-                    <div className="test-badge">Test {idx + 1}</div>
-                    <div className="test-input">
-                      <span className="label">Input:</span>
-                      <code>{tc.input || "N/A"}</code>
-                    </div>
-                    <div className="test-output">
-                      <span className="label">Expected:</span>
-                      <code>{tc.output || tc.expected_output || "N/A"}</code>
-                    </div>
-                    {testResults?.results?.[idx] && (
-                      <div className={`test-result ${testResults.results[idx].passed ? 'success' : 'fail'}`}>
-                        {testResults.results[idx].passed ? "✅ PASSED" : "❌ FAILED"}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* NPC Chat - Fixed in Quest Panel */}
-          <NPCChat 
-            feedback={npcMessage}
-            status={npcStatus}
-          />
+          {/* Container 3: NPC Chat (10%) */}
+          <div className="npc-container">
+            <NPCChat 
+              feedback={npcMessage}
+              status={npcStatus}
+            />
+          </div>
         </section>
 
         {/* Right Panel - Code Editor */}
