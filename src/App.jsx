@@ -14,7 +14,6 @@ import LeaderboardScreen from "./pages/Leaderboard/LeaderboardScreen";
 import DashboardScreen from "./pages/Dashboard/DashboardScreen";
 import AdminScreen from "./pages/Admin/AdminScreen";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
-import BackToTop from "./components/BackToTop";
 
 function App() {
   return (
@@ -99,7 +98,6 @@ function App() {
           {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <BackToTop />
       </BrowserRouter>
     </AuthProvider>
   );

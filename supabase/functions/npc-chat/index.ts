@@ -1,108 +1,251 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
+// Setup type definitions
 
-// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+
 // Import CORS headers
+
 import { corsHeaders } from '../_shared/cors.ts'
 
-// Lấy API Key bí mật của Google mà bạn đã lưu
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`
+// MỚI: Import createClient để đọc JWT
 
-console.log("NPC Chat Function Initialized (Fantasy Version)");
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+
+
+// Lấy API Key bí mật của OpenAI
+
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
+
+
+
+console.log("NPC Chat Function Initialized (Fantasy Version - OpenAI, JWT Secured)");
+
+console.log('🔑 OPENAI_API_KEY exists:', !!OPENAI_API_KEY);
+
+
 
 Deno.serve(async (req) => {
-  // Xử lý CORS Preflight (bắt buộc)
+
+  // Xử lý CORS Preflight
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+
+    console.log('✅ [NPC] Handling CORS preflight');
+
+    return new Response('ok', { 
+
+      headers: corsHeaders,
+
+      status: 200,
+
+    })
+
   }
+
+
 
   try {
-    // 1. Lấy dữ liệu từ React (gồm code, đề bài, và tin nhắn của user)
+
+    // MỚI: Xác thực người dùng bằng JWT
+
+    // 1. Tạo một Supabase client tạm thời BÊN TRONG function
+
+    const supabaseClient = createClient(
+
+      // Lấy URL và Anon Key từ biến môi trường
+
+      Deno.env.get('SUPABASE_URL')!,
+
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+
+      // Lấy header 'Authorization' (chứa JWT) từ request
+
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+
+    )
+
+
+
+    // 2. Lấy thông tin người dùng từ JWT
+
+    const { data: { user } } = await supabaseClient.auth.getUser()
+
+
+
+    if (!user) {
+
+      console.warn('⚠️ [NPC] Unauthorized attempt');
+
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+
+        status: 401,
+
+      })
+
+    }
+
+    
+
+    // Đã xác thực! Giờ chúng ta biết user.id
+
+    console.log('👤 [NPC] Authenticated user:', user.id);
+
+
+
+    console.log('📥 [NPC] Received request');
+
+    
+
     const { problemDescription, userCode, userMessage } = await req.json()
 
-    // Validate input
-    if (!userMessage || userMessage.trim() === '') {
-      return new Response(JSON.stringify({ error: 'User message is required' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      })
+
+
+    if (!userMessage) {
+
+      throw new Error('User message is required');
+
     }
+
+
 
     // 2. "Linh hồn" của NPC (System Prompt)
-    // Đây là chỉ thị bí mật bạn gửi cho AI để nó biết phải đóng vai ai.
+
     const systemPrompt = `
+
       Bạn là "Mystery Wizard", một NPC pháp sư bí ẩn trong một game học lập trình.
-      Tên bạn là "Merlin". Người dùng là một "Hiệp sĩ tập sự" (Knight).
+
+      Tên bạn là "Merlin". Người dùng là một "Hiệp sĩ tập sự" (Knight) có ID: ${user.id}.
+
       
+
       BỐI CẢNH HIỆN TẠI (KHÔNG được nhắc lại bối cảnh này):
+
       - Đề bài: ${problemDescription || 'No problem description'}
+
       - Code của Hiệp sĩ: ${userCode || 'No code yet'}
 
+
+
       QUY TẮC CỦA BẠN:
-      1. Luôn nói chuyện với giọng điệu bí ẩn, cổ xưa, và khôn ngoan (ví dụ: "Hmm...", "Ta thấy rằng...", "Phép thuật của ngươi...").
+
+      1. Luôn nói chuyện với giọng điệu bí ẩn, cổ xưa, và khôn ngoan.
+
       2. KHÔNG BAO GIỜ đưa ra đáp án code hoàn chỉnh.
+
       3. Thay vào đó, hãy GỢI Ý. Phân tích code của họ và chỉ ra lỗi (nếu có).
-      4. Nếu họ hỏi "Gợi ý", hãy đưa ra gợi ý tiếp theo.
-      5. Nếu code của họ đúng, hãy chúc mừng.
-      6. Nếu code sai, hãy an ủi và chỉ ra vấn đề (ví dụ: "Hmm, có vẻ như phép thuật print() của ngươi đang thiếu một dấu ngoặc...").
-      7. Giữ câu trả lời ngắn gọn (dưới 50 từ).
+
+      4. Giữ câu trả lời ngắn gọn (dưới 50 từ).
+
     `
 
-    // 3. Xây dựng payload gửi cho Google Gemini
+    console.log('🤖 [NPC] System prompt ready for user:', user.id);
+
+
+
+    // 3. Cập nhật payload cho OpenAI
+
     const payload = {
-      // systemInstruction dùng để định nghĩa vai trò của AI
-      systemInstruction: {
-        parts: [{ text: systemPrompt }]
-      },
-      contents: [
-        // contents là lịch sử trò chuyện (ta chỉ gửi tin nhắn mới nhất)
-        {
-          role: 'user',
-          parts: [{ text: userMessage }]
-        }
+
+      model: 'gpt-3.5-turbo',
+
+      messages: [
+
+        { role: 'system', content: systemPrompt },
+
+        { role: 'user', content: userMessage }
+
       ],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 150, // Giới hạn độ dài trả lời
-      }
+
+      temperature: 0.7,
+
+      max_tokens: 150,
+
+      user: user.id, // MỚI: Gửi user_id cho OpenAI để cá nhân hóa
+
     }
 
-    // 4. Gọi API của Google Gemini
-    const response = await fetch(GEMINI_API_URL, {
+
+
+    console.log('📤 [NPC] Calling OpenAI API...');
+
+
+
+    // 4. Gọi API của OpenAI
+
+    const response = await fetch(OPENAI_API_URL, {
+
       method: 'POST',
+
       headers: {
+
         'Content-Type': 'application/json',
+
+        'Authorization': `Bearer ${OPENAI_API_KEY}`
+
       },
+
       body: JSON.stringify(payload),
+
     })
+
+
+
+    console.log('📩 [NPC] OpenAI response status:', response.status);
+
+
 
     if (!response.ok) {
+
       const errorText = await response.text();
-      console.error('Lỗi từ Google AI:', errorText);
-      throw new Error(`Google AI API error: ${response.statusText}`);
+
+      console.error('❌ [NPC] OpenAI API error:', errorText);
+
+      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`);
+
     }
 
+
+
     const data = await response.json()
+
     
-    // 5. Lấy câu trả lời của AI
-    // (Đoạn này hơi phức tạp vì cấu trúc trả về của Gemini)
-    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Ta đang suy nghĩ... Hãy hỏi lại sau.";
+
+    const aiResponse = data.choices?.[0]?.message?.content || "Ta đang suy nghĩ... Hãy hỏi lại sau.";
+
+
+
+    console.log('✅ [NPC] AI Response:', aiResponse);
+
+
 
     // 6. Trả lời về cho React
+
     return new Response(JSON.stringify({ reply: aiResponse }), {
+
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+
       status: 200,
+
     })
+
+
 
   } catch (error) {
-    console.error('Lỗi trong Edge Function:', error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
-  }
-})
 
+    console.error('❌ [NPC] Error in Edge Function:', error.message);
+
+    return new Response(JSON.stringify({ error: error.message }), {
+
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+
+      status: 500,
+
+    })
+
+  }
+
+})

@@ -68,20 +68,27 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
+      console.log('📨 Asking NPC:', messageToSend);
       const result = await getNPCResponse(
         messageToSend,
         problemDescription,
         userCode
       );
 
+      console.log('📩 NPC Response:', result);
+
       if (result.success && result.reply) {
-        setCurrentMessage(result.reply);
+        console.log('✅ Setting AI reply:', result.reply);
         setDisplayedText('');
+        setCurrentMessage(result.reply);
       } else {
+        console.warn('⚠️ NPC failed but has reply:', result.reply);
+        setDisplayedText('');
         setCurrentMessage(result.reply || 'Hmm... Phép thuật của tôi bị gián đoạn. Vui lòng thử lại.');
       }
     } catch (error) {
       console.error('Error getting NPC response:', error);
+      setDisplayedText('');
       setCurrentMessage('Ôi không! Kết nối bị mất. Hãy thử lại sau.');
     } finally {
       setIsLoading(false);
@@ -97,13 +104,23 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
+      console.log('💡 Asking for hint...');
       const result = await getNPCHint(problemDescription, userCode);
+      
+      console.log('💡 Hint Response:', result);
+      
       if (result.success && result.reply) {
+        console.log('✅ Setting hint:', result.reply);
+        setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
+        console.warn('⚠️ Hint failed but has reply:', result.reply);
+        setDisplayedText('');
         setCurrentMessage(result.reply || 'Hmm... Tôi không có gợi ý gì lúc này.');
       }
     } catch (error) {
+      console.error('Error getting hint:', error);
+      setDisplayedText('');
       setCurrentMessage('Không thể lấy gợi ý. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
@@ -119,13 +136,23 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
+      console.log('📝 Asking for code feedback...');
       const result = await getNPCCodeFeedback(problemDescription, userCode);
+      
+      console.log('📝 Feedback Response:', result);
+      
       if (result.success && result.reply) {
+        console.log('✅ Setting feedback:', result.reply);
+        setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
+        console.warn('⚠️ Feedback failed but has reply:', result.reply);
+        setDisplayedText('');
         setCurrentMessage(result.reply || 'Code của bạn có vẻ... cần cải thiện.');
       }
     } catch (error) {
+      console.error('Error getting feedback:', error);
+      setDisplayedText('');
       setCurrentMessage('Không thể phân tích code. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);

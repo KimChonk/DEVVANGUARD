@@ -25,7 +25,7 @@ body {
     font-family: 'Cinzel', serif;
     background: linear-gradient(135deg, var(--dark-blue) 0%, var(--medium-blue) 50%, var(--light-blue) 100%);
     min-height: 100vh;
-    overflow: hidden;
+    overflow: auto;
     color: var(--text-light);
 }
 
@@ -33,13 +33,13 @@ body {
 .lesson-game-container {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: auto;
     display: flex;
     flex-direction: column;
     background: 
         radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(15, 52, 96, 0.4) 0%, transparent 50%);
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* ===== HEADER BATTLE ===== */

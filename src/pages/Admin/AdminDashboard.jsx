@@ -1,5 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { userService } from "../../services/apiClient";
+import { courseService } from "../../services/apiClient";
+import { lessonService } from "../../services/apiClient";
 import "../../assets/CSS/admindashboard.css";
 
 export default function AdminDashboard() {
@@ -11,6 +14,50 @@ export default function AdminDashboard() {
     avatar: "/icons/knight_icon.png",
     role: "System Administrator"
   });
+
+  // Real data states
+  const [totalCourses, setTotalCourses] = useState(0);
+  const [totalLessons, setTotalLessons] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  // Fetch real data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch courses
+        const coursesResult = await courseService.getAllCourses();
+        console.log('📊 Courses Result:', coursesResult);
+        if (coursesResult.success && Array.isArray(coursesResult.data)) {
+          setTotalCourses(coursesResult.data.length);
+          console.log('✅ Total Courses:', coursesResult.data.length);
+        }
+
+        // Fetch all users and filter (exclude admins) - more robust filter
+        const usersResult = await userService.getAllUsers();
+        console.log('👥 Users Result:', usersResult);
+        if (usersResult.success && Array.isArray(usersResult.data)) {
+          console.log('All users:', usersResult.data);
+          // Filter: only 'user' role OR where role is not 'admin'
+          const regularUsers = usersResult.data.filter(u => u.role === 'user' || (u.role && u.role !== 'admin'));
+          console.log('Regular users (non-admin):', regularUsers);
+          setTotalUsers(regularUsers.length);
+          console.log('✅ Total Users:', regularUsers.length);
+        }
+
+        // Fetch all lessons directly (no loop!)
+        const lessonsResult = await lessonService.getAllLessons();
+        console.log('📚 All Lessons Result:', lessonsResult);
+        if (lessonsResult.success && Array.isArray(lessonsResult.data)) {
+          setTotalLessons(lessonsResult.data.length);
+          console.log('✅ Total Lessons:', lessonsResult.data.length);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Weekly statistics
   const [weeklyStats] = useState({
@@ -143,38 +190,38 @@ export default function AdminDashboard() {
   // Quick stats for dashboard cards
   const quickStats = useMemo(() => [
     {
-      title: "Total Lessons",
-      value: weeklyStats.totalLessons,
-      change: "+12 this week",
+      title: "KHÓA HỌC",
+      value: totalCourses,
+      change: "+1 this month",
       icon: "fas fa-book",
       color: "blue",
       trend: "up"
     },
     {
-      title: "Active Students",
-      value: weeklyStats.activeStudents,
-      change: "+23 new this week",
-      icon: "fas fa-users",
+      title: "BÀI HỌC",
+      value: totalLessons,
+      change: "+3 this week",
+      icon: "fas fa-graduation-cap",
       color: "green",
       trend: "up"
     },
     {
-      title: "Completion Rate",
+      title: "NGƯỜI DÙNG",
+      value: totalUsers,
+      change: `+${Math.max(0, totalUsers - 1)} active`,
+      icon: "fas fa-users",
+      color: "purple",
+      trend: "up"
+    },
+    {
+      title: "TỈ LỆ HOÀN THÀNH",
       value: `${weeklyStats.averageCompletion}%`,
       change: "+5.2% from last week",
       icon: "fas fa-trophy",
       color: "gold",
       trend: "up"
-    },
-    {
-      title: "Learning Hours",
-      value: weeklyStats.totalHours,
-      change: "+340 hours this week",
-      icon: "fas fa-clock",
-      color: "purple",
-      trend: "up"
     }
-  ], [weeklyStats]);
+  ], [totalCourses, totalLessons, totalUsers, weeklyStats]);
 
   const getActivityIcon = (type) => {
     switch (type) {

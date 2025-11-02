@@ -71,7 +71,18 @@ export const courseService = {
   async getAllCourses() {
     try {
       const courses = await apiCall("/course");
-      return { success: true, data: courses };
+      // Map C# PascalCase to camelCase for frontend
+      const mappedCourses = Array.isArray(courses) ? courses.map(course => ({
+        id: course.courseId,
+        courseId: course.courseId,
+        name: course.name,
+        language: course.language,
+        description: course.description,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        lessons: course.lessons
+      })) : [];
+      return { success: true, data: mappedCourses };
     } catch (error) {
       return { success: false, message: error.message };
     }
@@ -81,7 +92,29 @@ export const courseService = {
   async getCourseById(courseId) {
     try {
       const course = await apiCall(`/course/${courseId}`);
-      return { success: true, data: course };
+      // Map C# PascalCase to camelCase
+      const mapped = {
+        id: course.courseId,
+        courseId: course.courseId,
+        name: course.name,
+        language: course.language,
+        description: course.description,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        lessons: course.lessons?.map(lesson => ({
+          id: lesson.lessonId,
+          lessonId: lesson.lessonId,
+          courseId: lesson.courseId,
+          lessonTitle: lesson.lessonTitle,
+          lessonOrder: lesson.lessonOrder,
+          problemDescription: lesson.problemDescription,
+          solutionTemplate: lesson.solutionTemplate,
+          testCases: lesson.testCases,
+          createdAt: lesson.createdAt,
+          updatedAt: lesson.updatedAt
+        })) || []
+      };
+      return { success: true, data: mapped };
     } catch (error) {
       return { success: false, message: error.message };
     }
@@ -128,11 +161,47 @@ export const courseService = {
 
 // ========== LESSON SERVICES ==========
 export const lessonService = {
+  // Lấy tất cả lessons (admin dashboard)
+  async getAllLessons() {
+    try {
+      const lessons = await apiCall(`/lesson`);
+      // Map C# PascalCase to camelCase
+      const mappedLessons = Array.isArray(lessons) ? lessons.map(lesson => ({
+        id: lesson.lessonId,
+        lessonId: lesson.lessonId,
+        courseId: lesson.courseId,
+        lessonTitle: lesson.lessonTitle,
+        lessonOrder: lesson.lessonOrder,
+        problemDescription: lesson.problemDescription,
+        solutionTemplate: lesson.solutionTemplate,
+        testCases: lesson.testCases,
+        createdAt: lesson.createdAt,
+        updatedAt: lesson.updatedAt
+      })) : [];
+      return { success: true, data: mappedLessons };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
   // Lấy lesson theo ID
   async getLessonById(lessonId) {
     try {
       const lesson = await apiCall(`/lesson/${lessonId}`);
-      return { success: true, data: lesson };
+      // Map C# PascalCase to camelCase
+      const mapped = {
+        id: lesson.lessonId,
+        lessonId: lesson.lessonId,
+        courseId: lesson.courseId,
+        lessonTitle: lesson.lessonTitle,
+        lessonOrder: lesson.lessonOrder,
+        problemDescription: lesson.problemDescription,
+        solutionTemplate: lesson.solutionTemplate,
+        testCases: lesson.testCases,
+        createdAt: lesson.createdAt,
+        updatedAt: lesson.updatedAt
+      };
+      return { success: true, data: mapped };
     } catch (error) {
       return { success: false, message: error.message };
     }
@@ -142,19 +211,35 @@ export const lessonService = {
   async getLessonsByCourseId(courseId) {
     try {
       const lessons = await apiCall(`/lesson/course/${courseId}`);
-      return { success: true, data: lessons };
+      // Map C# PascalCase to camelCase
+      const mappedLessons = Array.isArray(lessons) ? lessons.map(lesson => ({
+        id: lesson.lessonId,
+        lessonId: lesson.lessonId,
+        courseId: lesson.courseId,
+        lessonTitle: lesson.lessonTitle,
+        lessonOrder: lesson.lessonOrder,
+        problemDescription: lesson.problemDescription,
+        solutionTemplate: lesson.solutionTemplate,
+        testCases: lesson.testCases,
+        createdAt: lesson.createdAt,
+        updatedAt: lesson.updatedAt
+      })) : [];
+      return { success: true, data: mappedLessons };
     } catch (error) {
       return { success: false, message: error.message };
     }
   },
 
   // Tạo lesson mới
-  async createLesson(courseId, lessonTitle, lessonOrder) {
+  async createLesson(courseId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases) {
     try {
       const lesson = await apiCall("/lesson", "POST", {
         courseId,
         lessonTitle,
         lessonOrder,
+        problemDescription: problemDescription || null,
+        solutionTemplate: solutionTemplate || null,
+        testCases: testCases || null,
       });
       return { success: true, data: lesson };
     } catch (error) {
@@ -163,11 +248,14 @@ export const lessonService = {
   },
 
   // Cập nhật lesson
-  async updateLesson(lessonId, lessonTitle, lessonOrder) {
+  async updateLesson(lessonId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases) {
     try {
       const lesson = await apiCall(`/lesson/${lessonId}`, "PUT", {
         lessonTitle,
         lessonOrder,
+        problemDescription: problemDescription || null,
+        solutionTemplate: solutionTemplate || null,
+        testCases: testCases || null,
       });
       return { success: true, data: lesson };
     } catch (error) {
@@ -188,6 +276,26 @@ export const lessonService = {
 
 // ========== USER SERVICES ==========
 export const userService = {
+  // Get all users (for admin dashboard)
+  async getAllUsers() {
+    try {
+      const users = await apiCall("/user");
+      // Map C# PascalCase to camelCase
+      const mappedUsers = Array.isArray(users) ? users.map(user => ({
+        id: user.userId,
+        userId: user.userId,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      })) : [];
+      return { success: true, data: mappedUsers };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
   // Lấy profile của user hiện tại
   async getMyProfile() {
     try {

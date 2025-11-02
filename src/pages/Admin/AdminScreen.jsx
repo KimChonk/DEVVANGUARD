@@ -25,7 +25,10 @@ export default function AdminScreen() {
   const [lessonForm, setLessonForm] = useState({
     courseId: "",
     lessonTitle: "",
-    lessonOrder: ""
+    lessonOrder: "",
+    problemDescription: "",
+    solutionTemplate: "",
+    testCases: ""
   });
 
   // Fetch courses
@@ -111,14 +114,17 @@ export default function AdminScreen() {
     try {
       setLoading(true);
       const result = await lessonService.createLesson(
-        parseInt(lessonForm.courseId),
+        lessonForm.courseId,
         lessonForm.lessonTitle,
-        parseInt(lessonForm.lessonOrder) || 1
+        parseInt(lessonForm.lessonOrder) || 1,
+        lessonForm.problemDescription || null,
+        lessonForm.solutionTemplate || null,
+        lessonForm.testCases || null
       );
 
       if (result.success) {
         setMessage("✅ Tạo bài học thành công!");
-        setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "" });
+        setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
         setShowLessonForm(false);
         fetchLessonsByCourse(lessonForm.courseId);
       } else {
@@ -356,13 +362,13 @@ export default function AdminScreen() {
 
             {/* Course Form */}
             {showCourseForm && (
-              <div className="form-container">
-                <form className="admin-form" onSubmit={handleCreateCourse}>
-                  <div className="form-group">
-                    <label className="form-label">Tên Khóa Học</label>
+              <div className="admin-form-container">
+                <form className="admin-form-grid" onSubmit={handleCreateCourse}>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Tên Khóa Học</label>
                     <input
                       type="text"
-                      className="form-input"
+                      className="admin-input"
                       placeholder="VD: Python Mastery"
                       value={courseForm.name}
                       onChange={(e) =>
@@ -372,11 +378,11 @@ export default function AdminScreen() {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Ngôn Ngữ Lập Trình</label>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Ngôn Ngữ Lập Trình</label>
                     <input
                       type="text"
-                      className="form-input"
+                      className="admin-input"
                       placeholder="VD: Python"
                       value={courseForm.language}
                       onChange={(e) =>
@@ -389,10 +395,10 @@ export default function AdminScreen() {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Mô Tả</label>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Mô Tả</label>
                     <textarea
-                      className="form-input textarea"
+                      className="admin-input textarea"
                       placeholder="Mô tả chi tiết về khóa học"
                       value={courseForm.description}
                       onChange={(e) =>
@@ -407,7 +413,7 @@ export default function AdminScreen() {
 
                   <button
                     type="submit"
-                    className="form-submit"
+                    className="admin-submit"
                     disabled={loading}
                   >
                     {loading ? "⏳ Đang tạo..." : "✨ Tạo Khóa Học"}
@@ -484,12 +490,12 @@ export default function AdminScreen() {
 
             {/* Lesson Form */}
             {showLessonForm && (
-              <div className="form-container">
-                <form className="admin-form" onSubmit={handleCreateLesson}>
-                  <div className="form-group">
-                    <label className="form-label">Chọn Khóa Học</label>
+              <div className="admin-form-container">
+                <form className="admin-form-grid" onSubmit={handleCreateLesson}>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Chọn Khóa Học</label>
                     <select
-                      className="form-input"
+                      className="admin-input"
                       value={lessonForm.courseId}
                       onChange={(e) => {
                         setLessonForm({
@@ -514,11 +520,11 @@ export default function AdminScreen() {
                     </select>
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Tên Bài Học</label>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Tên Bài Học</label>
                     <input
                       type="text"
-                      className="form-input"
+                      className="admin-input"
                       placeholder="VD: Variables and Data Types"
                       value={lessonForm.lessonTitle}
                       onChange={(e) =>
@@ -531,11 +537,11 @@ export default function AdminScreen() {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Thứ Tự Bài Học</label>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Thứ Tự Bài Học</label>
                     <input
                       type="number"
-                      className="form-input"
+                      className="admin-input"
                       placeholder="VD: 1"
                       value={lessonForm.lessonOrder}
                       onChange={(e) =>
@@ -548,9 +554,57 @@ export default function AdminScreen() {
                     />
                   </div>
 
+                  <div className="admin-form-group">
+                    <label className="admin-label">Mô Tả Đề Bài (HTML/Markdown)</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder="Mô tả chi tiết đề bài..."
+                      value={lessonForm.problemDescription}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          problemDescription: e.target.value,
+                        })
+                      }
+                      rows="4"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Mã Mẫu / Starter Code</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder="Nhập code mẫu cho học viên..."
+                      value={lessonForm.solutionTemplate}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          solutionTemplate: e.target.value,
+                        })
+                      }
+                      rows="4"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Test Cases (JSON)</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder='[{"input": "5", "output": "25"}]'
+                      value={lessonForm.testCases}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          testCases: e.target.value,
+                        })
+                      }
+                      rows="4"
+                    />
+                  </div>
+
                   <button
                     type="submit"
-                    className="form-submit"
+                    className="admin-submit"
                     disabled={loading}
                   >
                     {loading ? "⏳ Đang tạo..." : "✨ Tạo Bài Học"}

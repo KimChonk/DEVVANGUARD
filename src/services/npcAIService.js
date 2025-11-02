@@ -3,6 +3,8 @@
  * Integrates with Google Gemini AI via Edge Function
  */
 
+import { supabase } from './supabaseClient';
+
 const EDGE_FUNCTION_URL = 'https://zcjyrssflzlkurmwbowg.supabase.co/functions/v1/npc-chat';
 
 /**
@@ -22,6 +24,19 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
       };
     }
 
+    // Get auth token from Supabase session
+    const { data: { session } } = await supabase.auth.getSession();
+    const authToken = session?.access_token;
+
+    if (!authToken) {
+      console.error('❌ No Supabase auth token found');
+      return {
+        success: false,
+        error: 'Authentication required',
+        reply: 'Vui lòng đăng nhập để sử dụng NPC.'
+      };
+    }
+
     console.log('🧙‍♂️ Sending to NPC AI:', { userMessage, problemDescription: problemDescription.substring(0, 100) + '...' });
 
     const response = await fetch(EDGE_FUNCTION_URL, {
@@ -29,6 +44,7 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
       },
       body: JSON.stringify({
         userMessage: userMessage.trim(),
@@ -37,13 +53,23 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
       }),
     });
 
+    console.log('📡 Response status:', response.status, response.statusText);
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('❌ NPC API Error:', response.status, errorData);
-      throw new Error(errorData.error || `HTTP ${response.status}`);
+      
+      // Return error but with fallback reply
+      return {
+        success: false,
+        error: errorData.error || `HTTP ${response.status}`,
+        reply: `Lỗi từ server (${response.status}): ${errorData.error || response.statusText}. Vui lòng kiểm tra kết nối.`
+      };
     }
 
     const data = await response.json();
+
+    console.log('📦 Response data:', data);
 
     if (data.reply) {
       console.log('✅ NPC Reply:', data.reply);
@@ -53,17 +79,32 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
       };
     } else if (data.error) {
       console.error('❌ NPC Error:', data.error);
-      throw new Error(data.error);
+      return {
+        success: false,
+        error: data.error,
+        reply: `NPC Error: ${data.error}`
+      };
     } else {
       throw new Error('Unexpected response format from NPC');
     }
 
   } catch (error) {
     console.error('❌ NPC Service Error:', error.message);
+    console.error('Error details:', error);
+    
+    // Determine error type
+    let userFriendlyMessage = 'Không thể kết nối với NPC. Vui lòng thử lại.';
+    
+    if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+      userFriendlyMessage = 'Lỗi kết nối: CORS policy. Kiểm tra lại edge function configuration.';
+    } else if (error.message.includes('timeout')) {
+      userFriendlyMessage = 'Timeout: Edge Function không phản hồi. Thử lại sau.';
+    }
+    
     return {
       success: false,
-      error: error.message || 'Không thể kết nối với NPC. Vui lòng thử lại.',
-      reply: 'Hmm... Phép thuật của tôi bị gián đoạn. Hãy thử lại sau.'
+      error: error.message,
+      reply: userFriendlyMessage
     };
   }
 }
