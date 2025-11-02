@@ -12,7 +12,6 @@ import LessonScreen from "./pages/Lesson/LessonScreen";
 import ProfileScreen from "./pages/Profile/ProfileScreen";
 import LeaderboardScreen from "./pages/Leaderboard/LeaderboardScreen";
 import DashboardScreen from "./pages/Dashboard/DashboardScreen";
-import AdminScreen from "./pages/Admin/AdminScreen";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 function App() {
@@ -82,7 +81,7 @@ function App() {
             path="/admin" 
             element={
               <AdminRoute>
-                <AdminScreen />
+                <AdminDashboard />
               </AdminRoute>
             } 
           />

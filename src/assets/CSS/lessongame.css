@@ -44,70 +44,109 @@ body {
 
 /* ===== HEADER BATTLE ===== */
 .game-header {
-    position: relative;
-    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 30px;
-    background: linear-gradient(180deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.8) 100%);
+    padding: 15px 30px;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(22, 33, 62, 0.95) 100%);
     border-bottom: 3px solid var(--primary-gold);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+    height: 80px;
+}
+
+.header-left {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 40px;
+}
+
+.header-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
 }
 
 .back-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: transparent;
-    border: 2px solid var(--error-red);
-    color: var(--error-red);
-    border-radius: 8px;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    border: none;
+    color: var(--dark-blue);
+    border-radius: 12px;
     cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-weight: 600;
+    font-size: 1.2rem;
     transition: all 0.3s ease;
-    font-size: 0.95rem;
-    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
 }
 
 .back-btn:hover {
-    background: var(--error-red);
-    color: white;
-    transform: translateX(-3px);
-    box-shadow: 0 0 15px rgba(244, 67, 54, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+.back-btn:active {
+    transform: translateY(0);
 }
 
 .level-title {
     font-family: 'MedievalSharp', cursive;
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: var(--text-gold);
-    text-shadow: 3px 3px 8px var(--shadow-dark);
-    text-align: center;
-    flex: 1;
+    text-shadow: 3px 3px 8px var(--shadow-dark), 0 0 10px rgba(212, 175, 55, 0.3);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.turn-counter {
-    background: linear-gradient(45deg, var(--primary-gold), var(--secondary-gold));
+.level-number {
+    font-size: 0.9rem;
+    color: rgba(232, 232, 232, 0.7);
+    margin: 5px 0 0 0;
+}
+
+.quest-status {
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
     color: var(--dark-blue);
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
     font-weight: 700;
-    font-size: 1rem;
-    text-transform: uppercase;
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.quest-status.completed {
+    background: linear-gradient(135deg, var(--success-green), #66bb6a);
 }
 
 /* ===== MAIN BATTLE AREA ===== */
 .game-main {
     position: relative;
-    z-index: 5;
+    width: 100%;
     display: flex;
-    flex: 1;
-    gap: 20px;
-    padding: 20px 30px;
-    overflow: hidden;
+    flex-direction: row;
+    margin-top: 80px;
+    gap: 15px;
+    padding: 20px;
+    min-height: calc(100vh - 80px);
 }
 
 /* ===== LEFT: QUEST DISPLAY (60%) ===== */
@@ -320,7 +359,7 @@ body {
 
 /* Code Editor */
 .code-arena {
-    flex: 1;
+    flex: 0 0 200px;
     background: #0d1117;
     border: 1px solid #30363d;
     border-radius: 8px;
@@ -331,7 +370,8 @@ body {
     line-height: 1.6;
     resize: none;
     outline: none;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 /* Monaco Editor Container */

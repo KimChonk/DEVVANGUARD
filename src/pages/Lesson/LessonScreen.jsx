@@ -220,16 +220,18 @@ export default function LessonScreen() {
 
       {/* Header Bar */}
       <header className="game-header">
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          ← Quay lại
-        </button>
+        <div className="header-left">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <i className="fas fa-arrow-left"></i>
+          </button>
+        </div>
         
-        <div className="level-info">
+        <div className="header-center">
           <h1 className="level-title">🗡️ {lesson?.lessonTitle || "Bài Học"}</h1>
           <p className="level-number">Bài #{lesson?.lessonOrder || "?"}</p>
         </div>
         
-        <div className="quest-stats">
+        <div className="header-right">
           {testResults && (
             <div className={`quest-status ${testResults.success ? 'completed' : 'active'}`}>
               {testResults.success ? "✅ HOÀN THÀNH" : "⚔️ ĐANG CHIẾN"}

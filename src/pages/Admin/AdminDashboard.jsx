@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { userService } from "../../services/apiClient";
-import { courseService } from "../../services/apiClient";
-import { lessonService } from "../../services/apiClient";
+import { userService, courseService, lessonService } from "../../services/apiClient";
+import { authService } from "../../services/supabaseClient";
 import "../../assets/CSS/admindashboard.css";
 
 export default function AdminDashboard() {
@@ -19,45 +18,208 @@ export default function AdminDashboard() {
   const [totalCourses, setTotalCourses] = useState(0);
   const [totalLessons, setTotalLessons] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [courses, setCourses] = useState([]);
+  const [lessons, setLessons] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  // Fetch real data from API
+  // UI states
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [showCourseForm, setShowCourseForm] = useState(false);
+  const [showLessonForm, setShowLessonForm] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [showMessage, setShowMessage] = useState(false);
+
+  // Form states
+  const [courseForm, setCourseForm] = useState({
+    name: "",
+    language: "",
+    description: ""
+  });
+
+  const [lessonForm, setLessonForm] = useState({
+    courseId: "",
+    lessonTitle: "",
+    lessonOrder: "",
+    problemDescription: "",
+    solutionTemplate: "",
+    testCases: ""
+  });
+
+  // Fetch all data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch courses
-        const coursesResult = await courseService.getAllCourses();
-        console.log('📊 Courses Result:', coursesResult);
-        if (coursesResult.success && Array.isArray(coursesResult.data)) {
-          setTotalCourses(coursesResult.data.length);
-          console.log('✅ Total Courses:', coursesResult.data.length);
-        }
-
-        // Fetch all users and filter (exclude admins) - more robust filter
-        const usersResult = await userService.getAllUsers();
-        console.log('👥 Users Result:', usersResult);
-        if (usersResult.success && Array.isArray(usersResult.data)) {
-          console.log('All users:', usersResult.data);
-          // Filter: only 'user' role OR where role is not 'admin'
-          const regularUsers = usersResult.data.filter(u => u.role === 'user' || (u.role && u.role !== 'admin'));
-          console.log('Regular users (non-admin):', regularUsers);
-          setTotalUsers(regularUsers.length);
-          console.log('✅ Total Users:', regularUsers.length);
-        }
-
-        // Fetch all lessons directly (no loop!)
-        const lessonsResult = await lessonService.getAllLessons();
-        console.log('📚 All Lessons Result:', lessonsResult);
-        if (lessonsResult.success && Array.isArray(lessonsResult.data)) {
-          setTotalLessons(lessonsResult.data.length);
-          console.log('✅ Total Lessons:', lessonsResult.data.length);
-        }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    };
-
-    fetchData();
+    fetchAllData();
   }, []);
+
+  // Auto hide message after 2 seconds with animation
+  useEffect(() => {
+    if (message) {
+      setShowMessage(true);
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+        setTimeout(() => {
+          setMessage("");
+        }, 500);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch courses
+      const coursesResult = await courseService.getAllCourses();
+      if (coursesResult.success && Array.isArray(coursesResult.data)) {
+        setCourses(coursesResult.data);
+        setTotalCourses(coursesResult.data.length);
+      }
+
+      // Fetch users
+      const usersResult = await userService.getAllUsers();
+      if (usersResult.success && Array.isArray(usersResult.data)) {
+        const regularUsers = usersResult.data.filter(u => u.role === 'user' || (u.role && u.role !== 'admin'));
+        setUsers(usersResult.data);
+        setTotalUsers(regularUsers.length);
+      }
+
+      // Fetch lessons
+      const lessonsResult = await lessonService.getAllLessons();
+      if (lessonsResult.success && Array.isArray(lessonsResult.data)) {
+        setLessons(lessonsResult.data);
+        setTotalLessons(lessonsResult.data.length);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setMessage("❌ Lỗi tải dữ liệu");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle course creation
+  const handleCreateCourse = async (e) => {
+    e.preventDefault();
+    if (!courseForm.name || !courseForm.language) {
+      setMessage("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await courseService.createCourse(
+        courseForm.name,
+        courseForm.language,
+        courseForm.description
+      );
+
+      if (result.success) {
+        setMessage("✅ Tạo khóa học thành công!");
+        setCourseForm({ name: "", language: "", description: "" });
+        setShowCourseForm(false);
+        fetchAllData();
+      } else {
+        setMessage("❌ Lỗi: " + (result.message || "Không thể tạo khóa học"));
+      }
+    } catch (err) {
+      setMessage("❌ Lỗi: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle lesson creation
+  const handleCreateLesson = async (e) => {
+    e.preventDefault();
+    if (!lessonForm.courseId || !lessonForm.lessonTitle) {
+      setMessage("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await lessonService.createLesson(
+        lessonForm.courseId,
+        lessonForm.lessonTitle,
+        parseInt(lessonForm.lessonOrder) || 1,
+        lessonForm.problemDescription || null,
+        lessonForm.solutionTemplate || null,
+        lessonForm.testCases || null
+      );
+
+      if (result.success) {
+        setMessage("✅ Tạo bài học thành công!");
+        setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
+        setShowLessonForm(false);
+        fetchAllData();
+      } else {
+        setMessage("❌ Lỗi: " + (result.message || "Không thể tạo bài học"));
+      }
+    } catch (err) {
+      setMessage("❌ Lỗi: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle course deletion
+  const handleDeleteCourse = async (courseId) => {
+    if (window.confirm("Bạn có chắc muốn xóa khóa học này?")) {
+      try {
+        setLoading(true);
+        const result = await courseService.deleteCourse(courseId);
+
+        if (result.success) {
+          setMessage("✅ Xóa khóa học thành công!");
+          fetchAllData();
+        } else {
+          setMessage("❌ Lỗi: " + (result.message || "Không thể xóa khóa học"));
+        }
+      } catch (err) {
+        setMessage("❌ Lỗi: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Handle lesson deletion
+  const handleDeleteLesson = async (lessonId) => {
+    if (window.confirm("Bạn có chắc muốn xóa bài học này?")) {
+      try {
+        setLoading(true);
+        const result = await lessonService.deleteLesson(lessonId);
+
+        if (result.success) {
+          setMessage("✅ Xóa bài học thành công!");
+          fetchAllData();
+        } else {
+          setMessage("❌ Lỗi: " + (result.message || "Không thể xóa bài học"));
+        }
+      } catch (err) {
+        setMessage("❌ Lỗi: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      const result = await authService.signOut();
+      if (result.success) {
+        navigate("/");
+      } else {
+        setMessage("❌ Lỗi đăng xuất: " + result.message);
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      setMessage("❌ Lỗi đăng xuất");
+    }
+  };
 
   // Weekly statistics
   const [weeklyStats] = useState({
@@ -269,11 +431,10 @@ export default function AdminDashboard() {
             </div>
             
             <ul className="admin-nav-links">
-              <li><a href="#" className="active">Dashboard</a></li>
-              <li><a href="#">Users</a></li>
-              <li><a href="#">Courses</a></li>
-              <li><a href="#">Analytics</a></li>
-              <li><a href="#">Settings</a></li>
+              <li><a href="#" className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>Dashboard</a></li>
+              <li><a href="#" className={activeTab === "courses" ? "active" : ""} onClick={() => setActiveTab("courses")}>Khóa Học</a></li>
+              <li><a href="#" className={activeTab === "lessons" ? "active" : ""} onClick={() => setActiveTab("lessons")}>Bài Học</a></li>
+              <li><a href="#" className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>Người Dùng</a></li>
             </ul>
           </div>
           
@@ -294,10 +455,10 @@ export default function AdminDashboard() {
             </div>
             <button 
               className="back-to-site-btn"
-              onClick={() => navigate("/main-menu")}
+              onClick={handleLogout}
             >
-              <i className="fas fa-arrow-left"></i>
-              Back to Site
+              <i className="fas fa-sign-out-alt"></i>
+              Log Out
             </button>
           </div>
         </div>
@@ -305,91 +466,102 @@ export default function AdminDashboard() {
 
       {/* Admin Dashboard Content */}
       <div className="admin-content">
-        {/* Header */}
-        <div className="admin-header">
-          <div className="admin-welcome">
-            <h1 className="admin-title">
-              <i className="fas fa-tachometer-alt"></i>
-              Admin Dashboard
-            </h1>
-            <p className="admin-subtitle">
-              Monitor and manage your DevVanguard learning platform
-            </p>
+        {/* Message Display */}
+        {message && (
+          <div className={`admin-message ${!showMessage ? 'disappear' : ''} ${message.includes('❌') ? 'error' : 'success'}`}>
+            {message}
+            <button type="button" onClick={() => setMessage("")} className="close-btn">×</button>
           </div>
-          
-          <div className="admin-date-time">
-            <div className="current-time">
-              {new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </div>
-            <div className="current-date">
-              {new Date().toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </div>
-          </div>
-        </div>
+        )}
 
-        {/* Quick Stats */}
-        <div className="admin-stats-grid">
-          {quickStats.map((stat, index) => (
-            <div key={index} className={`admin-stat-card ${stat.color}`}>
-              <div className="stat-icon">
-                <i className={stat.icon}></i>
+        {/* Dashboard Tab */}
+        {activeTab === "dashboard" && (
+          <>
+            {/* Header */}
+            <div className="admin-header">
+              <div className="admin-welcome">
+                <h1 className="admin-title">
+                  <i className="fas fa-tachometer-alt"></i>
+                  Admin Dashboard
+                </h1>
+                <p className="admin-subtitle">
+                  Monitor and manage your DevVanguard learning platform
+                </p>
               </div>
-              <div className="stat-content">
-                <h3 className="stat-value">{stat.value}</h3>
-                <p className="stat-title">{stat.title}</p>
-                <div className={`stat-change ${stat.trend}`}>
-                  <i className={`fas fa-arrow-${stat.trend === 'up' ? 'up' : 'down'}`}></i>
-                  {stat.change}
+              
+              <div className="admin-date-time">
+                <div className="current-time">
+                  {new Date().toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </div>
+                <div className="current-date">
+                  {new Date().toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
                 </div>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="admin-grid">
-          {/* Weekly Activity Chart */}
-          <div className="admin-widget chart-widget">
-            <div className="widget-header">
-              <h3 className="widget-title">
-                <i className="fas fa-chart-line"></i>
-                Weekly Activity Overview
-              </h3>
-              <div className="chart-legend">
-                <div className="legend-item">
-                  <div className="legend-color students"></div>
-                  <span>Students</span>
-                </div>
-                <div className="legend-item">
-                  <div className="legend-color lessons"></div>
-                  <span>Lessons</span>
-                </div>
-              </div>
-            </div>
-            <div className="activity-chart">
-              {weeklyActivity.map((day, index) => (
-                <div key={index} className="chart-day">
-                  <div className="chart-bars">
-                    <div 
-                      className="bar students-bar" 
-                      style={{ height: `${(day.students / 100) * 100}%` }}
-                      title={`${day.students} students`}
-                    ></div>
-                    <div 
-                      className="bar lessons-bar" 
-                      style={{ height: `${(day.lessons / 250) * 100}%` }}
-                      title={`${day.lessons} lessons`}
-                    ></div>
+            {/* Quick Stats */}
+            <div className="admin-stats-grid">
+              {quickStats.map((stat, index) => (
+                <div key={index} className={`admin-stat-card ${stat.color}`}>
+                  <div className="stat-icon">
+                    <i className={stat.icon}></i>
                   </div>
-                  <span className="day-label">{day.day}</span>
+                  <div className="stat-content">
+                    <h3 className="stat-value">{stat.value}</h3>
+                    <p className="stat-title">{stat.title}</p>
+                    <div className={`stat-change ${stat.trend}`}>
+                      <i className={`fas fa-arrow-${stat.trend === 'up' ? 'up' : 'down'}`}></i>
+                      {stat.change}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="admin-grid">
+              {/* Weekly Activity Chart */}
+              <div className="admin-widget chart-widget">
+                <div className="widget-header">
+                  <h3 className="widget-title">
+                    <i className="fas fa-chart-line"></i>
+                    Weekly Activity Overview
+                  </h3>
+                  <div className="chart-legend">
+                    <div className="legend-item">
+                      <div className="legend-color students"></div>
+                      <span>Students</span>
+                    </div>
+                    <div className="legend-item">
+                      <div className="legend-color lessons"></div>
+                      <span>Lessons</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-chart">
+                  {weeklyActivity.map((day, index) => (
+                    <div key={index} className="chart-day">
+                      <div className="chart-bars">
+                        <div 
+                          className="bar students-bar" 
+                          style={{ height: `${(day.students / 100) * 100}%` }}
+                          title={`${day.students} students`}
+                        ></div>
+                        <div 
+                          className="bar lessons-bar" 
+                          style={{ height: `${(day.lessons / 250) * 100}%` }}
+                          title={`${day.lessons} lessons`}
+                        ></div>
+                      </div>
+                      <span className="day-label">{day.day}</span>
                 </div>
               ))}
             </div>
@@ -496,6 +668,362 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+          </>
+        )}
+
+        {/* Courses Tab */}
+        {activeTab === "courses" && (
+          <div className="admin-tab-content">
+            <div className="section-header">
+              <h2 className="section-title">
+                <i className="fas fa-book"></i>
+                Quản Lý Khóa Học
+              </h2>
+              <button
+                type="button"
+                className="add-btn"
+                onClick={() => setShowCourseForm(!showCourseForm)}
+              >
+                <i className="fas fa-plus"></i>
+                {showCourseForm ? "Hủy" : "Thêm Khóa Học"}
+              </button>
+            </div>
+
+            {/* Course Form */}
+            {showCourseForm && (
+              <div className="admin-form-container">
+                <form className="admin-form-grid" onSubmit={handleCreateCourse}>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Tên Khóa Học</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      placeholder="VD: Python Mastery"
+                      value={courseForm.name}
+                      onChange={(e) =>
+                        setCourseForm({ ...courseForm, name: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Ngôn Ngữ Lập Trình</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      placeholder="VD: Python"
+                      value={courseForm.language}
+                      onChange={(e) =>
+                        setCourseForm({
+                          ...courseForm,
+                          language: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Mô Tả</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder="Mô tả chi tiết về khóa học"
+                      value={courseForm.description}
+                      onChange={(e) =>
+                        setCourseForm({
+                          ...courseForm,
+                          description: e.target.value,
+                        })
+                      }
+                      rows="4"
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="admin-submit"
+                    disabled={loading}
+                  >
+                    {loading ? "⏳ Đang tạo..." : "✨ Tạo Khóa Học"}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* Courses List */}
+            <div className="courses-list">
+              {loading && courses.length === 0 ? (
+                <div className="loading-state">
+                  <div className="spinner"></div>
+                  <p>Đang tải khóa học...</p>
+                </div>
+              ) : courses.length === 0 ? (
+                <div className="empty-state">
+                  <i className="fas fa-inbox"></i>
+                  <p>Chưa có khóa học nào</p>
+                </div>
+              ) : (
+                courses.map((course) => (
+                  <div key={course.id} className="course-card">
+                    <div className="course-card-header">
+                      <h3 className="course-name">{course.name}</h3>
+                      <span className="course-language">{course.language}</span>
+                    </div>
+                    <div className="course-actions">
+                      <button
+                        type="button"
+                        className="action-btn delete"
+                        onClick={() => handleDeleteCourse(course.id)}
+                      >
+                        <i className="fas fa-trash"></i>
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Lessons Tab */}
+        {activeTab === "lessons" && (
+          <div className="admin-tab-content">
+            <div className="section-header">
+              <h2 className="section-title">
+                <i className="fas fa-chalkboard"></i>
+                Quản Lý Bài Học
+              </h2>
+              <button
+                type="button"
+                className="add-btn"
+                onClick={() => setShowLessonForm(!showLessonForm)}
+              >
+                <i className="fas fa-plus"></i>
+                {showLessonForm ? "Hủy" : "Thêm Bài Học"}
+              </button>
+            </div>
+
+            {/* Lesson Form */}
+            {showLessonForm && (
+              <div className="admin-form-container">
+                <form className="admin-form-grid" onSubmit={handleCreateLesson}>
+                  <div className="admin-form-group">
+                    <label className="admin-label">Chọn Khóa Học</label>
+                    <select
+                      className="admin-input"
+                      value={lessonForm.courseId}
+                      onChange={(e) => {
+                        setLessonForm({
+                          ...lessonForm,
+                          courseId: e.target.value,
+                        });
+                      }}
+                      required
+                    >
+                      <option value="">-- Chọn khóa học --</option>
+                      {courses.map((course) => (
+                        <option key={course.id} value={course.id}>
+                          {course.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Tên Bài Học</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      placeholder="VD: Variables and Data Types"
+                      value={lessonForm.lessonTitle}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          lessonTitle: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Thứ Tự Bài Học</label>
+                    <input
+                      type="number"
+                      className="admin-input"
+                      placeholder="VD: 1"
+                      value={lessonForm.lessonOrder}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          lessonOrder: e.target.value,
+                        })
+                      }
+                      min="1"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Mô Tả Đề Bài (HTML/Markdown)</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder="Mô tả chi tiết đề bài..."
+                      value={lessonForm.problemDescription}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          problemDescription: e.target.value,
+                        })
+                      }
+                      rows="4"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Mã Mẫu / Starter Code</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder="Nhập code mẫu cho học viên..."
+                      value={lessonForm.solutionTemplate}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          solutionTemplate: e.target.value,
+                        })
+                      }
+                      rows="4"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">Test Cases (JSON)</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder='[{"input": "5", "output": "25"}]'
+                      value={lessonForm.testCases}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          testCases: e.target.value,
+                        })
+                      }
+                      rows="4"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="admin-submit"
+                    disabled={loading}
+                  >
+                    {loading ? "⏳ Đang tạo..." : "✨ Tạo Bài Học"}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* Lessons List */}
+            <div className="lessons-list">
+              {loading && lessons.length === 0 ? (
+                <div className="loading-state">
+                  <div className="spinner"></div>
+                  <p>Đang tải bài học...</p>
+                </div>
+              ) : lessons.length === 0 ? (
+                <div className="empty-state">
+                  <i className="fas fa-inbox"></i>
+                  <p>Chưa có bài học nào</p>
+                </div>
+              ) : (
+                lessons.map((lesson) => (
+                  <div key={lesson.lessonId} className="lesson-item-card">
+                    <div className="lesson-item-header">
+                      <h3 className="lesson-item-name">{lesson.lessonTitle}</h3>
+                      <span className="lesson-order">Bài #{lesson.lessonOrder}</span>
+                    </div>
+                    <div className="lesson-item-actions">
+                      <button
+                        type="button"
+                        className="action-btn delete"
+                        disabled={loading}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDeleteLesson(lesson.lessonId);
+                        }}
+                      >
+                        <i className="fas fa-trash"></i>
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === "users" && (
+          <div className="admin-tab-content">
+            <div className="section-header">
+              <h2 className="section-title">
+                <i className="fas fa-users"></i>
+                Quản Lý Người Dùng
+              </h2>
+            </div>
+
+            {/* Users List */}
+            <div className="users-list">
+              {loading && users.length === 0 ? (
+                <div className="loading-state">
+                  <div className="spinner"></div>
+                  <p>Đang tải danh sách người dùng...</p>
+                </div>
+              ) : users.length === 0 ? (
+                <div className="empty-state">
+                  <i className="fas fa-inbox"></i>
+                  <p>Chưa có người dùng nào</p>
+                </div>
+              ) : (
+                users.map((user) => (
+                  <div key={user.userId} className="user-item">
+                    <div className="user-info">
+                      <div className="user-avatar">
+                        {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
+                      </div>
+                      <div className="user-details">
+                        <p className="user-name">{user.fullName || "Unknown"}</p>
+                        <p className="user-email">{user.email}</p>
+                        <p className="user-id">ID: {user.userId}</p>
+                      </div>
+                    </div>
+                    <div className="user-stats">
+                      <div className="user-stat">
+                        <div className="user-stat-value">-</div>
+                        <div className="user-stat-label">Khóa Học</div>
+                      </div>
+                      <div className="user-stat">
+                        <div className="user-stat-value">-</div>
+                        <div className="user-stat-label">Bài Hoàn Thành</div>
+                      </div>
+                      <div className="user-stat">
+                        <div className="user-stat-value">-</div>
+                        <div className="user-stat-label">Tiến Độ</div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
