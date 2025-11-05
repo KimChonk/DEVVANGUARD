@@ -29,18 +29,24 @@ const LANGUAGE_MAP = {
 
 /**
  * Execute code using Piston API
- * @param {string} language - Programming language
+ * @param {string} language - Programming language (e.g., "python", "java", "cpp")
  * @param {string} code - Code to execute
  * @param {string} input - Optional input to stdin
  * @returns {Promise} Object with { stdout, stderr, exitCode, executionTime }
  */
 export async function executeCode(language, code, input = "") {
   try {
+    if (!language) {
+      throw new Error("Language parameter is required for code execution");
+    }
+    
     console.log(`🚀 Executing ${language} code via Piston API...`);
     const startTime = performance.now();
 
     const pistonLang = LANGUAGE_MAP[language] || language;
     const version = LANGUAGE_VERSIONS[language] || "*";
+    
+    console.log(`   Language Mapping: ${language} → ${pistonLang} v${version}`);
 
     const payload = {
       language: pistonLang,
@@ -224,12 +230,26 @@ export function formatTestResults(validationResult) {
 /**
  * Complete test flow: Execute code -> Validate test cases
  *
- * @param {string} language - Programming language
+ * @param {string} language - Programming language (e.g., "python", "java", "cpp")
  * @param {string} code - Code to execute
  * @param {Array} testCases - Array of test cases
  * @returns {Promise} Object with execution and test results
  */
 export async function executeAndValidate(language, code, testCases = []) {
+  // Validate language parameter
+  if (!language) {
+    return {
+      execution: { success: false, stdout: "", stderr: "Language parameter is required" },
+      validation: { passed: 0, total: 0, results: [] },
+      passed: false,
+      message: "❌ Lỗi: Ngôn ngữ lập trình không được xác định",
+      output: "Error: Language parameter is required",
+      formattedResults: "",
+    };
+  }
+
+  console.log(`📝 Starting code execution with language: ${language}`);
+  
   // Filter only public test cases
   const publicTests = testCases.filter(tc => !tc.hidden);
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { lessonService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
+import { convertDbToEditorLanguage, convertDbToPistonLanguage, getLanguageDisplayName } from "../../utils/languageMapping";
 import NPCChat from "../../components/NPCChat";
 import CodeEditor from "../../components/CodeEditor";
 import ProblemDescription from "../../components/ProblemDescription";
@@ -125,11 +126,20 @@ export default function LessonScreen() {
     setShowNpc(true);
     
     try {
-      // Detect language from course or default to python
-      const language = lesson?.courseId ? "python" : "python";
+      // Get course language from lesson
+      const dbLanguage = lesson?.course?.language;
+      if (!dbLanguage) {
+        setOutput("❌ Lỗi: Không tìm thấy ngôn ngữ của khóa học!");
+        setNpcStatus("error");
+        return;
+      }
+
+      // Convert DB language to Piston API language
+      const language = convertDbToPistonLanguage(dbLanguage);
       const testCases = getTestCases();
 
       console.log(`🚀 Executing ${language} code with ${testCases.length} test cases...`);
+      console.log(`📚 Course Language: ${dbLanguage} → Piston Language: ${language}`);
 
       // Execute code and validate
       const result = await executeAndValidate(language, code, testCases);
@@ -356,7 +366,7 @@ export default function LessonScreen() {
           {/* Editor Header */}
           <div className="editor-header">
             <h2>💻 Code Editor</h2>
-            <span className="lang-badge">Python 3.10</span>
+            <span className="lang-badge">{getLanguageDisplayName(lesson?.course?.language)}</span>
           </div>
 
           {/* Code Editor */}
@@ -364,7 +374,7 @@ export default function LessonScreen() {
             <CodeEditor 
               code={code}
               onChange={setCode}
-              language="python"
+              language={convertDbToEditorLanguage(lesson?.course?.language)}
               disabled={isRunning}
               onSave={handleRunCode}
             />

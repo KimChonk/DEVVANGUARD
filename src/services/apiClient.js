@@ -114,6 +114,7 @@ export const courseService = {
           updatedAt: lesson.updatedAt
         })) || []
       };
+      
       return { success: true, data: mapped };
     } catch (error) {
       return { success: false, message: error.message };
@@ -188,6 +189,19 @@ export const lessonService = {
   async getLessonById(lessonId) {
     try {
       const lesson = await apiCall(`/lesson/${lessonId}`);
+      
+      // Fetch course to get language
+      let courseLanguage = null;
+      if (lesson.courseId) {
+        try {
+          const course = await apiCall(`/course/${lesson.courseId}`);
+          courseLanguage = course.language || null;
+          console.log(`✅ Course language fetched: ${courseLanguage}`);
+        } catch (err) {
+          console.warn("Could not fetch course language:", err);
+        }
+      }
+      
       // Map C# PascalCase to camelCase
       const mapped = {
         id: lesson.lessonId,
@@ -199,7 +213,10 @@ export const lessonService = {
         solutionTemplate: lesson.solutionTemplate,
         testCases: lesson.testCases,
         createdAt: lesson.createdAt,
-        updatedAt: lesson.updatedAt
+        updatedAt: lesson.updatedAt,
+        course: {
+          language: courseLanguage
+        }
       };
       return { success: true, data: mapped };
     } catch (error) {
