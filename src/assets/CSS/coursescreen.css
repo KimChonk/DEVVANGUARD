@@ -441,6 +441,22 @@ body {
   box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
 }
 
+.lesson-list-item.completed {
+  background: rgba(76, 175, 80, 0.15);
+  border-color: var(--success-green);
+}
+
+.lesson-list-item.completed:hover {
+  background: rgba(76, 175, 80, 0.25);
+  border-color: var(--success-green);
+}
+
+.lesson-index.completed-badge {
+  background: linear-gradient(135deg, var(--success-green), #66bb6a);
+  color: #fff;
+  font-weight: 700;
+}
+
 .lesson-index {
   display: flex;
   align-items: center;
@@ -548,11 +564,28 @@ body {
   border-bottom: 2px solid rgba(212, 175, 55, 0.3);
 }
 
-.preview-header h2 {
+.preview-title-status {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.preview-header h2 {
   color: var(--text-gold);
   font-family: 'MedievalSharp', cursive;
   font-size: 1.3rem;
+}
+
+.completed-badge {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(76, 175, 80, 0.1));
+  border: 2px solid var(--success-green);
+  color: var(--success-green);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .start-lesson-btn {
@@ -1017,6 +1050,117 @@ body {
     padding: 6px 12px;
     font-size: 0.9rem;
   }
+}
+
+/* ===== SPAM WARNING MODAL ===== */
+.spam-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeInOverlay 0.3s ease-in-out;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.spam-warning-modal {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 3px solid #ff6b6b;
+  border-radius: 15px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 
+    0 0 30px rgba(255, 107, 107, 0.5),
+    inset 0 0 20px rgba(255, 107, 107, 0.1);
+  animation: slideInModal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+}
+
+@keyframes slideInModal {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.warning-header i {
+  font-size: 2rem;
+  color: #ff6b6b;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.warning-header h2 {
+  color: #ff6b6b;
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.warning-message {
+  color: var(--text-light);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.warning-btn-close {
+  background: linear-gradient(135deg, #ff6b6b, #ff5252);
+  border: none;
+  color: #fff;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.warning-btn-close:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+}
+
+.warning-btn-close:active {
+  transform: translateY(0);
 }
 @media (max-width: 580px) {
   /* Ẩn phần text "Back to Academy" */

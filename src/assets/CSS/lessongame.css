@@ -170,6 +170,23 @@ body {
   border-bottom-color: var(--accent-color);
 }
 
+/* Tab Button Icon */
+.tab-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: brightness(0.8);
+  transition: filter 0.2s ease;
+}
+
+.tab-btn:hover .tab-icon {
+  filter: brightness(1);
+}
+
+.tab-btn.active .tab-icon {
+  filter: brightness(1.2);
+}
+
 /* Tab Content */
 .sidebar-content {
   flex: 1;

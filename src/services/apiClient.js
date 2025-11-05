@@ -447,6 +447,29 @@ export const userProgressService = {
       return { success: false, message: error.message };
     }
   },
+
+  // Submit lesson (hoàn thành bài học và nhận XP reward)
+  async submitLesson(lessonId) {
+    try {
+      const result = await apiCall("/userprogress/submit-lesson", "POST", {
+        lessonId,
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Lấy progress của user cho một bài học cụ thể
+  async getUserProgressByLessonId(lessonId) {
+    try {
+      const progress = await apiCall(`/userprogress/lesson/${lessonId}`);
+      return { success: true, data: progress };
+    } catch (error) {
+      // Không có progress cho bài này, return empty
+      return { success: false, data: null, message: error.message };
+    }
+  },
 };
 
 // ========== USER STATS SERVICES ==========

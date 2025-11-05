@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCourse } from "../../hooks/useCourses";
-import { lessonService } from "../../services/apiClient";
+import { lessonService, userProgressService } from "../../services/apiClient";
 import LoadingScreen from "../../components/LoadingScreen";
+import ProblemDescription from "../../components/ProblemDescription";
 import "../../assets/CSS/coursescreen.css";
 
 export default function CourseScreen() {
@@ -14,6 +15,34 @@ export default function CourseScreen() {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
+  
+  // Trạng thái hoàn thành bài học
+  const [completedLessons, setCompletedLessons] = useState({});
+  
+  // Cảnh báo spam
+  const [showSpamWarning, setShowSpamWarning] = useState(false);
+  const [spamWarningMessage, setSpamWarningMessage] = useState("");
+
+  // Kiểm tra spam: nếu người dùng submit >5 lần trong 1 phút cho cùng bài
+  const checkSpamSubmission = (lessonId) => {
+    const submissionKey = `lesson_${lessonId}_submissions`;
+    const now = Date.now();
+    const submissions = JSON.parse(localStorage.getItem(submissionKey) || '[]');
+    
+    // Lọc những submission trong 1 phút gần nhất
+    const recentSubmissions = submissions.filter(time => now - time < 60000);
+    
+    if (recentSubmissions.length >= 5) {
+      setSpamWarningMessage(`⚠️ Phát hiện hành vi spam! Bạn đã submit ${recentSubmissions.length} lần trong 1 phút. Hãy cố gắng hoàn thành bài học hợp lý, không nên spam để lấy kinh nghiệm!`);
+      setShowSpamWarning(true);
+      return true;
+    }
+    
+    // Thêm submission mới
+    recentSubmissions.push(now);
+    localStorage.setItem(submissionKey, JSON.stringify(recentSubmissions));
+    return false;
+  };
 
   useEffect(() => {
     if (!courseId) return;
@@ -23,6 +52,21 @@ export default function CourseScreen() {
         if (result.success) {
           const lessonList = Array.isArray(result.data) ? result.data : [];
           setLessons(lessonList);
+          
+          // Lấy trạng thái hoàn thành cho từng bài
+          const completed = {};
+          for (const lesson of lessonList) {
+            try {
+              const progressResult = await userProgressService.getUserProgressByLessonId(lesson.lessonId);
+              if (progressResult.success && progressResult.data) {
+                completed[lesson.lessonId] = progressResult.data.status === 'completed';
+              }
+            } catch (err) {
+              console.log(`Không thể lấy trạng thái bài ${lesson.lessonId}`);
+            }
+          }
+          setCompletedLessons(completed);
+          
           // Auto-select first lesson
           if (lessonList.length > 0) {
             setSelectedLesson(lessonList[0]);
@@ -50,9 +94,6 @@ export default function CourseScreen() {
         <div className="navbar-center">
           <h1 className="course-title">{course.name}</h1>
         </div>
-        <div className="navbar-right">
-          <span className="course-meta">{lessons.length} bài học</span>
-        </div>
       </nav>
       
       <div className="course-main">
@@ -60,7 +101,6 @@ export default function CourseScreen() {
         <section className="lessons-panel">
           <div className="lessons-header">
             <h2>📚 Bài Học</h2>
-            <span className="lessons-count">{lessons.length} bài</span>
           </div>
           
           <div className="lessons-list-container">
@@ -71,22 +111,27 @@ export default function CourseScreen() {
               </div>
             ) : lessons.length > 0 ? (
               <div className="lessons-list">
-                {lessons.map((lesson, index) => (
-                  <div
-                    key={lesson.lessonId}
-                    className={`lesson-list-item ${selectedLesson?.lessonId === lesson.lessonId ? 'active' : ''}`}
-                    onClick={() => setSelectedLesson(lesson)}
-                  >
-                    <div className="lesson-index">{index + 1}</div>
-                    <div className="lesson-info">
-                      <h4>{lesson.lessonTitle}</h4>
-                      <p className="lesson-order">Bài #{lesson.lessonOrder}</p>
+                {lessons.map((lesson, index) => {
+                  const isCompleted = completedLessons[lesson.lessonId];
+                  return (
+                    <div
+                      key={lesson.lessonId}
+                      className={`lesson-list-item ${selectedLesson?.lessonId === lesson.lessonId ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                      onClick={() => setSelectedLesson(lesson)}
+                    >
+                      <div className={`lesson-index ${isCompleted ? 'completed-badge' : ''}`}>
+                        {isCompleted ? '✓' : index + 1}
+                      </div>
+                      <div className="lesson-info">
+                        <h4>{lesson.lessonTitle}</h4>
+                        <p className="lesson-order">{isCompleted ? '✅ Đã hoàn thành' : 'Chưa hoàn thành'}</p>
+                      </div>
+                      <div className="lesson-action">
+                        <i className="fas fa-chevron-right"></i>
+                      </div>
                     </div>
-                    <div className="lesson-action">
-                      <i className="fas fa-chevron-right"></i>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="empty-state">
@@ -102,10 +147,18 @@ export default function CourseScreen() {
           {selectedLesson ? (
             <div className="lesson-preview">
               <div className="preview-header">
-                <h2>🎯 {selectedLesson.lessonTitle}</h2>
+                <div className="preview-title-status">
+                  <h2>🎯 {selectedLesson.lessonTitle}</h2>
+                  {completedLessons[selectedLesson.lessonId] && (
+                    <span className="completed-badge">✅ Đã hoàn thành</span>
+                  )}
+                </div>
                 <button
                   className="start-lesson-btn"
                   onClick={() => {
+                    if (checkSpamSubmission(selectedLesson.lessonId)) {
+                      return;
+                    }
                     setIsLoading(true);
                     setLoadingMessage("Đang tải bài học...");
                     setTimeout(() => {
@@ -114,7 +167,8 @@ export default function CourseScreen() {
                     }, 1000);
                   }}
                 >
-                  <i className="fas fa-play"></i> Bắt Đầu
+                  <i className={`fas fa-${completedLessons[selectedLesson.lessonId] ? 'check' : 'play'}`}></i> 
+                  {completedLessons[selectedLesson.lessonId] ? 'Đã hoàn thành' : 'Bắt Đầu'}
                 </button>
               </div>
 
@@ -122,9 +176,7 @@ export default function CourseScreen() {
                 {selectedLesson.problemDescription ? (
                   <div className="description-section">
                     <h3>📋 Mô Tả Đề Bài</h3>
-                    <div className="description-text">
-                      {selectedLesson.problemDescription}
-                    </div>
+                    <ProblemDescription description={selectedLesson.problemDescription} />
                   </div>
                 ) : (
                   <p style={{ color: 'rgba(232, 232, 232, 0.6)' }}>Không có mô tả</p>
@@ -139,6 +191,25 @@ export default function CourseScreen() {
           )}
         </section>
       </div>
+
+      {/* Spam Warning Modal */}
+      {showSpamWarning && (
+        <div className="spam-warning-overlay">
+          <div className="spam-warning-modal">
+            <div className="warning-header">
+              <i className="fas fa-exclamation-triangle"></i>
+              <h2>⚠️ Cảnh báo</h2>
+            </div>
+            <p className="warning-message">{spamWarningMessage}</p>
+            <button 
+              className="warning-btn-close"
+              onClick={() => setShowSpamWarning(false)}
+            >
+              Tôi hiểu rồi
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

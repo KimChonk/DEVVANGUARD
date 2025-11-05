@@ -8,7 +8,7 @@ const LoadingScreen = ({ isVisible, message = 'Đang tải...' }) => {
     <div className="loading-screen-overlay">
       <div className="loading-screen-content">
         <img 
-          src="/images/zombie-walking-loading.gif" 
+          src="/UX/zombie-walking-loading.gif" 
           alt="Loading" 
           className="loading-gif"
         />
