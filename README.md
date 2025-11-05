@@ -1,8 +1,219 @@
-# 🏰 DevVanguard - Medieval Coding Adventure Platform
+# DevVanguard - Fantasy-Themed Coding Learning Platform
 
-> *"Embark on your coding quest and become a true Code Knight!"*
+DevVanguard is a fantasy-themed web application designed to teach programming concepts through interactive lessons and coding challenges. Users embark on a quest-like journey where they solve coding problems, earn XP rewards, and track their progress in a gamified learning environment.
 
-DevVanguard is an immersive, medieval/fantasy-themed coding education platform that transforms learning programming into an epic adventure. With a rich fantasy aesthetic and engaging gamification elements, students can master coding skills while progressing through their knightly journey.
+## Features
+
+### Core Learning Features
+- Interactive code editor with syntax highlighting (Monaco Editor)
+- Real-time code execution and validation using Piston API
+- Multi-language support (Python, JavaScript, Java, C++, etc.)
+- Test case validation with detailed feedback
+- Problem descriptions with formatted markdown rendering
+- NPC Guide system with contextual hints and feedback
+
+### User Progression System
+- XP-based reward system for completed lessons
+- Lesson completion tracking and status visualization
+- Spam prevention: Users cannot re-submit completed lessons for additional XP
+- User statistics dashboard showing total XP, lessons completed, and time spent
+- Profile management and user account features
+
+### Community Features
+- Forum system for discussions and Q&A
+- Post and comment creation with upvote/downvote functionality
+- Course-specific discussion threads
+- User reputation system through voting
+
+### UI/UX Enhancements
+- Fantasy-themed dark interface with cyberpunk aesthetics
+- Loading screens with animated zombie character
+- Success notification bubbles with particle effects and XP reward display
+- Alert notifications for duplicate lesson submission warnings
+- Responsive design for desktop and tablet views
+- Custom icon set for lesson features (hints, code, discussion)
+
+## Technology Stack
+
+### Frontend
+- React 18 with Vite bundler
+- Monaco Editor for code editing
+- Axios for API communication
+- CSS3 with animations and backdrop filters
+- JavaScript ES6+
+
+### Backend
+- C# .NET Core 8.0
+- Entity Framework Core with PostgreSQL
+- ASP.NET Core Web API
+- JWT authentication
+- CORS enabled for frontend integration
+
+### Database
+- PostgreSQL relational database
+- Supabase for authentication backend
+- Tables: users, courses, lessons, user_progress, user_stats, forum_posts, forum_comments
+
+### Code Execution
+- Piston API for secure code compilation and execution
+- Support for multiple programming languages
+- Real-time output streaming
+
+### Authentication
+- Supabase JWT token-based authentication
+- Protected routes with role-based access control
+- Admin and user role differentiation
+
+## Installation and Setup
+
+### Backend Setup
+```bash
+cd DEVVANGGUARD_API
+dotnet restore
+dotnet build
+dotnet run
+```
+Backend runs on http://localhost:5131
+
+### Frontend Setup
+```bash
+cd devvangguard
+npm install
+npm run dev      # Development
+npm run build    # Production build
+```
+Frontend runs on http://localhost:5173
+
+## Project Structure
+
+```
+DEVVANGGUARD_API/
+  Controllers/          # API endpoints
+  Models/              # Entity models
+  Repositories/        # Data access layer
+  Program.cs
+  appsettings.json
+
+devvangguard/
+  src/
+    components/        # Reusable React components
+    pages/            # Page components
+    services/         # API and business logic
+    hooks/            # Custom React hooks
+    utils/            # Helper functions
+    assets/CSS/       # Stylesheets
+  public/
+    UX/               # GIF animations
+    icons/            # Icon assets
+```
+
+## API Endpoints
+
+### User Management
+- POST /api/user/register
+- POST /api/user/login
+- GET /api/user/{userId}
+
+### Courses and Lessons
+- GET /api/course
+- GET /api/course/{courseId}
+- GET /api/lesson/{lessonId}
+
+### User Progress
+- POST /api/userprogress/submit-lesson
+- GET /api/userprogress/{userId}/{lessonId}
+
+### User Statistics
+- GET /api/userstats/{userId}
+- POST /api/userstats
+- PUT /api/userstats/{statId}
+
+### Forum
+- GET /api/forumpost
+- POST /api/forumpost
+- POST /api/forumcomment
+
+## Key Features Implementation
+
+### Lesson Submission System
+When users submit a completed lesson:
+1. System checks if lesson has already been completed by the user
+2. If not completed: Creates user_progress record, awards XP, increments lesson count
+3. If already completed: Shows alert notification preventing duplicate submission and XP gain
+4. Automatically redirects user back to course list after notification
+
+### XP Reward System
+- Each lesson has configurable XP reward
+- XP is only awarded on first successful completion
+- Prevents spam submissions and maintains game balance
+- User statistics automatically updated with new XP total
+
+### Course Display
+- Shows all available courses with lesson previews
+- Displays completion status with visual indicators
+- Start button for incomplete lessons, Completed status for finished ones
+- Formatted problem descriptions with syntax highlighting
+- Completion status color-coded in green for completed lessons
+
+### Code Execution Pipeline
+1. User writes code in Monaco Editor
+2. Piston API executes code with test cases
+3. Output displayed in real-time
+4. All test cases must pass before submission allowed
+5. NPC provides contextual feedback for success or errors
+
+## Database Schema
+
+### Users Table
+- user_id (UUID)
+- email (unique)
+- full_name
+- role (user, admin)
+- created_at, updated_at
+
+### User_Progress Table
+- progress_id (UUID)
+- user_id (foreign key)
+- lesson_id (foreign key)
+- status (in_progress, completed)
+- last_accessed (timestamp)
+
+### User_Stats Table
+- stat_id (UUID)
+- user_id (foreign key)
+- xp (integer)
+- total_lessons_completed (integer)
+- total_time_spent (integer)
+- last_updated (timestamp)
+
+### Lessons Table
+- lesson_id (UUID)
+- course_id (foreign key)
+- lesson_title
+- problem_description (markdown text)
+- solution_template
+- test_cases (JSON)
+- xp_reward (integer)
+
+## Development Notes
+
+- All timestamps use local datetime for PostgreSQL compatibility
+- Problem descriptions are parsed and rendered with syntax highlighting
+- Code execution is sandboxed via Piston API for security
+- User sessions managed through Supabase JWT tokens
+- Admin features require elevated permissions
+- Duplicate submission prevention uses local client-side validation before API call
+
+## Future Enhancements
+
+- Leaderboard system with user rankings
+- Achievement and badge system
+- Code submission history and version control
+- Difficulty levels for lessons
+- Multi-player coding challenges
+- Mobile app support
+- Advanced analytics and user progress reports
+- Achievement badges and milestones
 
 ## ⚔️ Features
 
