@@ -5,7 +5,8 @@ import { executeAndValidate, formatTestResults } from "../../services/pistonComp
 import NPCChat from "../../components/NPCChat";
 import CodeEditor from "../../components/CodeEditor";
 import ProblemDescription from "../../components/ProblemDescription";
-import "../../assets/CSS/lessongame.css";
+import Discussion from "../../components/Discussion";
+import "../../assets/CSS/leetcode-lesson.css";
 
 // NPC feedback for different lesson types
 const npcFeedback = {
@@ -48,6 +49,9 @@ export default function LessonScreen() {
   const [npcMessage, setNpcMessage] = useState("");
   const [npcStatus, setNpcStatus] = useState("idle");
   const [showNpc, setShowNpc] = useState(false);
+
+  // Sidebar panel state
+  const [activeSidebarTab, setActiveSidebarTab] = useState(null); // null, 'description', 'discussion', 'hints', 'npc'
 
   // Fetch lesson data
   useEffect(() => {
@@ -207,215 +211,256 @@ export default function LessonScreen() {
   const testCases = getTestCases();
 
   return (
-    <div className="lesson-game-container">
-      {/* Background Effects */}
-      <div className="game-background">
-        <div className="bg-gradient"></div>
-        <div className="floating-particles">
-          <div className="particle"></div>
-          <div className="particle"></div>
-          <div className="particle"></div>
-        </div>
-      </div>
-
-      {/* Header Bar */}
-      <header className="game-header">
+    <div className="lesson-screen-leetcode">
+      {/* Header */}
+      <header className="leetcode-header">
         <div className="header-left">
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            <i className="fas fa-arrow-left"></i>
+          <button className="back-btn" onClick={() => navigate(-1)} title="Quay lại">
+            ←
           </button>
-        </div>
-        
-        <div className="header-center">
-          <h1 className="level-title">🗡️ {lesson?.lessonTitle || "Bài Học"}</h1>
-          <p className="level-number">Bài #{lesson?.lessonOrder || "?"}</p>
+          <h1 className="lesson-title">{lesson?.lessonTitle || "Bài Học"}</h1>
         </div>
         
         <div className="header-right">
           {testResults && (
-            <div className={`quest-status ${testResults.success ? 'completed' : 'active'}`}>
-              {testResults.success ? "✅ HOÀN THÀNH" : "⚔️ ĐANG CHIẾN"}
+            <div className={`header-status ${testResults.success ? 'completed' : 'pending'}`}>
+              {testResults.success ? "✅ Hoàn thành" : "⏳ Đang làm"}
             </div>
           )}
         </div>
       </header>
 
-      {/* Main Game Area */}
-      <div className="game-main">
-        {/* Left Panel - Quest Display (60%) */}
-        <section className="quest-panel">
-          {/* Container 1: Problem Description (40% of quest-panel) */}
-          <div className="problem-container">
-            <div className="quest-header">
-              <h2>⚔️ Nhiệm Vụ</h2>
-              <span className="quest-badge">Quest #{lesson?.lessonOrder}</span>
-            </div>
-            
-            <div className="quest-description">
-              <ProblemDescription description={lesson?.problemDescription} />
-            </div>
+      {/* Main Container */}
+      <div className="leetcode-main">
+        {/* Left: Problem Description + Sidebar Tabs */}
+        <div className="problem-panel">
+          {/* Tab Buttons */}
+          <div className="sidebar-tabs">
+            <button
+              className={`tab-btn ${activeSidebarTab === null ? 'active' : ''}`}
+              onClick={() => setActiveSidebarTab(null)}
+              title="Mô tả bài toán"
+            >
+              📝
+            </button>
+            <button
+              className={`tab-btn ${activeSidebarTab === 'discussion' ? 'active' : ''}`}
+              onClick={() => setActiveSidebarTab('discussion')}
+              title="Discussion (Thảo luận)"
+            >
+              💬
+            </button>
+            <button
+              className={`tab-btn ${activeSidebarTab === 'hints' ? 'active' : ''}`}
+              onClick={() => setActiveSidebarTab('hints')}
+              title="Hints & Tips"
+            >
+              💡
+            </button>
+            <button
+              className={`tab-btn ${activeSidebarTab === 'npc' ? 'active' : ''}`}
+              onClick={() => setActiveSidebarTab('npc')}
+              title="NPC Chat"
+            >
+              🧙
+            </button>
           </div>
 
-          {/* Container 2: Test Cases (25% of quest-panel) */}
-          <div className="testcases-container">
-            {testCases.length > 0 && (
-              <div className="test-cases-preview">
-                {(() => {
-                  const publicTests = testCases.filter(tc => !tc.hidden);
-                  const hiddenTests = testCases.filter(tc => tc.hidden);
-                  return (
-                    <>
-                      <h3>🧪 Test Cases ({publicTests.length} public, {hiddenTests.length} hidden)</h3>
-                      <div className="test-cases-grid">
-                        {publicTests.slice(0, 3).map((tc, idx) => (
-                          <div 
-                            key={idx} 
-                            className={`test-case-card ${testResults?.results?.[idx]?.passed ? 'passed' : ''}`}
-                          >
-                            <div className="test-badge">Test {idx + 1}</div>
-                            <div className="test-input">
-                              <span className="label">Input:</span>
-                              <code>{tc.input || "N/A"}</code>
+          {/* Tab Content */}
+          <div className="sidebar-content">
+            {/* Description Tab (Default) */}
+            {activeSidebarTab === null && (
+              <div className="tab-pane active">
+                <div className="problem-description-box">
+                  <h2>📝 Mô Tả Bài Toán</h2>
+                  <div className="description-content">
+                    <ProblemDescription description={lesson?.problemDescription} />
+                  </div>
+
+                  {/* Test Cases Preview */}
+                  {testCases.length > 0 && (
+                    <div className="test-cases-section">
+                      <h3>🧪 Test Cases ({testCases.length})</h3>
+                      <div className="test-cases-list">
+                        {testCases.slice(0, 5).map((tc, idx) => (
+                          <div key={idx} className="test-case-item">
+                            <div className="test-label">Example {idx + 1}:</div>
+                            <div className="test-io">
+                              <div><strong>Input:</strong> <code>{tc.input || "N/A"}</code></div>
+                              <div><strong>Output:</strong> <code>{tc.expected || tc.expected_output || "N/A"}</code></div>
                             </div>
-                            <div className="test-output">
-                              <span className="label">Expected:</span>
-                              <code>{tc.expected || tc.expected_output || "N/A"}</code>
-                            </div>
-                            {testResults?.results?.[idx] && (
-                              <div className={`test-result ${testResults.results[idx].passed ? 'success' : 'fail'}`}>
-                                {testResults.results[idx].passed ? "✅ PASSED" : "❌ FAILED"}
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
-                    </>
-                  );
-                })()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Discussion Tab */}
+            {activeSidebarTab === 'discussion' && (
+              <div className="tab-pane active">
+                <Discussion lessonId={lessonId} />
+              </div>
+            )}
+
+            {/* Hints Tab */}
+            {activeSidebarTab === 'hints' && (
+              <div className="tab-pane active">
+                <div className="hints-box">
+                  <h2>💡 Gợi Ý & Tips</h2>
+                  <div className="hints-content">
+                    <div className="hint-item">
+                      <h3>Bước 1: Đọc kỹ bài toán</h3>
+                      <p>Hãy chắc chắn rằng bạn hiểu tất cả các yêu cầu trước khi bắt đầu code.</p>
+                    </div>
+                    <div className="hint-item">
+                      <h3>Bước 2: Vạch kế hoạch</h3>
+                      <p>Hãy vạch ra các bước giải quyết bài toán trước khi viết code.</p>
+                    </div>
+                    <div className="hint-item">
+                      <h3>Bước 3: Viết code từng phần</h3>
+                      <p>Viết code theo từng phần nhỏ và test mỗi phần để tìm lỗi dễ dàng hơn.</p>
+                    </div>
+                    <div className="hint-item">
+                      <h3>Gợi ý cho bài này:</h3>
+                      <p>{getFeedback().hint}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* NPC Chat Tab */}
+            {activeSidebarTab === 'npc' && (
+              <div className="tab-pane active">
+                <div className="npc-box">
+                  <h2>🧙 Hướng Dẫn Từ NPC</h2>
+                  <div className="npc-content">
+                    <NPCChat 
+                      feedback={npcMessage || "Xin chào, knight! Hãy bắt đầu cuộc phiêu lưu của bạn!"}
+                      status={npcStatus}
+                      problemDescription={lesson?.problemDescription || ''}
+                      userCode={code}
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Container 3: NPC Chat (35% of quest-panel) */}
-          <div className="npc-container">
-            <NPCChat 
-              feedback={npcMessage}
-              status={npcStatus}
-              problemDescription={lesson?.problemDescription || ''}
-              userCode={code}
+        {/* Right: Code Editor */}
+        <div className="editor-panel">
+          {/* Editor Header */}
+          <div className="editor-header">
+            <h2>💻 Code Editor</h2>
+            <span className="lang-badge">Python 3.10</span>
+          </div>
+
+          {/* Code Editor */}
+          <div className="code-editor-container">
+            <CodeEditor 
+              code={code}
+              onChange={setCode}
+              language="python"
+              disabled={isRunning}
+              onSave={handleRunCode}
             />
           </div>
-        </section>
 
-        {/* Right Panel - Code Editor (40%) */}
-        <section className="editor-panel">
-        <div className="editor-header">
-          <h2>💻 Code Arena</h2>
-          <span className="editor-hint">Python 3.10</span>
-        </div>
-
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          <CodeEditor 
-            code={code}
-            onChange={setCode}
-            language="python"
-            disabled={isRunning}
-            onSave={handleRunCode}
-          />
-        </div>
-
-        {/* Output Console */}
-        <div className="output-console">
-          <div className="console-header">
-            <span className="console-label">📤 Output</span>
-            <span className={`console-status ${isRunning ? 'running' : 'idle'}`}>
-              {isRunning ? "⏳ Đang chạy..." : "✓ Ready"}
-            </span>
-            {executionTime > 0 && (
-              <span className="execution-time">⏱️ {executionTime}ms</span>
-            )}
+          {/* Output Console */}
+          <div className="output-panel">
+            <div className="output-header">
+              <span className="output-label">📤 Output</span>
+              <span className={`output-status ${isRunning ? 'running' : ''}`}>
+                {isRunning ? "⏳ Running..." : "✓ Ready"}
+              </span>
+              {executionTime > 0 && <span className="exec-time">⏱️ {executionTime}ms</span>}
+            </div>
+            <pre className="output-content">{output}</pre>
           </div>
-          <pre className="console-output">{output}</pre>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="action-buttons">
-          <button
-            className="btn btn-hint"
-            onClick={handleHint}
-            disabled={isRunning}
-          >
-            💡 Gợi Ý
-          </button>
-          
-          <button
-            className="btn btn-run"
-            onClick={handleRunCode}
-            disabled={isRunning}
-          >
-            {isRunning ? "⏳ Đang chạy..." : "▶️ Chạy Code"}
-          </button>
-          
-          <button
-            className="btn btn-submit"
-            onClick={() => {
-              if (!testResults?.success) {
-                alert("⚠️ Vui lòng làm cho tất cả test cases pass trước khi nộp bài!");
-                return;
-              }
-              alert("✅ Bạn đã hoàn thành bài học! Chúc mừng, Knight!");
-              navigate(-1);
-            }}
-            disabled={isRunning}
-          >
-            ✅ Nộp Bài
-          </button>
-        </div>
+          {/* Action Buttons */}
+          <div className="action-buttons">
+            <button
+              className="btn btn-hint"
+              onClick={handleHint}
+              disabled={isRunning}
+              title="Nhận gợi ý từ NPC"
+            >
+              💡 Gợi Ý
+            </button>
+            
+            <button
+              className="btn btn-run"
+              onClick={handleRunCode}
+              disabled={isRunning}
+              title="Chạy test cases"
+            >
+              {isRunning ? "⏳ Chạy..." : "▶️ Chạy Code"}
+            </button>
+            
+            <button
+              className="btn btn-submit"
+              onClick={() => {
+                if (!testResults?.success) {
+                  alert("⚠️ Vui lòng làm cho tất cả test cases pass!");
+                  return;
+                }
+                alert("✅ Bạn đã hoàn thành bài học!");
+                navigate(-1);
+              }}
+              disabled={isRunning || !testResults?.success}
+              title="Nộp bài khi tất cả test pass"
+            >
+              ✅ Nộp Bài
+            </button>
+          </div>
 
-        {/* Test Results Card */}
-        {testResults && (
-          <div className={`results-card ${testResults.success ? 'success' : 'failure'}`}>
+          {/* Test Results */}
+          {testResults && (
+            <div className={`test-results ${testResults.success ? 'success' : 'failure'}`}>
               <div className="results-header">
-                <span className="results-icon">
-                  {testResults.success ? "🎉" : "⚡"}
-                </span>
-                <span className="results-text">
-                  {testResults.success 
-                    ? "🏆 TẤT CẢ TEST PASSED!" 
-                    : `❌ ${testResults.passed}/${testResults.total} Test Pass`}
-                </span>
+                {testResults.success ? (
+                  <>
+                    <span className="result-icon">🎉</span>
+                    <span>TẤT CẢ TEST PASSED!</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="result-icon">❌</span>
+                    <span>{testResults.passed}/{testResults.total} Test Passed</span>
+                  </>
+                )}
               </div>
-              
               {testResults.results && testResults.results.length > 0 && (
-                <div className="results-details">
+                <div className="results-body">
                   {testResults.results.map((result, idx) => (
-                    <div key={idx} className={`result-row ${result.passed ? 'pass' : 'fail'}`}>
-                      <span className="result-icon">
-                        {result.passed ? "✅" : "❌"}
-                      </span>
-                      <span className="result-name">{result.name}</span>
-                      <div className="result-values">
-                        <div className="expected">
-                          Expected: <code>{result.expected}</code>
+                    <div key={idx} className={`result-item ${result.passed ? 'pass' : 'fail'}`}>
+                      <span className="result-status">{result.passed ? "✅" : "❌"}</span>
+                      <span className="result-name">Test {idx + 1}</span>
+                      {!result.passed && (
+                        <div className="result-details">
+                          <div>Expected: <code>{result.expected}</code></div>
+                          <div>Got: <code>{result.actual}</code></div>
                         </div>
-                        <div className="actual">
-                          Got: <code>{result.actual}</code>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
             </div>
-        )}
-      </section>
+          )}
+        </div>
       </div>
 
       {/* Loading State */}
       {loading && (
-        <div className="loading-screen">
+        <div className="loading-overlay">
           <div className="loading-content">
-            <div className="loading-spinner"></div>
+            <div className="spinner"></div>
             <p>⏳ Đang tải bài học...</p>
           </div>
         </div>
@@ -423,8 +468,8 @@ export default function LessonScreen() {
 
       {/* Error State */}
       {error && (
-        <div className="error-screen">
-          <div className="error-content">
+        <div className="error-overlay">
+          <div className="error-dialog">
             <h2>❌ Lỗi</h2>
             <p>{error}</p>
             <button onClick={() => navigate(-1)}>← Quay lại</button>
