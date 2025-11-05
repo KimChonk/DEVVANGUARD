@@ -7,7 +7,7 @@ import NPCChat from "../../components/NPCChat";
 import CodeEditor from "../../components/CodeEditor";
 import ProblemDescription from "../../components/ProblemDescription";
 import Discussion from "../../components/Discussion";
-import "../../assets/CSS/leetcode-lesson.css";
+import "../../assets/CSS/lessongame.css";
 
 // NPC feedback for different lesson types
 const npcFeedback = {
@@ -290,18 +290,25 @@ export default function LessonScreen() {
                   {/* Test Cases Preview */}
                   {testCases.length > 0 && (
                     <div className="test-cases-section">
-                      <h3>🧪 Test Cases ({testCases.length})</h3>
-                      <div className="test-cases-list">
-                        {testCases.slice(0, 5).map((tc, idx) => (
-                          <div key={idx} className="test-case-item">
-                            <div className="test-label">Example {idx + 1}:</div>
-                            <div className="test-io">
-                              <div><strong>Input:</strong> <code>{tc.input || "N/A"}</code></div>
-                              <div><strong>Output:</strong> <code>{tc.expected || tc.expected_output || "N/A"}</code></div>
+                      {(() => {
+                        const publicTests = testCases.filter(tc => !tc.hidden);
+                        return (
+                          <>
+                            <h3>🧪 Test Cases ({publicTests.length})</h3>
+                            <div className="test-cases-list">
+                              {publicTests.slice(0, 5).map((tc, idx) => (
+                                <div key={idx} className="test-case-item">
+                                  <div className="test-label">Example {idx + 1}:</div>
+                                  <div className="test-io">
+                                    <div><strong>Input:</strong> <code>{tc.input || "N/A"}</code></div>
+                                    <div><strong>Output:</strong> <code>{tc.expected || tc.expected_output || "N/A"}</code></div>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -394,15 +401,6 @@ export default function LessonScreen() {
 
           {/* Action Buttons */}
           <div className="action-buttons">
-            <button
-              className="btn btn-hint"
-              onClick={handleHint}
-              disabled={isRunning}
-              title="Nhận gợi ý từ NPC"
-            >
-              💡 Gợi Ý
-            </button>
-            
             <button
               className="btn btn-run"
               onClick={handleRunCode}

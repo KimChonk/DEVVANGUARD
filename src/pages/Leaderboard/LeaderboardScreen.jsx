@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Navbar from '../../components/navbar';
+import LoadingScreen from '../../components/LoadingScreen';
 import '../../assets/CSS/leaderboard.css';
 
 export default function LeaderboardScreen() {

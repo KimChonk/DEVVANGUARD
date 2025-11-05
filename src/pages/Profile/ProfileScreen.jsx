@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
+import LoadingScreen from "../../components/LoadingScreen";
 
 import "../../assets/CSS/mainmenu.css";
 import "../../assets/CSS/profilescreen.css";
@@ -12,6 +12,8 @@ import Navbar from "../../components/navbar.jsx";
 export default function ProfileScreen() {
 
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
 
   const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
   
@@ -33,7 +35,12 @@ export default function ProfileScreen() {
   };
 
   const handleCourseClick = useCallback((courseId) => {
-    navigate(`/course/${courseId}`);
+    setIsLoading(true);
+    setLoadingMessage("Đang tải khóa học...");
+    setTimeout(() => {
+      navigate(`/course/${courseId}`);
+      setIsLoading(false);
+    }, 1000);
   }, [navigate]);
 
   const handleAvatarClick = () => {
@@ -72,7 +79,12 @@ export default function ProfileScreen() {
   );
 
   const handleEditProfile = () => {
-    navigate('/profile/edit'); // Điều hướng đến trang edit
+    setIsLoading(true);
+    setLoadingMessage("Đang tải form chỉnh sửa...");
+    setTimeout(() => {
+      navigate('/profile/edit');
+      setIsLoading(false);
+    }, 1000);
   };
   
   const [user] = useState(() => {
@@ -97,7 +109,7 @@ export default function ProfileScreen() {
 
   return (
     <>
-
+      <LoadingScreen isVisible={isLoading} message={loadingMessage} />
       <Navbar />
 
       <div className="profile-background"></div>

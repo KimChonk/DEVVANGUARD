@@ -1,9 +1,12 @@
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/dashboard.css";
 
 export default function DashboardScreen() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
   
   const [user] = useState({
     name: "Knight Coder",
@@ -122,15 +125,30 @@ export default function DashboardScreen() {
   ]);
 
   const handleCourseClick = useCallback((courseId) => {
-    navigate(`/course/${courseId}`);
+    setIsLoading(true);
+    setLoadingMessage("Đang tải khóa học...");
+    setTimeout(() => {
+      navigate(`/course/${courseId}`);
+      setIsLoading(false);
+    }, 1000);
   }, [navigate]);
 
   const handleProfileClick = () => {
-    navigate("/profile");
+    setIsLoading(true);
+    setLoadingMessage("Đang tải hồ sơ...");
+    setTimeout(() => {
+      navigate("/profile");
+      setIsLoading(false);
+    }, 1000);
   };
 
   const handleLeaderboardClick = () => {
-    navigate("/leaderboards");
+    setIsLoading(true);
+    setLoadingMessage("Đang tải bảng xếp hạng...");
+    setTimeout(() => {
+      navigate("/leaderboards");
+      setIsLoading(false);
+    }, 1000);
   };
 
   const getActivityIcon = (type) => {
@@ -152,6 +170,7 @@ export default function DashboardScreen() {
 
   return (
     <div className="dashboard-container">
+      <LoadingScreen isVisible={isLoading} message={loadingMessage} />
       <div className="dashboard-background"></div>
 
       {/* Navigation */}

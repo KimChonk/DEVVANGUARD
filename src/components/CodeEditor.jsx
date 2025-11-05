@@ -48,6 +48,18 @@ export default function CodeEditor({
         onSave();
       });
     }
+
+    // Chặn Ctrl+C (Copy)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyC, () => {
+      // Không làm gì - chặn copy
+      return;
+    });
+
+    // Chặn Ctrl+V (Paste)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, () => {
+      // Không làm gì - chặn paste
+      return;
+    });
   };
 
   const handleEditorChange = (value) => {

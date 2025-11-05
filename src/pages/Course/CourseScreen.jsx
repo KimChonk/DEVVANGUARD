@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCourse } from "../../hooks/useCourses";
 import { lessonService } from "../../services/apiClient";
+import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/coursescreen.css";
 
 export default function CourseScreen() {
@@ -11,6 +12,8 @@ export default function CourseScreen() {
   const [lessons, setLessons] = useState([]);
   const [lessonsLoading, setLessonsLoading] = useState(true);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
 
   useEffect(() => {
     if (!courseId) return;
@@ -36,6 +39,7 @@ export default function CourseScreen() {
 
   return (
     <div className="course-screen-container">
+      <LoadingScreen isVisible={isLoading} message={loadingMessage} />
       <div className="course-background"></div>
       <nav className="course-navbar">
         <div className="navbar-left">
@@ -101,7 +105,14 @@ export default function CourseScreen() {
                 <h2>🎯 {selectedLesson.lessonTitle}</h2>
                 <button
                   className="start-lesson-btn"
-                  onClick={() => navigate(`/lesson/${selectedLesson.lessonId}`)}
+                  onClick={() => {
+                    setIsLoading(true);
+                    setLoadingMessage("Đang tải bài học...");
+                    setTimeout(() => {
+                      navigate(`/lesson/${selectedLesson.lessonId}`);
+                      setIsLoading(false);
+                    }, 1000);
+                  }}
                 >
                   <i className="fas fa-play"></i> Bắt Đầu
                 </button>

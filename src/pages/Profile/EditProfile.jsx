@@ -3,11 +3,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/navbar.jsx';
+import LoadingScreen from '../../components/LoadingScreen';
 import '../../assets/CSS/editprofile.css'; // File CSS mới
 import '../../assets/CSS/mainmenu.css'; // Dùng chung biến màu
 
 export default function EditProfile() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
 
   // === SỬA 1: ĐỌC DỮ LIỆU TỪ LOCALSTORAGE KHI TẢI TRANG ===
   const [formData, setFormData] = useState(() => {
@@ -78,12 +81,18 @@ export default function EditProfile() {
     // 3. Lưu object mới vào local storage
     localStorage.setItem('devVanguardUser', JSON.stringify(updatedUser));
 
-    // 4. Quay lại trang profile
-    navigate('/profile');
+    // 4. Quay lại trang profile với loading
+    setIsLoading(true);
+    setLoadingMessage("Đang lưu thay đổi...");
+    setTimeout(() => {
+      navigate('/profile');
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
     <>
+      <LoadingScreen isVisible={isLoading} message={loadingMessage} />
       <Navbar />
       {/* Nền xanh đậm giống trang Profile */}
       <div className="profile-background"></div> 
@@ -156,7 +165,20 @@ export default function EditProfile() {
 
           {/* --- NÚT SUBMIT --- */}
           <div className="form-actions">
-            <button type="button" className="cancel-btn" onClick={() => navigate('/profile')}>Cancel</button>
+            <button 
+              type="button" 
+              className="cancel-btn" 
+              onClick={() => {
+                setIsLoading(true);
+                setLoadingMessage("Đang quay lại...");
+                setTimeout(() => {
+                  navigate('/profile');
+                  setIsLoading(false);
+                }, 1000);
+              }}
+            >
+              Cancel
+            </button>
             <button type="submit" className="save-btn">Save Changes</button>
           </div>
         </form>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCourses } from "../../hooks/useCourses";
 import { useUserProfile, useUserStats } from "../../hooks/useUser";
 import { authService } from "../../services/supabaseClient";
+import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/mainmenu.css";
 
 
@@ -62,6 +63,8 @@ export default function MainMenu() {
 
   const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
   const [isPracticeMenuOpen, setPracticeMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
   
   const toggleLearnMenu = () => {
     setLearnMenuOpen((prevState) => !prevState);
@@ -69,7 +72,12 @@ export default function MainMenu() {
 
   const handleCourseClick = useCallback(
     (courseId) => {
-      navigate(`/course/${courseId}`);
+      setIsLoading(true);
+      setLoadingMessage("Đang tải khóa học...");
+      setTimeout(() => {
+        navigate(`/course/${courseId}`);
+        setIsLoading(false);
+      }, 1000);
       setMobileMenuOpen(false);
     },
     [navigate]
@@ -77,7 +85,12 @@ export default function MainMenu() {
 
   // OPTIMIZATION: Wrapped in useCallback
   const handleAvatarClick = useCallback(() => {
-    navigate("/profile"); // This will navigate to the new profile page
+    setIsLoading(true);
+    setLoadingMessage("Đang tải hồ sơ...");
+    setTimeout(() => {
+      navigate("/profile");
+      setIsLoading(false);
+    }, 1000);
   }, [navigate]);
 
   const handleLogout = useCallback(async () => {
@@ -144,6 +157,7 @@ export default function MainMenu() {
 
   return (
     <div className="main-menu-container">
+      <LoadingScreen isVisible={isLoading} message={loadingMessage} />
       <div className="main-menu-background"></div>
 
       {/* Navigation */}
