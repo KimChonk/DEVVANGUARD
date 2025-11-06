@@ -193,7 +193,6 @@ body {
     width: 60px;
     height: 60px;
     filter: drop-shadow(0 0 15px var(--primary-gold));
-    animation: float 3s ease-in-out infinite;
 }
 
 @keyframes float {

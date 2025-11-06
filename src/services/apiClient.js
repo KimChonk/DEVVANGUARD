@@ -303,6 +303,7 @@ export const userService = {
         userId: user.userId,
         email: user.email,
         fullName: user.fullName,
+        avatarName: user.avatarName,
         role: user.role,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
@@ -481,6 +482,25 @@ export const userProgressService = {
     } catch (error) {
       // Không có progress cho bài này, return empty
       return { success: false, data: null, message: error.message };
+    }
+  },
+
+  // Lấy tất cả progress records của một user
+  async getUserProgressByUserId(userId) {
+    try {
+      const progressList = await apiCall(`/userprogress/user/${userId}`);
+      // Map C# PascalCase to camelCase
+      const mappedProgress = Array.isArray(progressList) ? progressList.map(p => ({
+        progressId: p.progressId,
+        userId: p.userId,
+        lessonId: p.lessonId,
+        status: p.status,
+        lastAccessed: p.lastAccessed,
+        user: p.user
+      })) : [];
+      return { success: true, data: mappedProgress };
+    } catch (error) {
+      return { success: false, data: [], message: error.message };
     }
   },
 };
