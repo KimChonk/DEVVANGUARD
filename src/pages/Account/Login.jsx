@@ -52,7 +52,7 @@ export default function Login() {
               const userData = await userService.getUserProfile(session.user.id);
               const role = userData?.data?.role || 'user';
               
-              // Wait for completed animation + 3.5 seconds then navigate
+              // Wait for completed animation + 1.5 seconds then navigate
               setTimeout(() => {
                 setShowLoadingNotification(false);
                 setIsSubmitting(false);
@@ -61,7 +61,7 @@ export default function Login() {
                 } else {
                   navigate("/main-menu");
                 }
-              }, 3500);
+              }, 1500);
             }
           } catch (profileErr) {
             console.warn("Could not fetch user role, redirecting to main menu:", profileErr);
@@ -69,7 +69,7 @@ export default function Login() {
               setShowLoadingNotification(false);
               setIsSubmitting(false);
               navigate("/main-menu");
-            }, 3500);
+            }, 1500);
           }
         } else {
           // Login failed - show error
