@@ -16,7 +16,7 @@ export default function MainMenu() {
 
   const [user, setUser] = useState({
     name: "Knight Coder",
-    avatar: "/images/default-avatar.jpg",
+    avatar: "/images/avatars/default-avatar.jpg",
     level: "Code Knight",
     currentXP: 850,
     nextLevelXP: 1000,
@@ -29,6 +29,9 @@ export default function MainMenu() {
       setUser((prev) => ({
         ...prev,
         name: profile.fullName || profile.email || prev.name,
+        avatar: profile.avatarName 
+          ? `/images/avatars/${profile.avatarName}` 
+          : `/images/avatars/default-avatar.jpg`,
       }));
     }
   }, [profile]);
@@ -190,45 +193,11 @@ export default function MainMenu() {
             </a>
 
             <ul className="main-nav-links">
-              <li className="nav-item-dropdown">
-                {" "}
-                {/* Thêm class để dễ style */}
-                <a onClick={toggleLearnMenu}>
-                  {" "}
-                  {/* Dùng onClick thay cho href */}
-                  Available Quests <i className="fas fa-chevron-down"></i>
-                </a>
-                {isLearnMenuOpen && (
-                  <div className="dropdown-menu">
-                    {courses && courses.length > 0 ? (
-                      courses.map((course) => (
-                        <a
-                          key={course.courseId || course.id}
-                          className="dropdown-item"
-                          onClick={() => navigate(`/course/${course.courseId || course.id}`)}
-                        >
-                          {course.name || course.title}
-                        </a>
-                      ))
-                    ) : (
-                      <a className="dropdown-item">Đang tải...</a>
-                    )}
-                  </div>
-                )}
-              </li>
               <li>
                 <a onClick={() => navigate("/dashboard")}>Dashboard</a>
               </li>
               <li>
-                <a href="/practice">
-                  Practice <i className="fas fa-chevron-down"></i>
-                </a>
-              </li>
-              <li>
-                <a href="/build">Build</a>
-              </li>
-              <li>
-                <a href="/leaderboards" className="nav-button">Leaderboards</a>
+                <a onClick={() => navigate("/leaderboards")} className="nav-button">Leaderboards</a>
               </li>
             </ul>
           </div>
@@ -278,15 +247,14 @@ export default function MainMenu() {
             </div>
           </div>
 
-          {/* Daily Streak Card */}
+          {/* Total Lessons Completed Card */}
           <div className="stats-card">
             <h3 className="stats-title">
-              <i className="fas fa-fire"></i> Daily Streak
+              <i className="fas fa-book"></i> Total Lessons
             </h3>
-            <div className="streak-display">
-              <span className="streak-number">{user.dailyStreak}</span>
-              <div className="streak-fire">🔥</div>
-              <span className="streak-label">Days in a row!</span>
+            <div className="lessons-display">
+              <span className="lessons-number">{rankData?.total_lessons_completed || 0}</span>
+              <span className="lessons-label">Completed</span>
             </div>
           </div>
 

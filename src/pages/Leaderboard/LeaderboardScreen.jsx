@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import Navbar from '../../components/navbar';
+import { useNavigate } from 'react-router-dom';
+import { useUserProfile } from '../../hooks/useUser';
+import { userService } from '../../services/apiClient';
 import LoadingScreen from '../../components/LoadingScreen';
 import '../../assets/CSS/leaderboard.css';
 
 export default function LeaderboardScreen() {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { profile } = useUserProfile();
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('all-time');
 
   // Fetch leaderboard data from API
   useEffect(() => {
@@ -19,13 +20,29 @@ export default function LeaderboardScreen() {
         setError(null);
         console.log('📊 Fetching leaderboard data...');
         
-        // Fetch từ API
-        const response = await fetch('http://localhost:5131/api/users/leaderboard?limit=100');
+        // Create a new method in userService or use direct apiCall
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5131'}/api/user/leaderboard/top?limit=10`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'omit'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
         const result = await response.json();
         
         if (result.success && result.data) {
           console.log('✅ Leaderboard fetched:', result.data);
-          setLeaderboardData(result.data);
+          // Ensure we have exactly 10 slots, fill empty ones with "Anonymous"
+          const leaderboardArray = Array.isArray(result.data) ? result.data : [];
+          while (leaderboardArray.length < 10) {
+            leaderboardArray.push(null); // null represents anonymous slot
+          }
+          setLeaderboardData(leaderboardArray);
         } else {
           console.error('❌ Failed to fetch leaderboard:', result.message);
           setError(result.message || 'Failed to load leaderboard');
@@ -39,120 +56,116 @@ export default function LeaderboardScreen() {
     };
 
     fetchLeaderboard();
-  }, [activeTab]);
+  }, []);
 
   if (loading) {
-    return (
-      <div className="leaderboard-screen">
-        <Navbar />
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>⏳ Đang tải bảng xếp hạng...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="leaderboard-screen">
-        <Navbar />
-        <div className="error-container">
-          <h2>❌ Lỗi</h2>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen isVisible={true} message="Đang tải bảng xếp hạng..." />;
   }
 
   return (
-    <div className="leaderboard-screen">
-      <Navbar />
+    <div className="leaderboard-page">
+      {/* Header */}
+      <header className="leaderboard-header">
+        <div className="leaderboard-header-content">
+          <button className="back-btn" onClick={() => navigate("/main-menu")}>
+            ← Back
+          </button>
+          <div className="header-title">
+            <h1>🏆 Leaderboard</h1>
+            <p>Top 10 Knights by Experience</p>
+          </div>
+        </div>
+      </header>
 
+      {/* Main Content */}
       <div className="leaderboard-container">
-        {/* Header */}
-        <header className="leaderboard-header">
-          <div className="header-icon">
-            🏆
+        {error ? (
+          <div className="error-container">
+            <p className="error-message">❌ {error}</p>
+            <button onClick={() => navigate("/main-menu")}>Return to Menu</button>
           </div>
-          <div className="header-text">
-            <h1 className="leaderboard-title">Bảng Xếp Hạng</h1>
-            <p className="leaderboard-subtitle">Cạnh tranh với các Knight khác và chinh phục đỉnh cao! ⚔️</p>
+        ) : leaderboardData.length === 0 ? (
+          <div className="no-data">
+            <p>No leaderboard data available</p>
           </div>
-        </header>
+        ) : (
+          <ul className="leaderboard-list">
+            {leaderboardData.map((user, index) => (
+              <li 
+                key={index} 
+                className={`leaderboard-item ${user && profile?.user_id === user.userId ? 'current-user' : ''} ${!user ? 'anonymous' : ''}`}
+              >
+                {/* Rank with Medal */}
+                <div className="rank-section">
+                  <span className="rank-number">#{index + 1}</span>
+                  {index < 3 && user && (
+                    <span className="medal">
+                      {index === 0 && '🥇'}
+                      {index === 1 && '🥈'}
+                      {index === 2 && '🥉'}
+                    </span>
+                  )}
+                </div>
 
-        {/* Tabs */}
-        <div className="tabs">
-          <button 
-            className={`tab ${activeTab === 'weekly' ? 'active' : ''}`}
-            onClick={() => setActiveTab('weekly')}
-          >
-            Tuần Này
-          </button>
-          <button 
-            className={`tab ${activeTab === 'all-time' ? 'active' : ''}`}
-            onClick={() => setActiveTab('all-time')}
-          >
-            Toàn Thời Gian
-          </button>
-        </div>
+                {/* User Info */}
+                <div className="user-info-section">
+                  {user ? (
+                    <>
+                      <img 
+                        src={`/images/avatars/${user.avatarName || 'default-avatar.jpg'}`}
+                        alt={user.fullName}
+                        className="user-avatar"
+                        onError={(e) => {
+                          e.target.src = '/images/avatars/default-avatar.jpg';
+                        }}
+                      />
+                      <h3 className="user-name">
+                        {user.fullName || 'Knight'}
+                      </h3>
+                    </>
+                  ) : (
+                    <>
+                      <div className="user-avatar anonymous-avatar">?</div>
+                      <h3 className="user-name anonymous-name">Vẫn đang ẩn danh</h3>
+                    </>
+                  )}
+                </div>
 
-        {/* Leaderboard List */}
-        <div className="leaderboard-content">
-          {leaderboardData.length === 0 ? (
-            <div className="no-data">
-              <p>Không có dữ liệu xếp hạng</p>
-            </div>
-          ) : (
-            <ol className="leaderboard-list">
-              {leaderboardData.map((userData, index) => (
-                <li key={userData.user_id || index} className={`leaderboard-item ${user?.id === userData.user_id ? 'current-user' : ''}`}>
-                  <div className="rank-section">
-                    <span className="rank">#{index + 1}</span>
-                    {index < 3 && (
-                      <div className="medal">
-                        {index === 0 && <span className="medal-icon gold">🥇</span>}
-                        {index === 1 && <span className="medal-icon silver">🥈</span>}
-                        {index === 2 && <span className="medal-icon bronze">🥉</span>}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="avatar-section">
-                    <img 
-                      src={userData.avatar_url || '/icons/knight_icon.png'} 
-                      alt={userData.full_name}
-                      className="avatar"
-                      onError={(e) => {
-                        e.target.src = '/icons/knight_icon.png';
-                      }}
-                    />
-                  </div>
-                  
-                  <div className="user-info">
-                    <h3 className="user-name">
-                      {userData.full_name || 'Knight'}
-                      {userData.role === 'admin' && <span className="admin-badge">👑</span>}
-                      {user?.id === userData.user_id && <span className="you-badge">(You)</span>}
-                    </h3>
-                    <p className="user-email">{userData.email}</p>
-                  </div>
-
-                  <div className="stats-section">
+                {/* Stats */}
+                {user ? (
+                  <>
                     <div className="stat">
-                      <span className="stat-label">XP</span>
-                      <span className="stat-value">{userData.total_xp || 0}</span>
+                      <div className="stat-value">{user.xp || 0}</div>
+                      <div className="stat-label">XP</div>
                     </div>
                     <div className="stat">
-                      <span className="stat-label">Hoàn Thành</span>
-                      <span className="stat-value">{userData.lessons_completed || 0}</span>
+                      <div className="stat-value">{user.totalLessonsCompleted || 0}</div>
+                      <div className="stat-label">Lessons</div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
+                    <div className="stat">
+                      <span className="rank-badge">{user.rankTitle || 'Newbie'}</span>
+                      <div className="stat-label">Level</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="stat">
+                      <div className="stat-value">-</div>
+                      <div className="stat-label">XP</div>
+                    </div>
+                    <div className="stat">
+                      <div className="stat-value">-</div>
+                      <div className="stat-label">Lessons</div>
+                    </div>
+                    <div className="stat">
+                      <div className="stat-value">-</div>
+                    </div>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

@@ -359,6 +359,19 @@ export const userService = {
     }
   },
 
+  // Cập nhật profile với fullName và avatarName
+  async updateProfile(data) {
+    try {
+      const user = await apiCall("/user/me", "PUT", {
+        fullName: data.fullName,
+        avatarName: data.avatarName,
+      });
+      return { success: true, data: user };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
   // Lấy user theo ID
   async getUserById(userId) {
     try {

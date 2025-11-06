@@ -1,16 +1,20 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
 import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/dashboard.css";
 
 export default function DashboardScreen() {
   const navigate = useNavigate();
+  const { profile } = useUserProfile();
+  const { stats } = useUserStats();
+  const { rankData } = useUserRank();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
   
-  const [user] = useState({
+  const [user, setUser] = useState({
     name: "Knight Coder",
-    avatar: "/images/default-avatar.jpg",
+    avatar: "/images/avatars/default-avatar.jpg",
     level: "Code Knight",
     currentXP: 850,
     nextLevelXP: 1000,
@@ -20,6 +24,30 @@ export default function DashboardScreen() {
     hoursLearned: 45,
     rank: 15
   });
+
+  // Update user info từ API
+  useEffect(() => {
+    if (profile) {
+      setUser((prev) => ({
+        ...prev,
+        name: profile.fullName || profile.email || prev.name,
+        avatar: profile.avatarName 
+          ? `/images/avatars/${profile.avatarName}` 
+          : `/images/avatars/default-avatar.jpg`,
+      }));
+    }
+  }, [profile]);
+
+  // Update rank từ rankData
+  useEffect(() => {
+    if (rankData) {
+      setUser((prev) => ({
+        ...prev,
+        level: rankData.rank_title || prev.level,
+        currentXP: rankData.xp || 0,
+      }));
+    }
+  }, [rankData]);
 
   // Recent activity data
   const [recentActivity] = useState([

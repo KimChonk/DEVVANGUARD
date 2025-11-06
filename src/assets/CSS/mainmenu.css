@@ -266,19 +266,36 @@ body {
   margin-bottom: 20px;
 }
 
-.streak-number {
+.lessons-display {
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.streak-number,
+.lessons-number {
   font-size: 3rem;
   font-weight: 700;
-  color: var(--streak-orange);
-  text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+  color: var(--primary-gold);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
   display: block;
   font-family: "MedievalSharp", cursive;
 }
 
-.streak-label {
+.lessons-number {
+  color: var(--success-green);
+  text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.lessons-label {
   color: var(--text-light);
   font-size: 1rem;
-  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .streak-fire {
@@ -305,18 +322,21 @@ body {
 
 .level-badge {
   background: linear-gradient(
-    45deg,
+    135deg,
     var(--primary-gold),
     var(--secondary-gold)
   );
   color: var(--dark-blue);
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 12px 24px;
+  border-radius: 25px;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   display: inline-block;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  border: 2px solid var(--primary-gold);
+  transition: all 0.3s ease;
 }
 
 .xp-display {
