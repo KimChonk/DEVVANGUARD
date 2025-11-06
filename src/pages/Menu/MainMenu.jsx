@@ -79,7 +79,7 @@ export default function MainMenu() {
   const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
   const [isPracticeMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
+  const [loadingMessage, setLoadingMessage] = useState("Loading...");
   
   const toggleLearnMenu = () => {
     setLearnMenuOpen((prevState) => !prevState);
@@ -88,7 +88,7 @@ export default function MainMenu() {
   const handleCourseClick = useCallback(
     (courseId) => {
       setIsLoading(true);
-      setLoadingMessage("Đang tải khóa học...");
+      setLoadingMessage("Loading course...");
       setTimeout(() => {
         navigate(`/course/${courseId}`);
         setIsLoading(false);
@@ -101,7 +101,7 @@ export default function MainMenu() {
   // OPTIMIZATION: Wrapped in useCallback
   const handleAvatarClick = useCallback(() => {
     setIsLoading(true);
-    setLoadingMessage("Đang tải hồ sơ...");
+    setLoadingMessage("Loading profile...");
     setTimeout(() => {
       navigate("/profile");
       setIsLoading(false);
@@ -213,7 +213,7 @@ export default function MainMenu() {
             />
           </button>
             <button className="logout-btn" onClick={handleLogout}>
-              <i className="fas fa-sign-out-alt"></i> Logout
+              <i className="fas fa-sign-out-alt"></i>
             </button>
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function MainMenu() {
             <div className="courses-grid">
               {coursesLoading ? (
                 <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
-                  <p>Đang tải các khóa học...</p>
+                  <p>Loading Courses...</p>
                 </div>
               ) : courses && courses.length > 0 ? (
                 courses.map((course) => (
@@ -306,9 +306,6 @@ export default function MainMenu() {
                       <div className="course-level">
                         <i className="fas fa-star"></i>
                         <span>{course.language || "General"}</span>
-                      </div>
-                      <div className="course-lessons">
-                        {Array.isArray(course.lessons) ? course.lessons.length : "0"} Lessons
                       </div>
                     </div>
 

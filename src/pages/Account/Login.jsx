@@ -18,15 +18,15 @@ export default function Login() {
     setSuccessMessage("");
     setLoading(true);
 
-    // Kiểm tra dữ liệu đầu vào
+    // Validate input data
     if (!email.trim()) {
-      setError("Vui lòng nhập email");
+      setError("Please enter your email");
       setLoading(false);
       return;
     }
 
     if (!password) {
-      setError("Vui lòng nhập mật khẩu");
+      setError("Please enter your password");
       setLoading(false);
       return;
     }
@@ -37,14 +37,14 @@ export default function Login() {
       if (result.success) {
         setSuccessMessage(result.message);
         
-        // Fetch user profile để kiểm tra role
+        // Fetch user profile to check role
         try {
           const session = await authService.getSession();
           if (session?.user?.id) {
             const userData = await userService.getUserProfile(session.user.id);
             const role = userData?.data?.role || 'user';
             
-            // Đợi 2 giây rồi điều hướng theo role
+            // Wait 2 seconds then navigate based on role
             setTimeout(() => {
               if (role === 'admin') {
                 navigate("/admin");
@@ -63,7 +63,7 @@ export default function Login() {
         setError(result.message);
       }
     } catch (err) {
-      setError("Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.");
+      setError("An error occurred during login. Please try again.");
       console.error("Login error:", err);
     } finally {
       setLoading(false);
@@ -147,7 +147,7 @@ export default function Login() {
             </div>
 
             <button type="submit" className="auth-btn" disabled={loading}>
-              <span>{loading ? "Đang đăng nhập..." : "Enter the Realm"}</span>
+              <span>{loading ? "Logging in..." : "Enter the Realm"}</span>
               <div className="btn-glow"></div>
             </button>
           </form>

@@ -45,7 +45,7 @@ export default function Discussion({ lessonId }) {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     if (!postTitle.trim() || !postContent.trim()) {
-      alert('Vui lòng nhập tiêu đề và nội dung');
+      alert('Please enter title and content');
       return;
     }
 
@@ -56,7 +56,7 @@ export default function Discussion({ lessonId }) {
       setPostContent('');
       setShowCreatePostForm(false);
     } catch (err) {
-      alert('Lỗi tạo post: ' + err.message);
+      alert('Error creating post: ' + err.message);
     } finally {
       setCreatePostLoading(false);
     }
@@ -65,7 +65,7 @@ export default function Discussion({ lessonId }) {
   // Handle update post
   const handleUpdatePost = async (postId) => {
     if (!editPostTitle.trim() || !editPostContent.trim()) {
-      alert('Vui lòng nhập tiêu đề và nội dung');
+      alert('Please enter title and content');
       return;
     }
 
@@ -75,18 +75,18 @@ export default function Discussion({ lessonId }) {
       setEditPostTitle('');
       setEditPostContent('');
     } catch (err) {
-      alert('Lỗi cập nhật post: ' + err.message);
+      alert('Error updating post: ' + err.message);
     }
   };
 
   // Handle delete post
   const handleDeletePost = async (postId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa post này?')) return;
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
 
     try {
       await deletePost(postId);
     } catch (err) {
-      alert('Lỗi xóa post: ' + err.message);
+      alert('Error deleting post: ' + err.message);
     }
   };
 
@@ -102,7 +102,7 @@ export default function Discussion({ lessonId }) {
         setUserUpvotes(prev => ({ ...prev, [postId]: true }));
       }
     } catch (err) {
-      alert('Lỗi upvote: ' + err.message);
+      alert('Error upvoting: ' + err.message);
     }
   };
 
@@ -119,7 +119,7 @@ export default function Discussion({ lessonId }) {
         setUserCommentUpvotes(prev => ({ ...prev, [upvoteKey]: true }));
       }
     } catch (err) {
-      alert('Lỗi upvote comment: ' + err.message);
+      alert('Error upvoting comment: ' + err.message);
     }
   };
 
@@ -127,7 +127,7 @@ export default function Discussion({ lessonId }) {
   const handleCreateComment = async (postId) => {
     const content = commentText[postId];
     if (!content || !content.trim()) {
-      alert('Vui lòng nhập nội dung comment');
+      alert('Please enter comment content');
       return;
     }
 
@@ -135,14 +135,14 @@ export default function Discussion({ lessonId }) {
       await createComment(postId, content);
       setCommentText({ ...commentText, [postId]: '' });
     } catch (err) {
-      alert('Lỗi tạo comment: ' + err.message);
+      alert('Error creating comment: ' + err.message);
     }
   };
 
   // Handle update comment
   const handleUpdateComment = async (commentId) => {
     if (!editCommentText.trim()) {
-      alert('Vui lòng nhập nội dung comment');
+      alert('Please enter comment content');
       return;
     }
 
@@ -151,18 +151,18 @@ export default function Discussion({ lessonId }) {
       setEditingCommentId(null);
       setEditCommentText('');
     } catch (err) {
-      alert('Lỗi cập nhật comment: ' + err.message);
+      alert('Error updating comment: ' + err.message);
     }
   };
 
   // Handle delete comment
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa comment này?')) return;
+    if (!window.confirm('Are you sure you want to delete this comment?')) return;
 
     try {
       await deleteComment(expandedPostId, commentId);
     } catch (err) {
-      alert('Lỗi xóa comment: ' + err.message);
+      alert('Error deleting comment: ' + err.message);
     }
   };
 
@@ -170,7 +170,7 @@ export default function Discussion({ lessonId }) {
     return (
       <div className="discussion-container">
         <div className="discussion-message">
-          Vui lòng đăng nhập để tham gia thảo luận
+          Please log in to participate in the discussion
         </div>
       </div>
     );
@@ -179,30 +179,30 @@ export default function Discussion({ lessonId }) {
   return (
     <div className="discussion-container">
       <div className="discussion-header">
-        <h2>💬 Thảo Luận</h2>
+        <h2>Discussion</h2>
         <button
           className="btn btn-primary"
           onClick={() => setShowCreatePostForm(!showCreatePostForm)}
         >
-          {showCreatePostForm ? 'Hủy' : '+ Tạo Post'}
+          {showCreatePostForm ? 'Cancel' : '+ Create Post'}
         </button>
       </div>
 
       {/* Create Post Form */}
       {showCreatePostForm && (
         <div className="create-post-form">
-          <h3>Tạo Post Mới</h3>
+          <h3>Create New Post</h3>
           <form onSubmit={handleCreatePost}>
             <input
               type="text"
-              placeholder="Tiêu đề"
+              placeholder="Title"
               value={postTitle}
               onChange={(e) => setPostTitle(e.target.value)}
               required
               maxLength="255"
             />
             <textarea
-              placeholder="Nội dung..."
+              placeholder="Content..."
               value={postContent}
               onChange={(e) => setPostContent(e.target.value)}
               required
@@ -210,7 +210,7 @@ export default function Discussion({ lessonId }) {
               rows="5"
             />
             <button type="submit" disabled={createPostLoading}>
-              {createPostLoading ? 'Đang tạo...' : 'Đăng Post'}
+              {createPostLoading ? 'Creating...' : 'Post'}
             </button>
           </form>
         </div>
@@ -219,9 +219,9 @@ export default function Discussion({ lessonId }) {
       {error && <div className="error-message">{error}</div>}
 
       {loading ? (
-        <div className="loading">Đang tải...</div>
+        <div className="loading">Loading...</div>
       ) : posts.length === 0 ? (
-        <div className="no-posts">Chưa có post nào. Hãy tạo post đầu tiên!</div>
+        <div className="no-posts">No posts yet. Be the first to create one!</div>
       ) : (
         <div className="posts-list">
           {posts.map((post) => (
@@ -246,13 +246,13 @@ export default function Discussion({ lessonId }) {
                       className="btn btn-success"
                       onClick={() => handleUpdatePost(post.postId)}
                     >
-                      Lưu
+                      Save
                     </button>
                     <button
                       className="btn btn-secondary"
                       onClick={() => setEditingPostId(null)}
                     >
-                      Hủy
+                      Cancel
                     </button>
                   </div>
                 </div>
@@ -263,8 +263,8 @@ export default function Discussion({ lessonId }) {
                     <div className="post-title-section">
                       <h3>{post.title}</h3>
                       <p className="post-meta">
-                        bởi {post.user?.fullName || 'Ẩn danh'} • {' '}
-                        {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+                        by {post.user?.fullName || 'Anonymous'} • {' '}
+                        {new Date(post.createdAt).toLocaleDateString('en-US')}
                       </p>
                     </div>
                     <div className="post-actions">
@@ -277,16 +277,16 @@ export default function Discussion({ lessonId }) {
                               setEditPostTitle(post.title);
                               setEditPostContent(post.content);
                             }}
-                            title="Chỉnh sửa"
+                            title="Edit"
                           >
-                            ✏️
+                            <img src="/icons/edit-button-icon.png" alt="Edit" className="icon-img" />
                           </button>
                           <button
                             className="btn-icon btn-danger"
                             onClick={() => handleDeletePost(post.postId)}
-                            title="Xóa"
+                            title="Delete"
                           >
-                            🗑️
+                            <img src="/icons/delete-button-icon.png" alt="Delete" className="icon-img" />
                           </button>
                         </>
                       )}
@@ -317,7 +317,7 @@ export default function Discussion({ lessonId }) {
                           )
                         }
                       >
-                        💬 {(post.comments || []).length} Comments
+                        {(post.comments || []).length} Comments
                       </button>
                     </div>
                   </div>
@@ -346,13 +346,13 @@ export default function Discussion({ lessonId }) {
                                       handleUpdateComment(comment.commentId)
                                     }
                                   >
-                                    Lưu
+                                    Save
                                   </button>
                                   <button
                                     className="btn btn-secondary"
                                     onClick={() => setEditingCommentId(null)}
                                   >
-                                    Hủy
+                                    Cancel
                                   </button>
                                 </div>
                               </div>
@@ -360,12 +360,12 @@ export default function Discussion({ lessonId }) {
                               <>
                                 <div className="comment-header">
                                   <strong>
-                                    {comment.user?.fullName || 'Ẩn danh'}
+                                    {comment.user?.fullName || 'Anonymous'}
                                   </strong>
                                   <span className="comment-date">
                                     {new Date(
                                       comment.createdAt
-                                    ).toLocaleDateString('vi-VN')}
+                                    ).toLocaleDateString('en-US')}
                                   </span>
                                   <div className="comment-actions">
                                     {(user?.id === comment.userId ||
@@ -381,9 +381,9 @@ export default function Discussion({ lessonId }) {
                                               comment.content
                                             );
                                           }}
-                                          title="Chỉnh sửa"
+                                          title="Edit"
                                         >
-                                          ✏️
+                                          <img src="/icons/edit-button-icon.png" alt="Edit" className="icon-img" />
                                         </button>
                                         <button
                                           className="btn-icon btn-danger"
@@ -392,9 +392,9 @@ export default function Discussion({ lessonId }) {
                                               comment.commentId
                                             )
                                           }
-                                          title="Xóa"
+                                          title="Delete"
                                         >
-                                          🗑️
+                                          <img src="/icons/delete-button-icon.png" alt="Delete" className="icon-img" />
                                         </button>
                                       </>
                                     )}
@@ -424,7 +424,7 @@ export default function Discussion({ lessonId }) {
                       {/* Create Comment Form */}
                       <div className="create-comment-form">
                         <textarea
-                          placeholder="Viết comment..."
+                          placeholder="Write a comment..."
                           value={commentText[post.postId] || ''}
                           onChange={(e) =>
                             setCommentText({
@@ -439,7 +439,7 @@ export default function Discussion({ lessonId }) {
                           className="btn btn-primary"
                           onClick={() => handleCreateComment(post.postId)}
                         >
-                          Gửi Comment
+                          Send Comment
                         </button>
                       </div>
                     </div>

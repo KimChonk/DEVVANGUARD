@@ -93,7 +93,7 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      setMessage("❌ Lỗi tải dữ liệu");
+      setMessage("Error fetching data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
   const handleCreateCourse = async (e) => {
     e.preventDefault();
     if (!courseForm.name || !courseForm.language) {
-      setMessage("Vui lòng điền đầy đủ thông tin");
+      setMessage("Please fill in all required fields");
       return;
     }
 
@@ -121,10 +121,10 @@ export default function AdminDashboard() {
         setShowCourseForm(false);
         fetchAllData();
       } else {
-        setMessage("❌ Lỗi: " + (result.message || "Không thể tạo khóa học"));
+        setMessage("Error: " + (result.message || "Unable to create course"));
       }
     } catch (err) {
-      setMessage("❌ Lỗi: " + err.message);
+      setMessage("Error: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
   const handleCreateLesson = async (e) => {
     e.preventDefault();
     if (!lessonForm.courseId || !lessonForm.lessonTitle) {
-      setMessage("Vui lòng điền đầy đủ thông tin");
+      setMessage("Please fill in all required fields");
       return;
     }
 
@@ -150,15 +150,15 @@ export default function AdminDashboard() {
       );
 
       if (result.success) {
-        setMessage("✅ Tạo bài học thành công!");
+        setMessage(" Lesson created successfully!");
         setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
         setShowLessonForm(false);
         fetchAllData();
       } else {
-        setMessage("❌ Lỗi: " + (result.message || "Không thể tạo bài học"));
+        setMessage("Error: " + (result.message || "Unable to create lesson"));
       }
     } catch (err) {
-      setMessage("❌ Lỗi: " + err.message);
+      setMessage("Error: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -166,19 +166,19 @@ export default function AdminDashboard() {
 
   // Handle course deletion
   const handleDeleteCourse = async (courseId) => {
-    if (window.confirm("Bạn có chắc muốn xóa khóa học này?")) {
+    if (window.confirm("Are you sure you want to delete this course?")) {
       try {
         setLoading(true);
         const result = await courseService.deleteCourse(courseId);
 
         if (result.success) {
-          setMessage("✅ Xóa khóa học thành công!");
+          setMessage("Course deleted successfully!");
           fetchAllData();
         } else {
-          setMessage("❌ Lỗi: " + (result.message || "Không thể xóa khóa học"));
+          setMessage("Error: " + (result.message || "Unable to delete course"));
         }
       } catch (err) {
-        setMessage("❌ Lỗi: " + err.message);
+        setMessage("Error: " + err.message);
       } finally {
         setLoading(false);
       }
@@ -187,19 +187,19 @@ export default function AdminDashboard() {
 
   // Handle lesson deletion
   const handleDeleteLesson = async (lessonId) => {
-    if (window.confirm("Bạn có chắc muốn xóa bài học này?")) {
+    if (window.confirm("Are you sure you want to delete this lesson?")) {
       try {
         setLoading(true);
         const result = await lessonService.deleteLesson(lessonId);
 
         if (result.success) {
-          setMessage("✅ Xóa bài học thành công!");
+          setMessage("Lesson deleted successfully!");
           fetchAllData();
         } else {
-          setMessage("❌ Lỗi: " + (result.message || "Không thể xóa bài học"));
+          setMessage("Error: " + (result.message || "Unable to delete lesson"));
         }
       } catch (err) {
-        setMessage("❌ Lỗi: " + err.message);
+        setMessage("Error: " + err.message);
       } finally {
         setLoading(false);
       }
@@ -213,11 +213,11 @@ export default function AdminDashboard() {
       if (result.success) {
         navigate("/");
       } else {
-        setMessage("❌ Lỗi đăng xuất: " + result.message);
+        setMessage("Error logging out: " + result.message);
       }
     } catch (err) {
       console.error("Logout error:", err);
-      setMessage("❌ Lỗi đăng xuất");
+      setMessage("Error logging out: " + err.message);
     }
   };
 
