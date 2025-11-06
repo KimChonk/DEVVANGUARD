@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { userService, userStatsService, userProgressService } from "../services/apiClient";
+import { supabase } from "../services/supabaseClient";
 
 export const useUserProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -148,4 +149,49 @@ export const useUserProgress = () => {
   };
 
   return { progress, loading, error, updateProgress };
+};
+
+export const useUserRank = () => {
+  const [rankData, setRankData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRank = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Get current user from Supabase Auth
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          setError("User not authenticated");
+          setLoading(false);
+          return;
+        }
+
+        // Fetch from user_profile_ranks view
+        const { data, error: fetchError } = await supabase
+          .from("user_profile_ranks")
+          .select("user_id, full_name, xp, total_lessons_completed, total_time_spent, rank_title")
+          .eq("user_id", user.id)
+          .single();
+
+        if (fetchError) {
+          setError(fetchError.message);
+        } else {
+          setRankData(data);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRank();
+  }, []);
+
+  return { rankData, loading, error };
 };

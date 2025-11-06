@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCourses } from "../../hooks/useCourses";
-import { useUserProfile, useUserStats } from "../../hooks/useUser";
+import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
 import { authService } from "../../services/supabaseClient";
 import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/mainmenu.css";
@@ -12,6 +12,7 @@ export default function MainMenu() {
   const { courses, loading: coursesLoading } = useCourses();
   const { profile, loading: profileLoading } = useUserProfile();
   const { stats, loading: statsLoading } = useUserStats();
+  const { rankData, loading: rankLoading } = useUserRank();
 
   const [user, setUser] = useState({
     name: "Knight Coder",
@@ -42,6 +43,17 @@ export default function MainMenu() {
       }));
     }
   }, [stats]);
+
+  // Update rank từ rankData (Supabase view)
+  useEffect(() => {
+    if (rankData) {
+      setUser((prev) => ({
+        ...prev,
+        level: rankData.rank_title || prev.level,
+        currentXP: rankData.xp || 0,
+      }));
+    }
+  }, [rankData]);
 
   // Random daily advice that changes each time page loads
   const dailyAdvices = [
