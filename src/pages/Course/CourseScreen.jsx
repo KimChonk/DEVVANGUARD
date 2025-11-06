@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCourse } from "../../hooks/useCourses";
 import { lessonService, userProgressService } from "../../services/apiClient";
+import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
 import LoadingScreen from "../../components/LoadingScreen";
 import ProblemDescription from "../../components/ProblemDescription";
 import "../../assets/CSS/coursescreen.css";
@@ -10,9 +11,13 @@ export default function CourseScreen() {
   const navigate = useNavigate();
   const { courseId } = useParams();
   const { course, loading: courseLoading } = useCourse(courseId);
+  const { profile } = useUserProfile();
+  const { stats } = useUserStats();
+  const { rankData } = useUserRank();
+  
   const [lessons, setLessons] = useState([]);
   const [lessonsLoading, setLessonsLoading] = useState(true);
-  const [selectedLesson, setSelectedLesson] = useState(null);
+  const [expandedLessonId, setExpandedLessonId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
   
@@ -22,6 +27,36 @@ export default function CourseScreen() {
   // Spam warning
   const [showSpamWarning, setShowSpamWarning] = useState(false);
   const [spamWarningMessage, setSpamWarningMessage] = useState("");
+
+  // User profile state
+  const [userProfile, setUserProfile] = useState({
+    name: "Knight Coder",
+    avatar: "/images/avatars/default-avatar.jpg",
+    level: "Beginner",
+    currentXP: 0,
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setUserProfile((prev) => ({
+        ...prev,
+        name: profile.fullName || profile.email || prev.name,
+        avatar: profile.avatarName 
+          ? `/images/avatars/${profile.avatarName}` 
+          : `/images/avatars/default-avatar.jpg`,
+      }));
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (rankData) {
+      setUserProfile((prev) => ({
+        ...prev,
+        level: rankData.rank_title || prev.level,
+        currentXP: rankData.xp || 0,
+      }));
+    }
+  }, [rankData]);
 
   // Check for spam: if user submits >5 times in 1 minute for the same lesson
   const checkSpamSubmission = (lessonId) => {
@@ -66,11 +101,6 @@ export default function CourseScreen() {
             }
           }
           setCompletedLessons(completed);
-          
-          // Auto-select first lesson
-          if (lessonList.length > 0) {
-            setSelectedLesson(lessonList[0]);
-          }
         }
       } finally {
         setLessonsLoading(false);
@@ -81,10 +111,14 @@ export default function CourseScreen() {
 
   if (courseLoading || !course) return <div>Loading...</div>;
 
+  const completedCount = Object.values(completedLessons).filter(Boolean).length;
+  const progressPercentage = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
+
   return (
     <div className="course-screen-container">
       <LoadingScreen isVisible={isLoading} message={loadingMessage} />
       <div className="course-background"></div>
+      
       <nav className="course-navbar">
         <div className="navbar-left">
           <button className="back-btn" onClick={() => navigate("/main-menu")}>
@@ -96,39 +130,95 @@ export default function CourseScreen() {
         </div>
       </nav>
       
-      <div className="course-main">
-        {/* LEFT PANEL - Lessons List */}
-        <section className="lessons-panel">
-          <div className="lessons-header">
+      <div className="course-main-new">
+        {/* LEFT PANEL - Lessons Grid */}
+        <section className="lessons-panel-new">
+          <div className="lessons-header-new">
             <h2>Lessons</h2>
+            <span className="lessons-count-new">{completedCount}/{lessons.length}</span>
           </div>
           
-          <div className="lessons-list-container">
+          <div className="lessons-list-container-new">
             {lessonsLoading ? (
               <div className="loading-state">
                 <div className="spinner"></div>
-                <p>Loading lesson...</p>
+                <p>Loading lessons...</p>
               </div>
             ) : lessons.length > 0 ? (
-              <div className="lessons-list">
+              <div className="lessons-list-new">
                 {lessons.map((lesson, index) => {
                   const isCompleted = completedLessons[lesson.lessonId];
+                  const isExpanded = expandedLessonId === lesson.lessonId;
+                  
                   return (
                     <div
                       key={lesson.lessonId}
-                      className={`lesson-list-item ${selectedLesson?.lessonId === lesson.lessonId ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
-                      onClick={() => setSelectedLesson(lesson)}
+                      className={`lesson-card-new ${isCompleted ? 'completed' : ''}`}
                     >
-                      <div className={`lesson-index ${isCompleted ? 'completed-badge' : ''}`}>
-                        {isCompleted ? '✓' : index + 1}
+                      <div
+                        className="lesson-card-header-new"
+                        onClick={() => setExpandedLessonId(isExpanded ? null : lesson.lessonId)}
+                      >
+                        <div className="lesson-index-new">
+                          {isCompleted ? (
+                            <i className="fas fa-check"></i>
+                          ) : (
+                            <span>{index + 1}</span>
+                          )}
+                        </div>
+                        
+                        <div className="lesson-info-new">
+                          <h4>{lesson.lessonTitle}</h4>
+                          <p className="lesson-status-text">
+                            {isCompleted ? '✓ Completed' : 'Not completed'}
+                          </p>
+                        </div>
+
+                        <button 
+                          className="expand-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedLessonId(isExpanded ? null : lesson.lessonId);
+                          }}
+                        >
+                          <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
+                        </button>
                       </div>
-                      <div className="lesson-info">
-                        <h4>{lesson.lessonTitle}</h4>
-                        <p className="lesson-order">{isCompleted ? ' Completed' : 'Not completed'}</p>
-                      </div>
-                      <div className="lesson-action">
-                        <i className="fas fa-chevron-right"></i>
-                      </div>
+
+                      {/* Expandable Description */}
+                      {isExpanded && (
+                        <div className="lesson-card-expanded">
+                          <div className="expanded-content">
+                            {lesson.problemDescription ? (
+                              <div className="description-section-new">
+                                <ProblemDescription description={lesson.problemDescription} />
+                              </div>
+                            ) : (
+                              <p style={{ color: 'rgba(232, 232, 232, 0.6)' }}>No description available</p>
+                            )}
+                          </div>
+
+                          <div className="expanded-actions">
+                            <button
+                              className="start-lesson-btn-new"
+                              onClick={() => {
+                                if (checkSpamSubmission(lesson.lessonId)) {
+                                  return;
+                                }
+                                setIsLoading(true);
+                                setLoadingMessage("Loading lesson...");
+                                setTimeout(() => {
+                                  navigate(`/lesson/${lesson.lessonId}`);
+                                  setIsLoading(false);
+                                }, 1000);
+                              }}
+                            >
+                              <i className={`fas fa-${isCompleted ? 'check' : 'play'}`}></i> 
+                              {isCompleted ? 'Completed' : 'Start Lesson'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -136,54 +226,53 @@ export default function CourseScreen() {
             ) : (
               <div className="empty-state">
                 <i className="fas fa-inbox"></i>
-                <p>Chưa có bài học</p>
+                <p>No lessons available</p>
               </div>
             )}
           </div>
         </section>
 
-        {/* RIGHT PANEL - Lesson Preview/Info */}
-        <section className="preview-panel">
-          {selectedLesson ? (
-            <div className="lesson-preview">
-              <div className="preview-header">
-                <button
-                  className="start-lesson-btn"
-                  onClick={() => {
-                    if (checkSpamSubmission(selectedLesson.lessonId)) {
-                      return;
-                    }
-                    setIsLoading(true);
-                    setLoadingMessage("Loading lesson...");
-                    setTimeout(() => {
-                      navigate(`/lesson/${selectedLesson.lessonId}`);
-                      setIsLoading(false);
-                    }, 1000);
-                  }}
-                >
-                  <i className={`fas fa-${completedLessons[selectedLesson.lessonId] ? 'check' : 'play'}`}></i> 
-                  {completedLessons[selectedLesson.lessonId] ? 'Completed' : 'Start Lesson'}
-                </button>
+        {/* RIGHT PANEL - User Profile Card */}
+        <aside className="profile-panel-new">
+          <div className="profile-card-new">
+            <div className="profile-header-new">
+              <img 
+                src={userProfile.avatar} 
+                alt="Avatar" 
+                className="profile-avatar-new"
+                onError={(e) => {
+                  e.target.src = "/icons/knight_icon.png";
+                }}
+              />
+              <div className="profile-info-new">
+                <h3 className="profile-name-new">{userProfile.name}</h3>
+                <p className="profile-level-new">{userProfile.level}</p>
               </div>
+            </div>
 
-              <div className="preview-content">
-                {selectedLesson.problemDescription ? (
-                  <div className="description-section">
-                    <h3>Problem Description</h3>
-                    <ProblemDescription description={selectedLesson.problemDescription} />
-                  </div>
-                ) : (
-                  <p style={{ color: 'rgba(232, 232, 232, 0.6)' }}>No description available</p>
-                )}
+            <div className="profile-stats-new">
+              <div className="profile-stat">
+                <span className="stat-label-new">Total XP</span>
+                <span className="stat-value-new">{userProfile.currentXP}</span>
+              </div>
+              <div className="profile-stat">
+                <span className="stat-label-new">Course Progress</span>
+                <div className="progress-bar-new">
+                  <div className="progress-fill-new" style={{ width: `${progressPercentage}%` }}></div>
+                </div>
+                <span className="stat-value-new">{Math.round(progressPercentage)}%</span>
+              </div>
+              <div className="profile-stat">
+                <span className="stat-label-new">Lessons Completed</span>
+                <span className="stat-value-new">{completedCount}/{lessons.length}</span>
               </div>
             </div>
-          ) : (
-            <div className="no-selection">
-              <i className="fas fa-hand-point-left"></i>
-              <p>Select a lesson to view details</p>
-            </div>
-          )}
-        </section>
+
+            <button className="view-profile-btn-new" onClick={() => navigate("/profile")}>
+              View Profile
+            </button>
+          </div>
+        </aside>
       </div>
 
       {/* Spam Warning Modal */}
@@ -199,7 +288,7 @@ export default function CourseScreen() {
               className="warning-btn-close"
               onClick={() => setShowSpamWarning(false)}
             >
-              I understand that !
+              I understand!
             </button>
           </div>
         </div>

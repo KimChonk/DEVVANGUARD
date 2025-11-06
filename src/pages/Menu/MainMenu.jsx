@@ -6,6 +6,27 @@ import { authService } from "../../services/supabaseClient";
 import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/mainmenu.css";
 
+// Map course names to their image files
+const courseImageMap = {
+  python: "python_course.jpg",
+  java: "java_course.png",
+  javascript: "html_course.jpg",
+  "c++": "csharp_course.png",
+  "c#": "csharp_course.png",
+  css: "css_course.jpg",
+  html: "html_course.jpg",
+  c: "c_course.png",
+};
+
+const getCourseImage = (courseName) => {
+  const name = courseName?.toLowerCase() || "";
+  for (const [key, image] of Object.entries(courseImageMap)) {
+    if (name.includes(key)) {
+      return `/images/${image}`;
+    }
+  }
+  return `/images/python_course.jpg`;
+};
 
 export default function MainMenu() {
   const navigate = useNavigate();
@@ -17,13 +38,14 @@ export default function MainMenu() {
   const [user, setUser] = useState({
     name: "Knight Coder",
     avatar: "/images/avatars/default-avatar.jpg",
-    level: "Code Knight",
+    level: "Beginner",
     currentXP: 850,
     nextLevelXP: 1000,
-    dailyStreak: 7,
+    totalLessonsCompleted: 0,
   });
 
-  // Update user info từ API
+  const [selectedFilter, setSelectedFilter] = useState("all");
+
   useEffect(() => {
     if (profile) {
       setUser((prev) => ({
@@ -36,7 +58,6 @@ export default function MainMenu() {
     }
   }, [profile]);
 
-  // Update XP từ stats
   useEffect(() => {
     if (stats) {
       setUser((prev) => ({
@@ -47,43 +68,19 @@ export default function MainMenu() {
     }
   }, [stats]);
 
-  // Update rank từ rankData (Supabase view)
   useEffect(() => {
     if (rankData) {
       setUser((prev) => ({
         ...prev,
         level: rankData.rank_title || prev.level,
         currentXP: rankData.xp || 0,
+        totalLessonsCompleted: rankData.total_lessons_completed || 0,
       }));
     }
   }, [rankData]);
 
-  // Random daily advice that changes each time page loads
-  const dailyAdvices = [
-    "A true knight never stops learning. Code a little every day!",
-    "The path to mastery is paved with curiosity and practice.",
-    "Every bug you fix makes you a stronger warrior.",
-    "Great code, like great quests, starts with a single line.",
-    "Debug with patience, code with passion.",
-    "The best time to learn was yesterday. The second best time is now.",
-    "Your next breakthrough is just one lesson away.",
-    "Consistency beats intensity. Keep your coding streak alive!",
-    "Every master was once a beginner. Every pro was once an amateur.",
-    "Code is poetry written in logic. Make yours beautiful.",
-  ];
-
-  const [dailyAdvice] = useState(() => {
-    return dailyAdvices[Math.floor(Math.random() * dailyAdvices.length)];
-  });
-
-  const [isLearnMenuOpen, setLearnMenuOpen] = useState(false);
-  const [isPracticeMenuOpen, setPracticeMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
-  
-  const toggleLearnMenu = () => {
-    setLearnMenuOpen((prevState) => !prevState);
-  }; 
 
   const handleCourseClick = useCallback(
     (courseId) => {
@@ -93,12 +90,10 @@ export default function MainMenu() {
         navigate(`/course/${courseId}`);
         setIsLoading(false);
       }, 1000);
-      setMobileMenuOpen(false);
     },
     [navigate]
   );
 
-  // OPTIMIZATION: Wrapped in useCallback
   const handleAvatarClick = useCallback(() => {
     setIsLoading(true);
     setLoadingMessage("Loading profile...");
@@ -115,81 +110,41 @@ export default function MainMenu() {
     }
   }, [navigate]);
 
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileMenuView, setMobileMenuView] = useState("main");
-
-  // OPTIMIZATION: Wrapped in useCallback
-  const showQuestsView = useCallback(() => {
-    setMobileMenuView("quests");
-  }, []);
-
-  // OPTIMIZATION: Wrapped in useCallback
-  const showMainView = useCallback(() => {
-    setMobileMenuView("main");
-  }, []);
-
-  // OPTIMIZATION: Wrapped in useCallback
-  const toggleMobileMenu = useCallback(() => {
-    setMobileMenuOpen((prevState) => !prevState);
-  }, []);
-  
-  // OPTIMIZATION: Wrapped in useCallback
-  const handleMobileNav = useCallback(
-    (path) => {
-      navigate(path);
-      setMobileMenuOpen(false); // Đóng menu mobile
-    },
-    [navigate]
-  );
-
-  const getLevelIcon = useCallback((level) => {
-    switch (level) {
-      case "Beginner":
-        return <i className="fas fa-star"></i>;
-      case "Intermediate":
-        return (
-          <>
-            <i className="fas fa-star"></i>
-            <i className="fas fa-star"></i>
-          </>
-        );
-      case "Advanced":
-        return (
-          <>
-            <i className="fas fa-star"></i>
-            <i className="fas fa-star"></i>
-            <i className="fas fa-star"></i>
-          </>
-        );
-      default:
-        return <i className="fas fa-star"></i>;
-    }
-  }, []);
-
   const xpPercentage = useMemo(() => {
     return (user.currentXP / user.nextLevelXP) * 100;
   }, [user.currentXP, user.nextLevelXP]);
 
+  const filteredCourses = useMemo(() => {
+    if (selectedFilter === "all") return courses;
+    return courses?.filter((course) =>
+      course.language?.toLowerCase().includes(selectedFilter.toLowerCase())
+    ) || [];
+  }, [courses, selectedFilter]);
+
+  const categories = useMemo(() => {
+    const cats = new Set(courses?.map((c) => c.language) || []);
+    return ["All Courses", ...Array.from(cats)].filter(Boolean);
+  }, [courses]);
+
   return (
     <div className="main-menu-container">
       <LoadingScreen isVisible={isLoading} message={loadingMessage} />
-      <div className="main-menu-background"></div>
 
       {/* Navigation */}
       <nav className="main-navbar">
         <div className="main-nav-container">
           <div className="main-nav-left">
             <a className="logo-link" onClick={() => navigate("/main-menu")}>
-                <div className="main-nav-logo">
+              <div className="main-nav-logo">
                 <img
-                    src="/icons/knight_icon.png"
-                    alt="Knight Icon"
-                    className="main-logo-icon"
+                  src="/icons/knight_icon.png"
+                  alt="Knight Icon"
+                  className="main-logo-icon"
                 />
                 <span className="main-logo-text">
-                    Dev <span className="main-highlight">Vanguard</span>
+                  Dev <span className="main-highlight">Vanguard</span>
                 </span>
-                </div>
+              </div>
             </a>
 
             <ul className="main-nav-links">
@@ -197,21 +152,21 @@ export default function MainMenu() {
                 <a onClick={() => navigate("/dashboard")}>Dashboard</a>
               </li>
               <li>
-                <a onClick={() => navigate("/leaderboards")} className="nav-button">Leaderboards</a>
+                <a onClick={() => navigate("/leaderboards")}>Leaderboards</a>
               </li>
             </ul>
           </div>
           <div className="main-nav-right">
             <button className="avatar-btn" onClick={handleAvatarClick}>
-            <img 
-              src={user.avatar} 
-              alt="User Avatar" 
-              className="user-avatar"
-              onError={(e) => {
-                e.target.src = "/icons/knight_icon.png";
-              }}
-            />
-          </button>
+              <img 
+                src={user.avatar} 
+                alt="User Avatar" 
+                className="user-avatar"
+                onError={(e) => {
+                  e.target.src = "/icons/knight_icon.png";
+                }}
+              />
+            </button>
             <button className="logout-btn" onClick={handleLogout}>
               <i className="fas fa-sign-out-alt"></i>
             </button>
@@ -220,109 +175,120 @@ export default function MainMenu() {
       </nav>
 
       {/* Main Content */}
-      <div className="main-content">
-        {/* User Stats Sidebar */}
-        <div className="user-stats-sidebar">
-          {/* User Profile Card */}
-          <div className="stats-card">
-            <h3 className="stats-title">
-              <i className="fas fa-user-circle"></i> {user.name}
-            </h3>
-            <div className="user-level">
-              <span className="level-badge">{user.level}</span>
+      <div className="main-content-wrapper">
+        {/* User Profile Card - Left Side */}
+        <div className="user-profile-card">
+          <div className="profile-header">
+            <img 
+              src={user.avatar} 
+              alt="Avatar" 
+              className="profile-avatar"
+              onError={(e) => {
+                e.target.src = "/icons/knight_icon.png";
+              }}
+            />
+            <div className="profile-info">
+              <h2 className="profile-name">{user.name}</h2>
+              <p className="profile-level">{user.level}</p>
             </div>
-            <div className="xp-display">
-              <div className="xp-label">
-                <span>Experience</span>
-                <span>
-                  {user.currentXP}/{user.nextLevelXP} XP
-                </span>
+          </div>
+
+          <div className="profile-stats">
+            <div className="stat-item">
+              <img src="/icons/xp-icon.png" alt="XP" className="stat-icon-img" />
+              <div className="stat-content">
+                <span className="stat-value">{user.currentXP}</span>
+                <span className="stat-label">Total XP</span>
               </div>
-              <div className="xp-bar">
-                <div
-                  className="xp-fill"
-                  style={{ width: `${xpPercentage}%` }}
-                ></div>
+            </div>
+
+            <div className="stat-item">
+              <img src="/icons/level-icon.png" alt="Level" className="stat-icon-img" />
+              <div className="stat-content">
+                <span className="stat-value">{user.level}</span>
+                <span className="stat-label">Level</span>
+              </div>
+            </div>
+
+            <div className="stat-item">
+              <img src="/icons/streak.png" alt="Lessons" className="stat-icon-img" />
+              <div className="stat-content">
+                <span className="stat-value">{user.totalLessonsCompleted}</span>
+                <span className="stat-label">Lessons completed</span>
               </div>
             </div>
           </div>
 
-          {/* Total Lessons Completed Card */}
-          <div className="stats-card">
-            <h3 className="stats-title">
-              <i className="fas fa-book"></i> Total Lessons
-            </h3>
-            <div className="lessons-display">
-              <span className="lessons-number">{rankData?.total_lessons_completed || 0}</span>
-              <span className="lessons-label">Completed</span>
-            </div>
-          </div>
-
-          {/* Daily Advice Card */}
-          <div className="daily-advice">
-            <div className="advice-title">
-              <i className="fas fa-scroll"></i>
-              Sage's Wisdom
-            </div>
-            <p className="advice-text">{dailyAdvice}</p>
-          </div>
+          <button className="view-profile-btn" onClick={handleAvatarClick}>
+            View profile
+          </button>
         </div>
 
-        {/* Courses Main Section */}
-        <div className="courses-main">
-          {/* Welcome Section */}
-          <section className="welcome-section">
-            <h1 className="welcome-title">Welcome Back, {user.name}!</h1>
-            <p className="welcome-subtitle">
-              Your coding adventure continues! Choose a quest to advance your
-              skills and grow stronger as a Code Knight.
-            </p>
-          </section>
-
-          {/* Courses Section */}
-          <section className="courses-section">
-            <div className="courses-header">
-              <h2 className="courses-title">Available Quests</h2>
+        {/* Courses Section - Right Side */}
+        <div className="courses-section-wrapper">
+          <div className="courses-header-section">
+            <h1 className="courses-main-title">
+              <i className="fas fa-book"></i> All Courses
+            </h1>
+            
+            <div className="category-filters">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className={`filter-btn ${selectedFilter === category.toLowerCase() || (selectedFilter === "all" && category === "All Courses") ? "active" : ""}`}
+                  onClick={() => setSelectedFilter(category === "All Courses" ? "all" : category.toLowerCase())}
+                >
+                  {category}
+                </button>
+              ))}
             </div>
+          </div>
 
-            <div className="courses-grid">
-              {coursesLoading ? (
-                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
-                  <p>Loading Courses...</p>
-                </div>
-              ) : courses && courses.length > 0 ? (
-                courses.map((course) => (
-                  <div
-                    key={course.courseId || course.id}
-                    className="course-card"
-                    onClick={() => handleCourseClick(course.courseId || course.id)}
-                  >
-                    <h3 className="course-title">{course.name || course.title}</h3>
-                    <p className="course-description">
-                      {course.description || "Bài học chuyên biệt"}
+          <div className="courses-grid">
+            {coursesLoading ? (
+              <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
+                <p>Loading Courses...</p>
+              </div>
+            ) : filteredCourses && filteredCourses.length > 0 ? (
+              filteredCourses.map((course) => (
+                <div
+                  key={course.courseId || course.id}
+                  className="course-card-new"
+                  onClick={() => handleCourseClick(course.courseId || course.id)}
+                >
+                  <div className="course-image-container">
+                    <img
+                      src={getCourseImage(course.name || course.title)}
+                      alt={course.name || course.title}
+                      className="course-image"
+                      onError={(e) => {
+                        e.target.src = "/images/python_course.jpg";
+                      }}
+                    />
+                    <span className="course-badge">NEW!</span>
+                  </div>
+
+                  <div className="course-info">
+                    <span className="course-label">COURSE</span>
+                    <h3 className="course-title-new">{course.name || course.title}</h3>
+                    <p className="course-desc">
+                      {course.description || "Learn this amazing course"}
                     </p>
-
-                    <div className="course-meta">
-                      <div className="course-level">
-                        <i className="fas fa-star"></i>
-                        <span>{course.language || "General"}</span>
-                      </div>
-                    </div>
-
-                    <div className="course-action">
-                      <button className="start-course-btn">
-                        <i className="fas fa-play"></i> Start Quest
-                      </button>
+                    
+                    <div className="course-footer">
+                      <span className="course-level-badge">
+                        <i className="fas fa-bar-chart"></i> {course.language || "General"}
+                      </span>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
-                  <p>Chưa có khóa học nào. Hãy quay lại sau!</p>
                 </div>
-              )}
-            </div>
-          </section>
+              ))
+            ) : (
+              <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
+                <p>No courses available</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
