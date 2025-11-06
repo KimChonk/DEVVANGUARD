@@ -1,7 +1,7 @@
 import React from 'react';
 import '../assets/CSS/loadingscreen.css';
 
-const LoadingScreen = ({ isVisible, message = 'Đang tải...' }) => {
+const LoadingScreen = ({ isVisible, message = 'Loading...' }) => {
   if (!isVisible) return null;
 
   return (

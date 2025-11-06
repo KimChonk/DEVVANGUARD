@@ -9,29 +9,30 @@ import ProblemDescription from "../../components/ProblemDescription";
 import Discussion from "../../components/Discussion";
 import SuccessNotification from "../../components/SuccessNotification";
 import AlertNotification from "../../components/AlertNotification";
+import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/lessongame.css";
 
 // NPC feedback for different lesson types
 const npcFeedback = {
   helloWorld: {
-    hint: "Sử dụng lệnh print() để in ra một chuỗi văn bản.",
-    success: "Bạn đã chiến thắng! In ra thành công!",
-    wrongOutput: "Output không khớp. Hãy kiểm tra lại.",
+    hint: "Use the print() function to output a text string.",
+    success: "You won! Successfully printed!",
+    wrongOutput: "Output doesn't match. Please check again.",
   },
   doubleNumber: {
-    hint: "Đọc số từ input rồi nhân nó với 2.",
-    success: "Chiến thắng! Phép nhân hoàn hảo!",
-    wrongOutput: "Kết quả sai. Nhân lại xem sao.",
+    hint: "Read a number from input and multiply it by 2.",
+    success: "Victory! Perfect multiplication!",
+    wrongOutput: "Wrong result. Try again.",
   },
   sumNumbers: {
-    hint: "Cộng tất cả các số lại với nhau.",
-    success: "Chiến thắng! Bạn thống trị phép cộng!",
-    wrongOutput: "Tính toán sai. Thử lại nào!",
+    hint: "Add all the numbers together.",
+    success: "Victory! You're great at addition!",
+    wrongOutput: "Incorrect. Try again!",
   },
   default: {
-    hint: "Suy nghĩ kỹ về logic của bài toán.",
-    success: "Chiến thắng! Bạn rất giỏi!",
-    wrongOutput: "Chưa đúng. Hãy thử lại!",
+    hint: "Think carefully about the problem logic.",
+    success: "Victory! You're very skilled!",
+    wrongOutput: "Not correct. Please try again!",
   }
 };
 
@@ -65,6 +66,10 @@ export default function LessonScreen() {
   // User progress state
   const [userProgress, setUserProgress] = useState(null);
 
+  // Loading screen state
+  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [pageLoadingMessage, setPageLoadingMessage] = useState("Loading lesson...");
+
   // Sidebar panel state
   const [activeSidebarTab, setActiveSidebarTab] = useState(null); // null, 'description', 'discussion', 'hints', 'npc'
 
@@ -78,7 +83,7 @@ export default function LessonScreen() {
         const result = await lessonService.getLessonById(lessonId);
         
         if (result.success) {
-          console.log("✅ Lesson fetched:", result.data);
+          console.log("✓ Lesson fetched:", result.data);
           setLesson(result.data);
           
           // Initialize code with template
@@ -90,18 +95,18 @@ export default function LessonScreen() {
           const progressResult = await userProgressService.getUserProgressByLessonId(lessonId);
           if (progressResult.success && progressResult.data) {
             setUserProgress(progressResult.data);
-            console.log("✅ User progress:", progressResult.data);
+            console.log("✓ User progress:", progressResult.data);
           }
           
           // Show welcome message
           setNpcStatus("welcome");
           setShowNpc(true);
         } else {
-          console.error("❌ Fetch failed:", result.message);
+          console.error("✗ Fetch failed:", result.message);
           setError(result.message);
         }
       } catch (err) {
-        console.error("❌ Error:", err);
+        console.error("✗ Error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -140,7 +145,7 @@ export default function LessonScreen() {
 
   const handleRunCode = async () => {
     setIsRunning(true);
-    setOutput("⏳ Đang chạy code...");
+    setOutput("Running code...");
     setTestResults(null);
     setExecutionTime(0);
     setNpcStatus("thinking");
@@ -150,7 +155,7 @@ export default function LessonScreen() {
       // Get course language from lesson
       const dbLanguage = lesson?.course?.language;
       if (!dbLanguage) {
-        setOutput("❌ Lỗi: Không tìm thấy ngôn ngữ của khóa học!");
+        setOutput("Error: Could not find the course language!");
         setNpcStatus("error");
         return;
       }
@@ -159,8 +164,8 @@ export default function LessonScreen() {
       const language = convertDbToPistonLanguage(dbLanguage);
       const testCases = getTestCases();
 
-      console.log(`🚀 Executing ${language} code with ${testCases.length} test cases...`);
-      console.log(`📚 Course Language: ${dbLanguage} → Piston Language: ${language}`);
+      console.log(`Executing ${language} code with ${testCases.length} test cases...`);
+      console.log(`Course Language: ${dbLanguage} → Piston Language: ${language}`);
 
       // Execute code and validate
       const result = await executeAndValidate(language, code, testCases);
@@ -197,7 +202,7 @@ export default function LessonScreen() {
           success: result.passed,
         });
       } else {
-        setOutput(`❌ Execution Error:\n${result.execution.stderr}`);
+        setOutput(`Error:\n${result.execution.stderr}`);
         const feedback = getFeedback();
         setNpcMessage(feedback.wrongOutput);
         setNpcStatus("error");
@@ -212,9 +217,9 @@ export default function LessonScreen() {
         });
       }
     } catch (err) {
-      console.error("❌ Error:", err);
-      setOutput(`❌ Lỗi: ${err.message}`);
-      setNpcMessage(`❌ Có lỗi xảy ra: ${err.message}`);
+      console.error("✗ Error:", err);
+      setOutput(`Error: ${err.message}`);
+      setNpcMessage(`Error occurred: ${err.message}`);
       setNpcStatus("error");
       setShowNpc(true);
       
@@ -243,19 +248,20 @@ export default function LessonScreen() {
 
   return (
     <div className="lesson-screen-leetcode">
+      <LoadingScreen isVisible={isPageLoading} message={pageLoadingMessage} />
       {/* Header */}
       <header className="leetcode-header">
         <div className="header-left">
-          <button className="back-btn" onClick={() => navigate(-1)} title="Quay lại">
+          <button className="back-btn" onClick={() => navigate(-1)} title="Go back">
             ←
           </button>
-          <h1 className="lesson-title">{lesson?.lessonTitle || "Bài Học"}</h1>
+          <h1 className="lesson-title">{lesson?.lessonTitle || "Lesson"}</h1>
         </div>
         
         <div className="header-right">
           {testResults && (
             <div className={`header-status ${testResults.success ? 'completed' : 'pending'}`}>
-              {testResults.success ? "✅ Hoàn thành" : "⏳ Đang làm"}
+              {testResults.success ? "Completed" : "In Progress"}
             </div>
           )}
         </div>
@@ -270,14 +276,14 @@ export default function LessonScreen() {
             <button
               className={`tab-btn ${activeSidebarTab === null ? 'active' : ''}`}
               onClick={() => setActiveSidebarTab(null)}
-              title="Mô tả bài toán"
+              title="Problem Description"
             >
-              <img src="/icons/code-icon.png" alt="Hints" className="tab-icon" />
+              <img src="/icons/code-icon.png" alt="Description" className="tab-icon" />
             </button>
             <button
               className={`tab-btn ${activeSidebarTab === 'discussion' ? 'active' : ''}`}
               onClick={() => setActiveSidebarTab('discussion')}
-              title="Discussion (Thảo luận)"
+              title="Discussion"
             >
               <img src="/icons/discusion-icon.png" alt="Discussion" className="tab-icon" />
             </button>
@@ -303,7 +309,7 @@ export default function LessonScreen() {
             {activeSidebarTab === null && (
               <div className="tab-pane active">
                 <div className="problem-description-box">
-                  <h2> Mô Tả Bài Toán</h2>
+                  <h2>Problem Description</h2>
                   <div className="description-content">
                     <ProblemDescription description={lesson?.problemDescription} />
                   </div>
@@ -315,7 +321,7 @@ export default function LessonScreen() {
                         const publicTests = testCases.filter(tc => !tc.hidden);
                         return (
                           <>
-                            <h3>🧪 Test Cases ({publicTests.length})</h3>
+                            <h3>Test Cases ({publicTests.length})</h3>
                             <div className="test-cases-list">
                               {publicTests.slice(0, 5).map((tc, idx) => (
                                 <div key={idx} className="test-case-item">
@@ -347,22 +353,22 @@ export default function LessonScreen() {
             {activeSidebarTab === 'hints' && (
               <div className="tab-pane active">
                 <div className="hints-box">
-                  <h2> Gợi Ý & Tips</h2>
+                  <h2>Hints & Tips</h2>
                   <div className="hints-content">
                     <div className="hint-item">
-                      <h3>Bước 1: Đọc kỹ bài toán</h3>
-                      <p>Hãy chắc chắn rằng bạn hiểu tất cả các yêu cầu trước khi bắt đầu code.</p>
+                      <h3>Step 1: Read the Problem Carefully</h3>
+                      <p>Make sure you understand all the requirements before you start coding.</p>
                     </div>
                     <div className="hint-item">
-                      <h3>Bước 2: Vạch kế hoạch</h3>
-                      <p>Hãy vạch ra các bước giải quyết bài toán trước khi viết code.</p>
+                      <h3>Step 2: Plan Your Approach</h3>
+                      <p>Write down the steps to solve the problem before you start coding.</p>
                     </div>
                     <div className="hint-item">
-                      <h3>Bước 3: Viết code từng phần</h3>
-                      <p>Viết code theo từng phần nhỏ và test mỗi phần để tìm lỗi dễ dàng hơn.</p>
+                      <h3>Step 3: Write Code Step by Step</h3>
+                      <p>Write code in small parts and test each part to find bugs more easily.</p>
                     </div>
                     <div className="hint-item">
-                      <h3>Gợi ý cho bài này:</h3>
+                      <h3>Hint for this problem:</h3>
                       <p>{getFeedback().hint}</p>
                     </div>
                   </div>
@@ -374,10 +380,10 @@ export default function LessonScreen() {
             {activeSidebarTab === 'npc' && (
               <div className="tab-pane active">
                 <div className="npc-box">
-                  <h2> Hướng Dẫn Từ NPC</h2>
+                  <h2>NPC Guide</h2>
                   <div className="npc-content">
                     <NPCChat 
-                      feedback={npcMessage || "Xin chào, knight! Hãy bắt đầu cuộc phiêu lưu của bạn!"}
+                      feedback={npcMessage || "Hello, knight! Start your adventure!"}
                       status={npcStatus}
                       problemDescription={lesson?.problemDescription || ''}
                       userCode={code}
@@ -391,10 +397,66 @@ export default function LessonScreen() {
 
         {/* Right: Code Editor */}
         <div className="editor-panel">
-          {/* Editor Header */}
+          {/* Editor Header with Language and Buttons */}
           <div className="editor-header">
-            <h2> Code Editor</h2>
-            <span className="lang-badge">{getLanguageDisplayName(lesson?.course?.language)}</span>
+            <div className="editor-header-left">
+              <h2>Code Editor</h2>
+              <span className="lang-badge">{getLanguageDisplayName(lesson?.course?.language)}</span>
+            </div>
+            <div className="editor-header-right">
+              <button
+                className="btn btn-run"
+                onClick={handleRunCode}
+                disabled={isRunning}
+                title="Run test cases"
+              >
+                {isRunning ? "Running..." : "Run Code"}
+              </button>
+              
+              <button
+                className="btn btn-submit"
+                onClick={async () => {
+                  if (!testResults?.success) {
+                    alert("Please make sure all test cases pass!");
+                    return;
+                  }
+
+                  // Check if lesson already completed BEFORE submitting
+                  if (userProgress && userProgress.status === "completed") {
+                    setAlertMessage("This lesson is already completed!\nYou cannot submit again and will not receive additional XP.");
+                    setShowAlertNotification(true);
+                    return;
+                  }
+
+                  // Submit lesson to backend
+                  const result = await userProgressService.submitLesson(lessonId);
+                  
+                  if (result.success) {
+                    const { xpReward, totalXp } = result.data;
+                    setSuccessXpReward(xpReward);
+                    setSuccessMessage(`You completed this lesson!\nTotal XP: ${totalXp}`);
+                    setShowSuccessNotification(true);
+                    
+                    // Navigate after success animation completes
+                    setTimeout(() => {
+                      navigate(-1);
+                    }, 3600);
+                  } else {
+                    // Check if lesson was already completed
+                    if (result.data?.alreadyCompleted) {
+                      setAlertMessage("This lesson is already completed!\nYou cannot submit again and will not receive additional XP.");
+                      setShowAlertNotification(true);
+                    } else {
+                      alert(`Error submitting lesson: ${result.message}`);
+                    }
+                  }
+                }}
+                disabled={isRunning || !testResults?.success}
+                title="Submit when all tests pass"
+              >
+                Submit
+              </button>
+            </div>
           </div>
 
           {/* Code Editor */}
@@ -411,69 +473,13 @@ export default function LessonScreen() {
           {/* Output Console */}
           <div className="output-panel">
             <div className="output-header">
-              <span className="output-label"> Output</span>
+              <span className="output-label">Output</span>
               <span className={`output-status ${isRunning ? 'running' : ''}`}>
-                {isRunning ? " Running..." : " Ready"}
+                {isRunning ? "Running..." : "Ready"}
               </span>
-              {executionTime > 0 && <span className="exec-time">⏱️ {executionTime}ms</span>}
+              {executionTime > 0 && <span className="exec-time">{executionTime}ms</span>}
             </div>
             <pre className="output-content">{output}</pre>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="action-buttons">
-            <button
-              className="btn btn-run"
-              onClick={handleRunCode}
-              disabled={isRunning}
-              title="Chạy test cases"
-            >
-              {isRunning ? "Chạy..." : "Chạy Code"}
-            </button>
-            
-            <button
-              className="btn btn-submit"
-              onClick={async () => {
-                if (!testResults?.success) {
-                  alert("⚠️ Vui lòng làm cho tất cả test cases pass!");
-                  return;
-                }
-
-                // Check if lesson already completed BEFORE submitting
-                if (userProgress && userProgress.status === "completed") {
-                  setAlertMessage("⚠️ Bài học này đã được hoàn thành từ trước!\nBạn không thể nộp lại và sẽ không nhận thêm XP.");
-                  setShowAlertNotification(true);
-                  return;
-                }
-
-                // Submit lesson to backend
-                const result = await userProgressService.submitLesson(lessonId);
-                
-                if (result.success) {
-                  const { xpReward, totalXp } = result.data;
-                  setSuccessXpReward(xpReward);
-                  setSuccessMessage(`Bạn đã hoàn thành bài học này!\nTổng XP: ${totalXp}`);
-                  setShowSuccessNotification(true);
-                  
-                  // Navigate after success animation completes
-                  setTimeout(() => {
-                    navigate(-1);
-                  }, 3600);
-                } else {
-                  // Check if lesson was already completed
-                  if (result.data?.alreadyCompleted) {
-                    setAlertMessage("⚠️ Bài học này đã được hoàn thành từ trước!\nBạn không thể nộp lại và sẽ không nhận thêm XP.");
-                    setShowAlertNotification(true);
-                  } else {
-                    alert(`❌ Lỗi khi nộp bài: ${result.message}`);
-                  }
-                }
-              }}
-              disabled={isRunning || !testResults?.success}
-              title="Nộp bài khi tất cả test pass"
-            >
-              ✅ Nộp Bài
-            </button>
           </div>
 
           {/* Test Results */}
@@ -482,13 +488,13 @@ export default function LessonScreen() {
               <div className="results-header">
                 {testResults.success ? (
                   <>
-                    <span className="result-icon">🎉</span>
-                    <span>TẤT CẢ TEST PASSED!</span>
+                    <span className="result-icon">Success!</span>
+                    <span>ALL TESTS PASSED!</span>
                   </>
                 ) : (
                   <>
-                    <span className="result-icon">❌</span>
-                    <span>{testResults.passed}/{testResults.total} Test Passed</span>
+                    <span className="result-icon">Failed</span>
+                    <span>{testResults.passed}/{testResults.total} Tests Passed</span>
                   </>
                 )}
               </div>
@@ -496,7 +502,7 @@ export default function LessonScreen() {
                 <div className="results-body">
                   {testResults.results.map((result, idx) => (
                     <div key={idx} className={`result-item ${result.passed ? 'pass' : 'fail'}`}>
-                      <span className="result-status">{result.passed ? "✅" : "❌"}</span>
+                      <span className="result-status">{result.passed ? "Pass" : "Fail"}</span>
                       <span className="result-name">Test {idx + 1}</span>
                       {!result.passed && (
                         <div className="result-details">
@@ -534,7 +540,7 @@ export default function LessonScreen() {
         <div className="loading-overlay">
           <div className="loading-content">
             <div className="spinner"></div>
-            <p>⏳ Đang tải bài học...</p>
+            <p>Loading lesson...</p>
           </div>
         </div>
       )}
@@ -543,9 +549,9 @@ export default function LessonScreen() {
       {error && (
         <div className="error-overlay">
           <div className="error-dialog">
-            <h2>❌ Lỗi</h2>
+            <h2>Error</h2>
             <p>{error}</p>
-            <button onClick={() => navigate(-1)}>← Quay lại</button>
+            <button onClick={() => navigate(-1)}>Go back</button>
           </div>
         </div>
       )}

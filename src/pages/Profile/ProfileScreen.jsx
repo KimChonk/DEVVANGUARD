@@ -12,7 +12,7 @@ export default function ProfileScreen() {
   const { rankData } = useUserRank();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
+  const [loadingMessage, setLoadingMessage] = useState("Loading...");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editFormData, setEditFormData] = useState({
     fullName: "",
@@ -70,7 +70,7 @@ export default function ProfileScreen() {
   const handleSaveProfile = async () => {
     try {
       setIsLoading(true);
-      setLoadingMessage("Đang lưu thay đổi...");
+      setLoadingMessage("Loading changes...");
 
       const response = await userService.updateProfile({
         fullName: editFormData.fullName,
@@ -97,14 +97,14 @@ export default function ProfileScreen() {
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Có lỗi xảy ra khi cập nhật hồ sơ");
+      alert("Error updating profile. Please try again.");
       setIsLoading(false);
     }
   };
 
   const handleLogout = () => {
     setIsLoading(true);
-    setLoadingMessage("Đang đăng xuất...");
+    setLoadingMessage("Logging out...");
     setTimeout(() => {
       navigate("/login");
       setIsLoading(false);
@@ -112,7 +112,7 @@ export default function ProfileScreen() {
   };
 
   if (profileLoading) {
-    return <LoadingScreen isVisible={true} message="Đang tải hồ sơ..." />;
+    return <LoadingScreen isVisible={true} message="Loading profile..." />;
   }
 
   const currentAvatar = editFormData.avatarName || "default-avatar.jpg";
@@ -127,11 +127,11 @@ export default function ProfileScreen() {
         <header className="profile-header">
           <div className="profile-header-content">
             <button className="back-btn" onClick={() => navigate("/main-menu")}>
-              ← Back
+              <i className="fas fa-arrow-left"></i>
             </button>
-            <h1>Profile</h1>
+            <h1 className="profile-header-title">Profile</h1>
             <button className="logout-btn" onClick={handleLogout}>
-              Logout
+              <i className="fas fa-sign-out-alt"></i>
             </button>
           </div>
         </header>

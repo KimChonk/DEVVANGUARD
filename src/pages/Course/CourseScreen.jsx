@@ -14,31 +14,31 @@ export default function CourseScreen() {
   const [lessonsLoading, setLessonsLoading] = useState(true);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
+  const [loadingMessage, setLoadingMessage] = useState("Loading...");
   
   // Trạng thái hoàn thành bài học
   const [completedLessons, setCompletedLessons] = useState({});
   
-  // Cảnh báo spam
+  // Spam warning
   const [showSpamWarning, setShowSpamWarning] = useState(false);
   const [spamWarningMessage, setSpamWarningMessage] = useState("");
 
-  // Kiểm tra spam: nếu người dùng submit >5 lần trong 1 phút cho cùng bài
+  // Check for spam: if user submits >5 times in 1 minute for the same lesson
   const checkSpamSubmission = (lessonId) => {
     const submissionKey = `lesson_${lessonId}_submissions`;
     const now = Date.now();
     const submissions = JSON.parse(localStorage.getItem(submissionKey) || '[]');
     
-    // Lọc những submission trong 1 phút gần nhất
+    // Filter submissions from the last minute
     const recentSubmissions = submissions.filter(time => now - time < 60000);
     
     if (recentSubmissions.length >= 5) {
-      setSpamWarningMessage(`⚠️ Phát hiện hành vi spam! Bạn đã submit ${recentSubmissions.length} lần trong 1 phút. Hãy cố gắng hoàn thành bài học hợp lý, không nên spam để lấy kinh nghiệm!`);
+      setSpamWarningMessage(`⚠️ Spam detected! You have submitted ${recentSubmissions.length} times in 1 minute. Please try to complete the lesson reasonably, do not spam to gain experience!`);
       setShowSpamWarning(true);
       return true;
     }
-    
-    // Thêm submission mới
+
+    // Add new submission time
     recentSubmissions.push(now);
     localStorage.setItem(submissionKey, JSON.stringify(recentSubmissions));
     return false;
@@ -62,7 +62,7 @@ export default function CourseScreen() {
                 completed[lesson.lessonId] = progressResult.data.status === 'completed';
               }
             } catch (err) {
-              console.log(`Không thể lấy trạng thái bài ${lesson.lessonId}`);
+              console.log(`Cannot fetch progress for lesson ${lesson.lessonId}`);
             }
           }
           setCompletedLessons(completed);
@@ -100,14 +100,14 @@ export default function CourseScreen() {
         {/* LEFT PANEL - Lessons List */}
         <section className="lessons-panel">
           <div className="lessons-header">
-            <h2>📚 Bài Học</h2>
+            <h2>Lessons</h2>
           </div>
           
           <div className="lessons-list-container">
             {lessonsLoading ? (
               <div className="loading-state">
                 <div className="spinner"></div>
-                <p>Đang tải bài học...</p>
+                <p>Loading lesson...</p>
               </div>
             ) : lessons.length > 0 ? (
               <div className="lessons-list">
@@ -124,7 +124,7 @@ export default function CourseScreen() {
                       </div>
                       <div className="lesson-info">
                         <h4>{lesson.lessonTitle}</h4>
-                        <p className="lesson-order">{isCompleted ? '✅ Đã hoàn thành' : 'Chưa hoàn thành'}</p>
+                        <p className="lesson-order">{isCompleted ? ' Completed' : 'Not completed'}</p>
                       </div>
                       <div className="lesson-action">
                         <i className="fas fa-chevron-right"></i>
@@ -147,12 +147,6 @@ export default function CourseScreen() {
           {selectedLesson ? (
             <div className="lesson-preview">
               <div className="preview-header">
-                <div className="preview-title-status">
-                  <h2>🎯 {selectedLesson.lessonTitle}</h2>
-                  {completedLessons[selectedLesson.lessonId] && (
-                    <span className="completed-badge">✅ Đã hoàn thành</span>
-                  )}
-                </div>
                 <button
                   className="start-lesson-btn"
                   onClick={() => {
@@ -160,7 +154,7 @@ export default function CourseScreen() {
                       return;
                     }
                     setIsLoading(true);
-                    setLoadingMessage("Đang tải bài học...");
+                    setLoadingMessage("Loading lesson...");
                     setTimeout(() => {
                       navigate(`/lesson/${selectedLesson.lessonId}`);
                       setIsLoading(false);
@@ -168,25 +162,25 @@ export default function CourseScreen() {
                   }}
                 >
                   <i className={`fas fa-${completedLessons[selectedLesson.lessonId] ? 'check' : 'play'}`}></i> 
-                  {completedLessons[selectedLesson.lessonId] ? 'Đã hoàn thành' : 'Bắt Đầu'}
+                  {completedLessons[selectedLesson.lessonId] ? 'Completed' : 'Start Lesson'}
                 </button>
               </div>
 
               <div className="preview-content">
                 {selectedLesson.problemDescription ? (
                   <div className="description-section">
-                    <h3>📋 Mô Tả Đề Bài</h3>
+                    <h3>Problem Description</h3>
                     <ProblemDescription description={selectedLesson.problemDescription} />
                   </div>
                 ) : (
-                  <p style={{ color: 'rgba(232, 232, 232, 0.6)' }}>Không có mô tả</p>
+                  <p style={{ color: 'rgba(232, 232, 232, 0.6)' }}>No description available</p>
                 )}
               </div>
             </div>
           ) : (
             <div className="no-selection">
               <i className="fas fa-hand-point-left"></i>
-              <p>Chọn một bài học để xem chi tiết</p>
+              <p>Select a lesson to view details</p>
             </div>
           )}
         </section>
@@ -198,14 +192,14 @@ export default function CourseScreen() {
           <div className="spam-warning-modal">
             <div className="warning-header">
               <i className="fas fa-exclamation-triangle"></i>
-              <h2>⚠️ Cảnh báo</h2>
+              <h2>Warning</h2>
             </div>
             <p className="warning-message">{spamWarningMessage}</p>
             <button 
               className="warning-btn-close"
               onClick={() => setShowSpamWarning(false)}
             >
-              Tôi hiểu rồi
+              I understand that !
             </button>
           </div>
         </div>

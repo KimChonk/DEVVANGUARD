@@ -243,22 +243,30 @@ body {
 }
 
 .stats-card {
-  background: rgba(26, 26, 46, 0.8);
-  border-radius: 20px;
-  padding: 25px;
+  background: rgba(26, 26, 46, 0.6);
+  border-radius: 12px;
+  padding: 20px;
   margin-bottom: 20px;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  background: rgba(26, 26, 46, 0.8);
+  border-color: rgba(212, 175, 55, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .stats-title {
   font-family: "MedievalSharp", cursive;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: var(--text-gold);
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   text-align: center;
-  text-shadow: 1px 1px 2px var(--shadow-dark);
+  text-shadow: none;
+  font-weight: 600;
 }
 
 .streak-display {
