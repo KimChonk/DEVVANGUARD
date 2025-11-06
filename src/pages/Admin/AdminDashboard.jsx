@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { userService, courseService, lessonService } from "../../services/apiClient";
+import { userService, courseService, lessonService, userProgressService } from "../../services/apiClient";
 import { authService } from "../../services/supabaseClient";
 import "../../assets/CSS/admindashboard.css";
 
@@ -21,6 +21,7 @@ export default function AdminDashboard() {
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [users, setUsers] = useState([]);
+  const [userProgress, setUserProgress] = useState({});
 
   // UI states
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -52,20 +53,6 @@ export default function AdminDashboard() {
     fetchAllData();
   }, []);
 
-  // Auto hide message after 2 seconds with animation
-  useEffect(() => {
-    if (message) {
-      setShowMessage(true);
-      const timer = setTimeout(() => {
-        setShowMessage(false);
-        setTimeout(() => {
-          setMessage("");
-        }, 500);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
-
   const fetchAllData = async () => {
     try {
       setLoading(true);
@@ -83,6 +70,18 @@ export default function AdminDashboard() {
         const regularUsers = usersResult.data.filter(u => u.role === 'user' || (u.role && u.role !== 'admin'));
         setUsers(usersResult.data);
         setTotalUsers(regularUsers.length);
+
+        // Fetch progress for each user
+        const progressMap = {};
+        for (const user of usersResult.data) {
+          const progressResult = await userProgressService.getUserProgressByUserId(user.userId);
+          if (progressResult.success && Array.isArray(progressResult.data)) {
+            progressMap[user.userId] = progressResult.data;
+          } else {
+            progressMap[user.userId] = [];
+          }
+        }
+        setUserProgress(progressMap);
       }
 
       // Fetch lessons
@@ -352,7 +351,7 @@ export default function AdminDashboard() {
   // Quick stats for dashboard cards
   const quickStats = useMemo(() => [
     {
-      title: "KHÓA HỌC",
+      title: "COURSES",
       value: totalCourses,
       change: "+1 this month",
       icon: "fas fa-book",
@@ -360,7 +359,7 @@ export default function AdminDashboard() {
       trend: "up"
     },
     {
-      title: "BÀI HỌC",
+      title: "LESSONS",
       value: totalLessons,
       change: "+3 this week",
       icon: "fas fa-graduation-cap",
@@ -368,22 +367,14 @@ export default function AdminDashboard() {
       trend: "up"
     },
     {
-      title: "NGƯỜI DÙNG",
+      title: "USERS",
       value: totalUsers,
       change: `+${Math.max(0, totalUsers - 1)} active`,
       icon: "fas fa-users",
       color: "purple",
       trend: "up"
-    },
-    {
-      title: "TỈ LỆ HOÀN THÀNH",
-      value: `${weeklyStats.averageCompletion}%`,
-      change: "+5.2% from last week",
-      icon: "fas fa-trophy",
-      color: "gold",
-      trend: "up"
     }
-  ], [totalCourses, totalLessons, totalUsers, weeklyStats]);
+  ], [totalCourses, totalLessons, totalUsers]);
 
   const getActivityIcon = (type) => {
     switch (type) {
@@ -432,9 +423,9 @@ export default function AdminDashboard() {
             
             <ul className="admin-nav-links">
               <li><a href="#" className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>Dashboard</a></li>
-              <li><a href="#" className={activeTab === "courses" ? "active" : ""} onClick={() => setActiveTab("courses")}>Khóa Học</a></li>
-              <li><a href="#" className={activeTab === "lessons" ? "active" : ""} onClick={() => setActiveTab("lessons")}>Bài Học</a></li>
-              <li><a href="#" className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>Người Dùng</a></li>
+              <li><a href="#" className={activeTab === "courses" ? "active" : ""} onClick={() => setActiveTab("courses")}>Courses</a></li>
+              <li><a href="#" className={activeTab === "lessons" ? "active" : ""} onClick={() => setActiveTab("lessons")}>Lessons</a></li>
+              <li><a href="#" className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>Users</a></li>
             </ul>
           </div>
           
@@ -484,9 +475,6 @@ export default function AdminDashboard() {
                   <i className="fas fa-tachometer-alt"></i>
                   Admin Dashboard
                 </h1>
-                <p className="admin-subtitle">
-                  Monitor and manage your DevVanguard learning platform
-                </p>
               </div>
               
               <div className="admin-date-time">
@@ -528,146 +516,82 @@ export default function AdminDashboard() {
 
             {/* Main Content Grid */}
             <div className="admin-grid">
-              {/* Weekly Activity Chart */}
-              <div className="admin-widget chart-widget">
+              {/* Course Statistics */}
+              <div className="admin-widget courses-widget full-width">
                 <div className="widget-header">
                   <h3 className="widget-title">
-                    <i className="fas fa-chart-line"></i>
-                    Weekly Activity Overview
+                    <i className="fas fa-graduation-cap"></i>
+                    Course Statistics
                   </h3>
-                  <div className="chart-legend">
-                    <div className="legend-item">
-                      <div className="legend-color students"></div>
-                      <span>Students</span>
-                    </div>
-                    <div className="legend-item">
-                      <div className="legend-color lessons"></div>
-                      <span>Lessons</span>
-                    </div>
+                </div>
+                <div className="courses-table">
+                  <div className="table-header">
+                    <div className="col-course">Course</div>
+                    <div className="col-lessons">Total Lessons</div>
+                    <div className="col-students">Students Completed</div>
+                    <div className="col-completion">Completion Rate</div>
+                  </div>
+                  <div className="table-body">
+                    {courses.length === 0 ? (
+                      <div className="empty-table">
+                        <p>No courses available</p>
+                      </div>
+                    ) : (
+                      courses.map((course) => {
+                        // Count lessons for this course
+                        const courseLessons = lessons.filter(l => l.courseId === course.id);
+                        const totalLessonsInCourse = courseLessons.length;
+                        
+                        // Count students who completed AT LEAST ONE lesson in this course
+                        let studentsCompleted = 0;
+                        
+                        if (totalLessonsInCourse > 0) {
+                          // For each user, check if they completed at least ONE lesson in this course
+                          users.forEach(user => {
+                            const userProgressArray = userProgress[user.userId] || [];
+                            
+                            // Check if user has ANY completed lesson in this course
+                            const hasCompletedAnyLesson = userProgressArray.some(p => {
+                              const lesson = courseLessons.find(l => l.lessonId === p.lessonId);
+                              return lesson && p.status === 'completed';
+                            });
+                            
+                            if (hasCompletedAnyLesson) {
+                              studentsCompleted++;
+                            }
+                          });
+                        }
+                        
+                        const completionRate = totalUsers > 0 
+                          ? Math.round((studentsCompleted / totalUsers) * 100) 
+                          : 0;
+                        
+                        return (
+                          <div key={course.id} className="table-row">
+                            <div className="col-course">
+                              <div className="course-info">
+                                <span className="course-name">{course.name}</span>
+                              </div>
+                            </div>
+                            <div className="col-lessons">{totalLessonsInCourse}</div>
+                            <div className="col-students">{studentsCompleted}</div>
+                            <div className="col-completion">
+                              <div className="completion-bar">
+                                <div 
+                                  className="completion-fill"
+                                  style={{ width: `${completionRate}%` }}
+                                ></div>
+                              </div>
+                              <span className="completion-text">{completionRate}%</span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
-                <div className="activity-chart">
-                  {weeklyActivity.map((day, index) => (
-                    <div key={index} className="chart-day">
-                      <div className="chart-bars">
-                        <div 
-                          className="bar students-bar" 
-                          style={{ height: `${(day.students / 100) * 100}%` }}
-                          title={`${day.students} students`}
-                        ></div>
-                        <div 
-                          className="bar lessons-bar" 
-                          style={{ height: `${(day.lessons / 250) * 100}%` }}
-                          title={`${day.lessons} lessons`}
-                        ></div>
-                      </div>
-                      <span className="day-label">{day.day}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Course Statistics */}
-          <div className="admin-widget courses-widget">
-            <div className="widget-header">
-              <h3 className="widget-title">
-                <i className="fas fa-graduation-cap"></i>
-                Course Statistics
-              </h3>
-            </div>
-            <div className="courses-table">
-              <div className="table-header">
-                <div className="col-course">Course</div>
-                <div className="col-lessons">Lessons</div>
-                <div className="col-students">Students</div>
-                <div className="col-completion">Completion</div>
-              </div>
-              <div className="table-body">
-                {courseStats.map((course) => (
-                  <div key={course.id} className="table-row">
-                    <div className="col-course">
-                      <div className="course-info">
-                        <span className="course-name">{course.name}</span>
-                        <span className={`course-status ${course.status}`}>
-                          {course.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="col-lessons">{course.totalLessons}</div>
-                    <div className="col-students">{course.studentsEnrolled}</div>
-                    <div className="col-completion">
-                      <div className="completion-bar">
-                        <div 
-                          className="completion-fill"
-                          style={{ width: `${course.completionRate}%` }}
-                        ></div>
-                      </div>
-                      <span className="completion-text">{course.completionRate}%</span>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
-          </div>
-
-          {/* Recent Activities */}
-          <div className="admin-widget activities-widget">
-            <div className="widget-header">
-              <h3 className="widget-title">
-                <i className="fas fa-bell"></i>
-                Recent Activities
-              </h3>
-            </div>
-            <div className="activities-list">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="activity-item">
-                  <div 
-                    className="activity-icon"
-                    style={{ backgroundColor: getStatusColor(activity.status) }}
-                  >
-                    <i className={getActivityIcon(activity.type)}></i>
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-message">{activity.message}</p>
-                    <span className="activity-time">{activity.timestamp}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* System Metrics */}
-          <div className="admin-widget metrics-widget">
-            <div className="widget-header">
-              <h3 className="widget-title">
-                <i className="fas fa-server"></i>
-                System Metrics
-              </h3>
-            </div>
-            <div className="metrics-grid">
-              <div className="metric-item">
-                <div className="metric-label">Server Uptime</div>
-                <div className="metric-value success">{systemMetrics.serverUptime}</div>
-              </div>
-              <div className="metric-item">
-                <div className="metric-label">Response Time</div>
-                <div className="metric-value good">{systemMetrics.responseTime}</div>
-              </div>
-              <div className="metric-item">
-                <div className="metric-label">Active Connections</div>
-                <div className="metric-value info">{systemMetrics.activeConnections}</div>
-              </div>
-              <div className="metric-item">
-                <div className="metric-label">Data Usage</div>
-                <div className="metric-value info">{systemMetrics.dataUsage}</div>
-              </div>
-              <div className="metric-item">
-                <div className="metric-label">Error Rate</div>
-                <div className="metric-value success">{systemMetrics.errorRate}</div>
-              </div>
-            </div>
-          </div>
-        </div>
           </>
         )}
 
@@ -677,7 +601,7 @@ export default function AdminDashboard() {
             <div className="section-header">
               <h2 className="section-title">
                 <i className="fas fa-book"></i>
-                Quản Lý Khóa Học
+                Manage Courses
               </h2>
               <button
                 type="button"
@@ -685,7 +609,7 @@ export default function AdminDashboard() {
                 onClick={() => setShowCourseForm(!showCourseForm)}
               >
                 <i className="fas fa-plus"></i>
-                {showCourseForm ? "Hủy" : "Thêm Khóa Học"}
+                {showCourseForm ? "Cancel" : "Add Course"}
               </button>
             </div>
 
@@ -694,11 +618,11 @@ export default function AdminDashboard() {
               <div className="admin-form-container">
                 <form className="admin-form-grid" onSubmit={handleCreateCourse}>
                   <div className="admin-form-group">
-                    <label className="admin-label">Tên Khóa Học</label>
+                    <label className="admin-label">Course Name</label>
                     <input
                       type="text"
                       className="admin-input"
-                      placeholder="VD: Python Mastery"
+                      placeholder="E.g.: Python Mastery"
                       value={courseForm.name}
                       onChange={(e) =>
                         setCourseForm({ ...courseForm, name: e.target.value })
@@ -708,11 +632,11 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Ngôn Ngữ Lập Trình</label>
+                    <label className="admin-label">Programming Language</label>
                     <input
                       type="text"
                       className="admin-input"
-                      placeholder="VD: Python"
+                      placeholder="E.g.: Python"
                       value={courseForm.language}
                       onChange={(e) =>
                         setCourseForm({
@@ -725,10 +649,10 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Mô Tả</label>
+                    <label className="admin-label">Description</label>
                     <textarea
                       className="admin-input textarea"
-                      placeholder="Mô tả chi tiết về khóa học"
+                      placeholder="Enter detailed course description"
                       value={courseForm.description}
                       onChange={(e) =>
                         setCourseForm({
@@ -745,7 +669,7 @@ export default function AdminDashboard() {
                     className="admin-submit"
                     disabled={loading}
                   >
-                    {loading ? "⏳ Đang tạo..." : "✨ Tạo Khóa Học"}
+                    {loading ? "Creating..." : "Create Course"}
                   </button>
                 </form>
               </div>
@@ -756,12 +680,12 @@ export default function AdminDashboard() {
               {loading && courses.length === 0 ? (
                 <div className="loading-state">
                   <div className="spinner"></div>
-                  <p>Đang tải khóa học...</p>
+                  <p>Loading courses...</p>
                 </div>
               ) : courses.length === 0 ? (
                 <div className="empty-state">
                   <i className="fas fa-inbox"></i>
-                  <p>Chưa có khóa học nào</p>
+                  <p>No courses available</p>
                 </div>
               ) : (
                 courses.map((course) => (
@@ -777,7 +701,7 @@ export default function AdminDashboard() {
                         onClick={() => handleDeleteCourse(course.id)}
                       >
                         <i className="fas fa-trash"></i>
-                        Xóa
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -793,7 +717,7 @@ export default function AdminDashboard() {
             <div className="section-header">
               <h2 className="section-title">
                 <i className="fas fa-chalkboard"></i>
-                Quản Lý Bài Học
+                Manage Lessons
               </h2>
               <button
                 type="button"
@@ -801,7 +725,7 @@ export default function AdminDashboard() {
                 onClick={() => setShowLessonForm(!showLessonForm)}
               >
                 <i className="fas fa-plus"></i>
-                {showLessonForm ? "Hủy" : "Thêm Bài Học"}
+                {showLessonForm ? "Cancel" : "Add Lesson"}
               </button>
             </div>
 
@@ -810,7 +734,7 @@ export default function AdminDashboard() {
               <div className="admin-form-container">
                 <form className="admin-form-grid" onSubmit={handleCreateLesson}>
                   <div className="admin-form-group">
-                    <label className="admin-label">Chọn Khóa Học</label>
+                    <label className="admin-label">Select Course</label>
                     <select
                       className="admin-input"
                       value={lessonForm.courseId}
@@ -822,7 +746,7 @@ export default function AdminDashboard() {
                       }}
                       required
                     >
-                      <option value="">-- Chọn khóa học --</option>
+                      <option value="">-- Select course --</option>
                       {courses.map((course) => (
                         <option key={course.id} value={course.id}>
                           {course.name}
@@ -832,11 +756,11 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Tên Bài Học</label>
+                    <label className="admin-label">Lesson Name</label>
                     <input
                       type="text"
                       className="admin-input"
-                      placeholder="VD: Variables and Data Types"
+                      placeholder="E.g.: Variables and Data Types"
                       value={lessonForm.lessonTitle}
                       onChange={(e) =>
                         setLessonForm({
@@ -849,11 +773,11 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Thứ Tự Bài Học</label>
+                    <label className="admin-label">Lesson Order</label>
                     <input
                       type="number"
                       className="admin-input"
-                      placeholder="VD: 1"
+                      placeholder="E.g.: 1"
                       value={lessonForm.lessonOrder}
                       onChange={(e) =>
                         setLessonForm({
@@ -866,10 +790,10 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Mô Tả Đề Bài (HTML/Markdown)</label>
+                    <label className="admin-label">Problem Description (HTML/Markdown)</label>
                     <textarea
                       className="admin-input textarea"
-                      placeholder="Mô tả chi tiết đề bài..."
+                      placeholder="Enter detailed problem description..."
                       value={lessonForm.problemDescription}
                       onChange={(e) =>
                         setLessonForm({
@@ -882,10 +806,10 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Mã Mẫu / Starter Code</label>
+                    <label className="admin-label">Starter Code Template</label>
                     <textarea
                       className="admin-input textarea"
-                      placeholder="Nhập code mẫu cho học viên..."
+                      placeholder="Enter starter code for students..."
                       value={lessonForm.solutionTemplate}
                       onChange={(e) =>
                         setLessonForm({
@@ -918,7 +842,7 @@ export default function AdminDashboard() {
                     className="admin-submit"
                     disabled={loading}
                   >
-                    {loading ? "⏳ Đang tạo..." : "✨ Tạo Bài Học"}
+                    {loading ? "Creating..." : "Create Lesson"}
                   </button>
                 </form>
               </div>
@@ -929,19 +853,19 @@ export default function AdminDashboard() {
               {loading && lessons.length === 0 ? (
                 <div className="loading-state">
                   <div className="spinner"></div>
-                  <p>Đang tải bài học...</p>
+                  <p>Loading lessons...</p>
                 </div>
               ) : lessons.length === 0 ? (
                 <div className="empty-state">
                   <i className="fas fa-inbox"></i>
-                  <p>Chưa có bài học nào</p>
+                  <p>No lessons available</p>
                 </div>
               ) : (
                 lessons.map((lesson) => (
                   <div key={lesson.lessonId} className="lesson-item-card">
                     <div className="lesson-item-header">
                       <h3 className="lesson-item-name">{lesson.lessonTitle}</h3>
-                      <span className="lesson-order">Bài #{lesson.lessonOrder}</span>
+                      <span className="lesson-order">Lesson #{lesson.lessonOrder}</span>
                     </div>
                     <div className="lesson-item-actions">
                       <button
@@ -959,7 +883,7 @@ export default function AdminDashboard() {
                         }}
                       >
                         <i className="fas fa-trash"></i>
-                        Xóa
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -975,7 +899,7 @@ export default function AdminDashboard() {
             <div className="section-header">
               <h2 className="section-title">
                 <i className="fas fa-users"></i>
-                Quản Lý Người Dùng
+                Manage Users
               </h2>
             </div>
 
@@ -984,19 +908,26 @@ export default function AdminDashboard() {
               {loading && users.length === 0 ? (
                 <div className="loading-state">
                   <div className="spinner"></div>
-                  <p>Đang tải danh sách người dùng...</p>
+                  <p>Loading users...</p>
                 </div>
               ) : users.length === 0 ? (
                 <div className="empty-state">
                   <i className="fas fa-inbox"></i>
-                  <p>Chưa có người dùng nào</p>
+                  <p>No users available</p>
                 </div>
               ) : (
                 users.map((user) => (
                   <div key={user.userId} className="user-item">
                     <div className="user-info">
                       <div className="user-avatar">
-                        {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
+                        <img 
+                          src={user.avatarName && user.avatarName.trim() ? `/images/avatars/${user.avatarName}` : "/images/avatars/default-avatar.jpg"}
+                          alt={user.fullName || "User Avatar"}
+                          className="avatar-image"
+                          onError={(e) => {
+                            e.target.src = "/images/avatars/default-avatar.jpg";
+                          }}
+                        />
                       </div>
                       <div className="user-details">
                         <p className="user-name">{user.fullName || "Unknown"}</p>
@@ -1006,16 +937,10 @@ export default function AdminDashboard() {
                     </div>
                     <div className="user-stats">
                       <div className="user-stat">
-                        <div className="user-stat-value">-</div>
-                        <div className="user-stat-label">Khóa Học</div>
-                      </div>
-                      <div className="user-stat">
-                        <div className="user-stat-value">-</div>
-                        <div className="user-stat-label">Bài Hoàn Thành</div>
-                      </div>
-                      <div className="user-stat">
-                        <div className="user-stat-value">-</div>
-                        <div className="user-stat-label">Tiến Độ</div>
+                        <div className="user-stat-value">
+                          {userProgress[user.userId] ? userProgress[user.userId].filter(p => p.status === 'completed').length : 0}
+                        </div>
+                        <div className="user-stat-label">Lessons Completed</div>
                       </div>
                     </div>
                   </div>
