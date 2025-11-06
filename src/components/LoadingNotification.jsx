@@ -6,16 +6,18 @@ const LoadingNotification = ({ isVisible, status = 'connecting', onClose }) => {
 
   useEffect(() => {
     if (isVisible && status === 'completed') {
-      // Auto-close after 3.5 seconds when completed
+      // Auto-close after 1.5 seconds when completed
       const timer = setTimeout(() => {
         setIsClosing(true);
         setTimeout(() => {
           onClose();
         }, 600);
-      }, 3500);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [isVisible, status, onClose]);
+
+  if (!isVisible && !isClosing) return null;
 
   return (
     <div className={`loading-notification-overlay ${isClosing ? 'closing' : ''}`}>

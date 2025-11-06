@@ -131,12 +131,12 @@ export default function Register() {
           // Show completed gif
           setLoadingStatus("completed");
           
-          // Wait for completed animation + 3.5 seconds then navigate
+          // Wait for completed animation + 1.5 seconds then navigate
           setTimeout(() => {
             setShowLoadingNotification(false);
             setIsSubmitting(false);
             navigate("/login");
-          }, 3500);
+          }, 1500);
         } else {
           // Register failed - show error
           setLoadingStatus("connecting");
