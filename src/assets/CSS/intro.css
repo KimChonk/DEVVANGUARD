@@ -51,6 +51,18 @@ body {
     to { transform: scale(1.1); }
 }
 
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+        /* Thêm hiệu ứng trượt lên 1 chút cho đẹp mắt */
+        transform: translateY(15px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .overlay {
     position: absolute;
     top: 0;
@@ -165,10 +177,20 @@ body {
 .hero-content {
     max-width: 800px;
     text-align: center;
-    animation: fadeIn 1.5s ease-in-out;
-    margin-top: 60px;
+    /* animation: fadeIn 1.5s ease-in-out; */
+    margin-top: 0;
     margin-left: auto;
     margin-right: auto;
+}
+
+.hero-text-container {
+    background: linear-gradient(145deg, rgba(20, 25, 35, 0.75), rgba(30, 40, 50, 0.7));
+    backdrop-filter: blur(10px);
+    padding: 25px 40px; 
+    
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .hero-title {
@@ -207,8 +229,8 @@ body {
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease, box-shadow 0.3s ease, text-shadow 0.3s ease;
+    box-shadow: 0 0 15px 5px rgba(76, 175, 80, 0.4);
     position: relative;
     overflow: hidden;
 }
@@ -227,7 +249,8 @@ body {
 .btn:hover {
     background-color: var(--primary-dark);
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+    box-shadow: 0 0 30px 10px rgba(76, 175, 80, 0.7);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
 
 .btn:hover::before {
@@ -251,7 +274,10 @@ body {
 }
 
 .scroll-indicator {
-    margin-top: 50px;
+
+    margin-top: 30px;    /* Khoảng cách từ chữ mô tả */
+    
+    /* Giữ nguyên các thuộc tính còn lại */
     text-align: center;
     animation: bounce 2s infinite;
 }
@@ -307,6 +333,7 @@ body {
 }
 
 .section-title {
+    display: block !important;
     font-size: 2.5rem;
     margin-bottom: 15px;
     text-align: center;
@@ -314,6 +341,26 @@ body {
     color: #ffffff;
     position: relative;
     z-index: 1;
+}
+
+.section-subtitle::before {
+    content: '';
+    display: block; /* 1. Biến nó thành 1 khối riêng */
+    
+    width: 120px;
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+
+    /* 2. Tự động căn giữa */
+    margin-left: auto;
+    margin-right: auto;
+
+    /* 3. Tạo khoảng cách với chữ subtitle bên dưới */
+    margin-bottom: 20px; 
+
+    /* Tùy chọn phát sáng */
+    box-shadow: 0 0 15px 3px rgba(76, 175, 80, 0.5);
 }
 
 .section-subtitle {
@@ -354,13 +401,22 @@ body {
     border-color: var(--primary-color);
 }
 
+.courses-grid-container {
+  position: relative; /* Bắt buộc */
+        margin-bottom: 60px;
+  /* Đây là phép thuật: 
+     Ra lệnh cho CSS chuyển động mượt mà
+     khi chiều cao (height) bị thay đổi bởi JavaScript */
+  transition: height 0.4s ease-out;
+}
+
 .courses-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 40px;
-    margin-bottom: 60px;
     position: relative;
     z-index: 1;
+    animation: fadeInContent 0.4s ease-out;
 }
 
 .course-card {
@@ -419,6 +475,7 @@ body {
     font-size: 1.5rem;
     margin-bottom: 15px;
     color: #ffffff;
+    font-family: 'MedievalSharp', cursive;
 }
 
 .course-description {
@@ -429,11 +486,32 @@ body {
 }
 
 .course-level {
-    font-size: 0.8rem;
+    /* font-size: 0.8rem;
     color: var(--primary-color);
     display: flex;
     align-items: center;
+    gap: 5px; */
+    font-size: 0.75rem; /* Giảm size 1 chút */
+    color: #dac82c !important; /* Màu vàng cổ điển */
+    display: inline-flex; /* Đổi từ flex */
+    align-items: center;
     gap: 5px;
+
+    /* Style của "huy hiệu" */
+    background-color: rgba(76, 175, 80, 0.2); /* Nền mờ */
+    border: 1px solid var(--primary-color); /* Viền */
+    padding: 4px 10px;
+    border-radius: 20px; /* Bo tròn */
+    font-weight: 600; /* Đậm hơn */
+}
+
+.explore-courses-btn {
+  text-align: center;
+  margin-top: 40px;
+
+  /* 2 DÒNG QUAN TRỌNG NHẤT ĐỂ SỬA LỖI: */
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== FEATURES SECTION ===== */
@@ -518,7 +596,7 @@ body {
 .feature-icon {
     font-size: 3rem;
     margin-bottom: 25px;
-    color: var(--primary-color);
+    color: #dac82c;
     text-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
     transition: all 0.4s ease;
     position: relative;
@@ -646,7 +724,7 @@ body {
 
 .developer-role {
     font-size: 0.9rem;
-    color: var(--primary-color);
+    color: #ffcc00;
     margin-bottom: 20px;
 }
 
@@ -707,6 +785,8 @@ body {
 
 .stat-card {
     text-align: center;
+    flex-direction: column; /* <-- Thêm dòng này để xếp dọc */
+    align-items: center;
     padding: 35px;
     background: linear-gradient(145deg, rgba(30, 35, 45, 0.9), rgba(45, 50, 60, 0.8));
     border-radius: 20px;
@@ -763,6 +843,7 @@ body {
     font-size: 1rem;
     color: var(--text-light);
 }
+
 
 /* ===== CTA SECTION ===== */
 .cta-section {
