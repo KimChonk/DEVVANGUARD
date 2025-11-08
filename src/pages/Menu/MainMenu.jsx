@@ -269,15 +269,14 @@ export default function MainMenu() {
                   </div>
 
                   <div className="course-info">
-                    <span className="course-label">COURSE</span>
-                    <h3 className="course-title-new">{course.name || course.title}</h3>
+                    <span className="course-label">{course.name || course.title}</span>
                     <p className="course-desc">
                       {course.description || "Learn this amazing course"}
                     </p>
                     
                     <div className="course-footer">
                       <span className="course-level-badge">
-                        <i className="fas fa-bar-chart"></i> {course.language || "General"}
+                        {course.language || "General"}
                       </span>
                     </div>
                   </div>

@@ -35,6 +35,26 @@ body {
   color: var(--text-light);
 }
 
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 26, 46, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary-gold), var(--secondary-gold));
+  border-radius: 5px;
+  box-shadow: inset 0 0 6px rgba(212, 175, 55, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--secondary-gold), var(--primary-gold));
+  box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
 /* ===== COURSE SCREEN CONTAINER ===== */
 .course-screen-container {
   position: relative;
@@ -379,12 +399,12 @@ body {
 }
 
 .profile-card-new {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(0, 217, 255, 0.05));
-  border: 2px solid rgba(212, 175, 55, 0.3);
+  background: transparent;
+  border: 2px solid rgba(212, 175, 55, 0.4);
   border-radius: 15px;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
