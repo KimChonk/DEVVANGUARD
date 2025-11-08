@@ -23,6 +23,26 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 26, 46, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #d4af37, #b8941f);
+  border-radius: 5px;
+  box-shadow: inset 0 0 6px rgba(212, 175, 55, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #b8941f, #d4af37);
+  box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
 /* ===== NAVIGATION ===== */
 .main-navbar {
   position: sticky;
@@ -396,11 +416,10 @@
 }
 
 .course-label {
-  font-size: 0.7rem;
-  color: var(--primary-gold);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: 1.2rem;
+  color: var(--text-light);
+  font-weight: 600;
+  margin: 0;
 }
 
 .course-title-new {
@@ -428,19 +447,12 @@
 }
 
 .course-level-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  display: inline-block;
   font-size: 0.8rem;
   color: var(--accent-cyan);
   background: rgba(0, 217, 255, 0.1);
   padding: 0.35rem 0.8rem;
   border-radius: 20px;
-}
-
-.course-level-badge i {
-  color: var(--primary-gold);
-  font-size: 0.9rem;
 }
 
 /* ===== RESPONSIVE ===== */
