@@ -40,7 +40,7 @@ export async function executeCode(language, code, input = "") {
       throw new Error("Language parameter is required for code execution");
     }
     
-    console.log(`🚀 Executing ${language} code via Piston API...`);
+    console.log(` Executing ${language} code via Piston API...`);
     const startTime = performance.now();
 
     const pistonLang = LANGUAGE_MAP[language] || language;
