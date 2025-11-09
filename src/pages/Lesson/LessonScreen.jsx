@@ -570,6 +570,9 @@ export default function LessonScreen() {
               <div className="editor-header-left">
                 <h2>Code Editor</h2>
                 <span className="lang-badge">{getLanguageDisplayName(lesson?.course?.language)}</span>
+                <span className={`exec-time-badge ${executionTime === 0 ? 'default' : executionTime < 100 ? 'fast' : executionTime < 500 ? 'normal' : 'slow'}`}>
+                  {executionTime === 0 ? '0ms' : `${executionTime.toFixed(0)}ms`}
+                </span>
               </div>
               <div className="editor-header-right">
                   <button onClick={toggleEditorMaximize} className="control-btn" title="Maximize/Restore">
@@ -653,10 +656,12 @@ export default function LessonScreen() {
             <div className="output-panel">
               <div className="output-header">
                 <span className="output-label">Output</span>
-                <span className={`output-status ${isRunning ? 'running' : ''}`}>
-                  {isRunning ? "Running..." : "Ready"}
-                </span>
-                {executionTime > 0 && <span className="exec-time">{executionTime}ms</span>}
+                <div className="output-info">
+                  <span className={`output-status ${isRunning ? 'running' : ''}`}>
+                    {isRunning ? "Running..." : "Ready"}
+                  </span>
+                  {executionTime > 0 && <span className="exec-time">Execution Time: {executionTime.toFixed(2)}ms</span>}
+                </div>
               </div>
               <pre className="output-content">{output}</pre>
             </div>
