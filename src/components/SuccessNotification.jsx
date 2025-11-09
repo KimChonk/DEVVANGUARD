@@ -36,7 +36,7 @@ const SuccessNotification = ({ isVisible, message, xpReward, onClose }) => {
 
         {/* Success Message */}
         <div className="success-content">
-          <h2 className="success-title">🎉 Nộp Bài Thành Công! 🎉</h2>
+          <h2 className="success-title">Wooho~ ! You did it</h2>
           <p className="success-message">{message}</p>
 
           {/* XP Reward Display */}
@@ -52,7 +52,7 @@ const SuccessNotification = ({ isVisible, message, xpReward, onClose }) => {
           )}
 
           {/* Motivational Quote */}
-          <p className="motivational-text">Tiếp tục học hỏi để trở nên mạnh mẽ! 💪</p>
+          <p className="motivational-text">Keep learning to become stronger!</p>
         </div>
 
         {/* Decorative Elements */}
