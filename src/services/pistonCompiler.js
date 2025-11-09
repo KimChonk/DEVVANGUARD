@@ -40,7 +40,7 @@ export async function executeCode(language, code, input = "") {
       throw new Error("Language parameter is required for code execution");
     }
     
-    console.log(`🚀 Executing ${language} code via Piston API...`);
+    console.log(` Executing ${language} code via Piston API...`);
     const startTime = performance.now();
 
     const pistonLang = LANGUAGE_MAP[language] || language;
@@ -74,14 +74,44 @@ export async function executeCode(language, code, input = "") {
 
     const result = await response.json();
     const endTime = performance.now();
-    const executionTime = Math.round(endTime - startTime);
+    const totalNetworkTime = Math.round(endTime - startTime);
 
     console.log("✅ Piston API Response:", result);
+    console.log(`📊 Total API time: ${totalNetworkTime}ms`);
 
-    // Extract output from result
+    // Extract output and execution time from result
     const stdout = result.run?.stdout || "";
     const stderr = result.run?.stderr || "";
     const exitCode = result.run?.code || 0;
+    
+    // Calculate execution time
+    // The Piston API includes compilation + execution time
+    // We estimate execution time by subtracting network overhead (approximately 20-30% of total time)
+    let executionTime = Math.max(5, Math.round(totalNetworkTime * 0.75));
+    
+    // If the response contains specific timing information, use it
+    if (result.run) {
+      console.log("📌 Run object keys:", Object.keys(result.run));
+      // Check for any time-related fields in the response
+      if (result.run.time) {
+        const timeValue = result.run.time;
+        // If it's a string like "123ms" or "0.123s", parse it
+        if (typeof timeValue === 'string') {
+          if (timeValue.includes('ms')) {
+            executionTime = Math.round(parseFloat(timeValue));
+          } else if (timeValue.includes('s')) {
+            executionTime = Math.round(parseFloat(timeValue) * 1000);
+          }
+        } else if (typeof timeValue === 'number') {
+          // If it's already a number, assume it's in milliseconds
+          executionTime = Math.round(timeValue);
+        }
+        console.log(`⏱️ Execution time from response: ${executionTime}ms`);
+      }
+    }
+    
+    // Ensure execution time is at least 1ms and at most the total network time
+    executionTime = Math.max(1, Math.min(executionTime, totalNetworkTime));
 
     if (stderr) {
       console.error("❌ Stderr:", stderr);
@@ -257,7 +287,12 @@ export async function executeAndValidate(language, code, testCases = []) {
     // No test cases to run
     const execution = await executeCode(language, code);
     return {
-      execution,
+      execution: { 
+        success: execution.success, 
+        stdout: execution.stdout, 
+        stderr: execution.stderr, 
+        executionTime: execution.executionTime || 0 
+      },
       validation: { passed: 0, total: 0, results: [] },
       passed: false,
       message: "No public test cases to run",
@@ -268,6 +303,7 @@ export async function executeAndValidate(language, code, testCases = []) {
   const results = [];
   let passedCount = 0;
   let allOutputs = "";
+  let executionTimeMs = 0;
 
   for (let i = 0; i < publicTests.length; i++) {
     const testCase = publicTests[i];
@@ -275,6 +311,12 @@ export async function executeAndValidate(language, code, testCases = []) {
     
     // Execute code with this specific test input
     const execution = await executeCode(language, code, input);
+    
+    // Store execution time from first test (all tests use same code, so time is similar)
+    if (i === 0) {
+      executionTimeMs = execution.executionTime || 0;
+      console.log(`⏱️ Captured execution time from first test: ${executionTimeMs}ms`);
+    }
     
     if (!execution.success) {
       console.error(`Test ${i + 1} execution failed:`, execution.stderr);
@@ -347,7 +389,7 @@ export async function executeAndValidate(language, code, testCases = []) {
   };
 
   return {
-    execution: { success: true, stdout: allOutputs, stderr: "" },
+    execution: { success: true, stdout: allOutputs, stderr: "", executionTime: executionTimeMs },
     validation,
     passed: allPassed,
     message: allPassed

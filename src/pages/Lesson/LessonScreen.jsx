@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { lessonService, userProgressService } from "../../services/apiClient";
+import { lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
 import { convertDbToEditorLanguage, convertDbToPistonLanguage, getLanguageDisplayName } from "../../utils/languageMapping";
+import { formatProblemDescription } from "../../utils/problemDescriptionParser";
 import NPCChat from "../../components/NPCChat";
 import CodeEditor from "../../components/CodeEditor";
 import ProblemDescription from "../../components/ProblemDescription";
@@ -66,10 +67,14 @@ export default function LessonScreen() {
   const [error, setError] = useState(null);
 
   const [code, setCode] = useState("");
-  const [output, setOutput] = useState("Kết quả sẽ hiển thị ở đây...");
+  const [output, setOutput] = useState("Result will show here...");
   const [isRunning, setIsRunning] = useState(false);
   const [testResults, setTestResults] = useState(null);
   const [executionTime, setExecutionTime] = useState(0);
+  
+  // Hints state
+  const [hints, setHints] = useState([]);
+  const [hintsLoading, setHintsLoading] = useState(false);
   
   // NPC Guide states
   const [npcMessage, setNpcMessage] = useState("");
@@ -129,7 +134,7 @@ export default function LessonScreen() {
       try {
         setLoading(true);
         setError(null);
-        console.log(`🔄 Fetching lesson ${lessonId}...`);
+        console.log(` Fetching lesson ${lessonId}...`);
         const result = await lessonService.getLessonById(lessonId);
         
         if (result.success) {
@@ -145,18 +150,30 @@ export default function LessonScreen() {
           const progressResult = await userProgressService.getUserProgressByLessonId(lessonId);
           if (progressResult.success && progressResult.data) {
             setUserProgress(progressResult.data);
-            console.log("✓ User progress:", progressResult.data);
+            console.log(" User progress:", progressResult.data);
           }
+
+          // Fetch hints for this lesson
+          setHintsLoading(true);
+          const hintsResult = await lessonHintService.getHintsByLessonId(lessonId);
+          if (hintsResult.success) {
+            setHints(hintsResult.data || []);
+            console.log(" Hints fetched:", hintsResult.data);
+          } else {
+            console.warn(" Could not fetch hints:", hintsResult.message);
+            setHints([]);
+          }
+          setHintsLoading(false);
           
           // Show welcome message
           setNpcStatus("welcome");
           setShowNpc(true);
         } else {
-          console.error("✗ Fetch failed:", result.message);
+          console.error(" Fetch failed:", result.message);
           setError(result.message);
         }
       } catch (err) {
-        console.error("✗ Error:", err);
+        console.error(" Error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -490,22 +507,23 @@ export default function LessonScreen() {
                 <div className="hints-box">
                   <h2>Hints & Tips</h2>
                   <div className="hints-content">
-                    <div className="hint-item">
-                      <h3>Step 1: Read the Problem Carefully</h3>
-                      <p>Make sure you understand all the requirements before you start coding.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Step 2: Plan Your Approach</h3>
-                      <p>Write down the steps to solve the problem before you start coding.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Step 3: Write Code Step by Step</h3>
-                      <p>Write code in small parts and test each part to find bugs more easily.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Hint for this problem:</h3>
-                      <p>{getFeedback().hint}</p>
-                    </div>
+                    {hintsLoading ? (
+                      <div className="loading-message">Loading hints...</div>
+                    ) : hints && hints.length > 0 ? (
+                      hints.map((hint, index) => (
+                        <div key={hint.hintId || index} className="hint-item">
+                          <h3>{hint.title}</h3>
+                          <div 
+                            className="hint-content-formatted"
+                            dangerouslySetInnerHTML={{ __html: formatProblemDescription(hint.content) }}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-hints-message">
+                        <p>No hints available for this lesson yet.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -552,6 +570,9 @@ export default function LessonScreen() {
               <div className="editor-header-left">
                 <h2>Code Editor</h2>
                 <span className="lang-badge">{getLanguageDisplayName(lesson?.course?.language)}</span>
+                <span className={`exec-time-badge ${executionTime === 0 ? 'default' : executionTime < 100 ? 'fast' : executionTime < 500 ? 'normal' : 'slow'}`}>
+                  {executionTime === 0 ? '0ms' : `${executionTime.toFixed(0)}ms`}
+                </span>
               </div>
               <div className="editor-header-right">
                   <button onClick={toggleEditorMaximize} className="control-btn" title="Maximize/Restore">
@@ -635,10 +656,12 @@ export default function LessonScreen() {
             <div className="output-panel">
               <div className="output-header">
                 <span className="output-label">Output</span>
-                <span className={`output-status ${isRunning ? 'running' : ''}`}>
-                  {isRunning ? "Running..." : "Ready"}
-                </span>
-                {executionTime > 0 && <span className="exec-time">{executionTime}ms</span>}
+                <div className="output-info">
+                  <span className={`output-status ${isRunning ? 'running' : ''}`}>
+                    {isRunning ? "Running..." : "Ready"}
+                  </span>
+                  {executionTime > 0 && <span className="exec-time">Execution Time: {executionTime.toFixed(2)}ms</span>}
+                </div>
               </div>
               <pre className="output-content">{output}</pre>
             </div>
