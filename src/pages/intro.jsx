@@ -132,16 +132,11 @@ export default function Intro() {
 
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title" style={{ textAlign: "center" }}>
-              BE THE MIGHTY CODEKNIGHT LEADING THE FUTURE OF CODE
+            <h1 className="hero-title glow-text shine-text" style={{ textAlign: "center" }}>
+              FORCE YOUR CODING LEGEND
             </h1>
-            <h2 className="hero-subtitle" style={{ textAlign: "center" }}>
-              Commence a grand odyssey through the timeless realms of programming
-            </h2>
             <p className="hero-description" style={{ textAlign: "center" }}>
-              Welcome to Dev Vanguard, where learning to code becomes an adventure! Navigate through challenging terrains of algorithms,
-              conquer the mountains of data structures, and discover the hidden treasures of programming languages.
-              Your quest to become a coding master starts here ~
+              Welcome to Dev Vanguard, lets Conquer algorithms, scale mountains of data, and unlock the treasures of programming. Join the quest to become a coding master.
             </p>
             <div style={{ textAlign: "center" }}>
               <a href="/login" className="btn">Start Your Adventure</a>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useDiscussion from '../hooks/useDiscussion';
 import { useAuth } from '../contexts/AuthContext';
-import '../assets/CSS/Discussion.css';
+import './Discussion.css';
 
 /**
  * Discussion Component

@@ -120,46 +120,6 @@ export const authService = {
     }
   },
 
-  // Đăng nhập qua Google
-  async signInWithGoogle() {
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/main-menu`,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return { success: true, data, message: "Redirect to Google..." };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
-  // Đăng nhập qua Facebook
-  async signInWithFacebook() {
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "facebook",
-        options: {
-          redirectTo: `${window.location.origin}/main-menu`,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return { success: true, data, message: "Redirect to Facebook..." };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
   // Lắng nghe thay đổi trạng thái xác thực
   onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange(callback);
