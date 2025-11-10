@@ -1,4 +1,5 @@
 :root {
+    /* Biến CSS cơ bản (giữ lại) */
     --primary-color: #4CAF50;
     --primary-dark: #3e8e41;
     --accent-color: #ff1100;
@@ -6,6 +7,13 @@
     --text-dark: #0a0a0a;
     --bg-dark: #0a0a0a;
     --bg-card: rgba(255, 255, 255, 0.1);
+
+    /* Biến CSS mới (Chủ đề Tím) */
+    --bg-realm: #0B0A1D;       /* Nền chính (Tím than đậm) */
+    --bg-card-new: #1D1B31;    /* Nền phụ (cho thẻ) */
+    --text-muted: #A0A0A0;     /* Chữ phụ, mô tả */
+    --accent-magic: #8A2BE2;   /* Màu nhấn (Tím) */
+    --accent-hover: #9932CC;   /* Màu nhấn khi hover */
 }
 
 * {
@@ -17,11 +25,13 @@
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: #ffffff;
+    background-color: var(--bg-realm);
+    color: var(--text-light);
     overflow-x: hidden;
     font-size: 16px;
     line-height: 1.6;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
 }
 
 /* ===== HERO SECTION ===== */
@@ -38,7 +48,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/images/background.jpg');
+    background-image: url('/images/knightbackground.gif');
     background-size: cover;
     background-position: center;
     filter: brightness(0.7);
@@ -273,37 +283,59 @@ body {
     60% { transform: translateY(-10px); }
 }
 
-/* ===== COURSES SECTION ===== */
+/* ===== GLOW EFFECT (Thanh kiếm lóa sáng) ===== */
+@keyframes glow-pulse {
+    0% {
+        text-shadow: 0 0 10px rgba(76, 175, 80, 0.5),
+                     0 0 20px rgba(76, 175, 80, 0.3),
+                     0 0 30px rgba(76, 175, 80, 0.2);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(76, 175, 80, 1),
+                     0 0 30px rgba(76, 175, 80, 0.8),
+                     0 0 40px rgba(76, 175, 80, 0.6),
+                     0 0 50px rgba(76, 175, 80, 0.4);
+    }
+    100% {
+        text-shadow: 0 0 10px rgba(76, 175, 80, 0.5),
+                     0 0 20px rgba(76, 175, 80, 0.3),
+                     0 0 30px rgba(76, 175, 80, 0.2);
+    }
+}
+
+.glow-text {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ===== SHINE EFFECT (Bling sáng bóng chạy từ trái sang phải) ===== */
+@keyframes shine-sweep {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.shine-text {
+    background: linear-gradient(
+        90deg,
+        #ffffff 0%,
+        #ffffff 25%,
+        rgba(255, 255, 255, 0.5) 50%,
+        #ffffff 75%,
+        #ffffff 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shine-sweep 3s infinite;
+}
 .courses-section {
-    background: linear-gradient(135deg, rgba(10, 15, 25, 0.9), rgba(20, 25, 35, 0.8));
+    background-color: var(--bg-dark);
     position: relative;
     overflow: hidden;
-}
-
-.courses-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('/images/Countryside_MAP.jpg');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.4;
-    z-index: 0;
-    filter: hue-rotate(20deg) contrast(1.1);
-}
-
-.courses-section::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(ellipse at center, transparent 0%, rgba(76, 175, 80, 0.05) 50%, transparent 100%);
-    z-index: 0;
 }
 
 .section-title {
@@ -450,7 +482,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/images/background.jpg');
+    background-image: url('/images/black_background.jpg');
     background-size: cover;
     background-position: center;
     opacity: 0.3;
@@ -552,7 +584,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/images/paraddise_MAP.jpg');
+    background-image: url('/images/black_background.jpg');
     background-size: cover;
     background-position: center;
     opacity: 0.3;
@@ -689,7 +721,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/images/background.jpg');
+    background-image: url('/images/black_background.jpg');
     background-size: cover;
     background-position: center;
     opacity: 0.25;

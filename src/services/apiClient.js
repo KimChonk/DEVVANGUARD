@@ -24,9 +24,9 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
     const headers = await getAuthHeader();
     const fullUrl = `${API_BASE_URL}/api${endpoint}`;
 
-    console.log(`API Call: ${method} ${fullUrl}`);
-    console.log(`API Base URL: ${API_BASE_URL}`);
-    console.log(`Headers:`, headers);
+    console.log(`🚀 API Call: ${method} ${fullUrl}`);
+    console.log(`📌 API Base URL: ${API_BASE_URL}`);
+    console.log(`📋 Headers:`, headers);
 
     const options = {
       method,
@@ -35,12 +35,12 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
 
     if (data) {
       options.body = JSON.stringify(data);
-      console.log(`Body:`, data);
+      console.log(`📦 Body:`, data);
     }
 
     const response = await fetch(fullUrl, options);
 
-    console.log(`Response Status: ${response.status}`);
+    console.log(`✅ Response Status: ${response.status}`);
 
     if (!response.ok) {
       try {
@@ -49,7 +49,7 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
       } catch (parseError) {
         // Response không phải JSON (có thể là HTML exception page)
         const errorText = await response.text();
-        console.error("Error Response Text:", errorText.substring(0, 200));
+        console.error("❌ Error Response Text:", errorText.substring(0, 200));
         throw new Error(`API error: ${response.status} - ${errorText.substring(0, 100)}`);
       }
     }
@@ -60,7 +60,7 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
 
     return await response.json();
   } catch (error) {
-    console.error(`API call error [${method} ${endpoint}]:`, error);
+    console.error(`❌ API call error [${method} ${endpoint}]:`, error);
     throw error;
   }
 };
@@ -78,6 +78,7 @@ export const courseService = {
         name: course.name,
         language: course.language,
         description: course.description,
+        courseImage: course.courseImage,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
         lessons: course.lessons
@@ -99,6 +100,7 @@ export const courseService = {
         name: course.name,
         language: course.language,
         description: course.description,
+        courseImage: course.courseImage,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
         lessons: course.lessons?.map(lesson => ({
@@ -569,113 +571,3 @@ export const userStatsService = {
     }
   },
 };
-
-// ========== LESSON HINT SERVICES ==========
-export const lessonHintService = {
-  // Get all hints for a lesson
-  async getHintsByLessonId(lessonId) {
-    try {
-      const hints = await apiCall(`/lessonhint/lesson/${lessonId}`);
-      const mappedHints = Array.isArray(hints) ? hints.map(hint => ({
-        id: hint.hintId,
-        hintId: hint.hintId,
-        lessonId: hint.lessonId,
-        title: hint.title,
-        content: hint.content,
-        orderIndex: hint.orderIndex,
-        createdAt: hint.createdAt
-      })) : [];
-      return { success: true, data: mappedHints };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
-  // Get hint by ID
-  async getHintById(hintId) {
-    try {
-      const hint = await apiCall(`/lessonhint/${hintId}`);
-      const mapped = {
-        id: hint.hintId,
-        hintId: hint.hintId,
-        lessonId: hint.lessonId,
-        title: hint.title,
-        content: hint.content,
-        orderIndex: hint.orderIndex,
-        createdAt: hint.createdAt
-      };
-      return { success: true, data: mapped };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
-  // Get all hints (for admin dashboard)
-  async getAllHints() {
-    try {
-      const hints = await apiCall("/lessonhint");
-      const mappedHints = Array.isArray(hints) ? hints.map(hint => ({
-        id: hint.hintId,
-        hintId: hint.hintId,
-        lessonId: hint.lessonId,
-        title: hint.title,
-        content: hint.content,
-        orderIndex: hint.orderIndex,
-        createdAt: hint.createdAt
-      })) : [];
-      return { success: true, data: mappedHints };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
-  // Create new hint
-  async createHint(lessonId, title, content, orderIndex = 0) {
-    try {
-      const hint = await apiCall("/lessonhint", "POST", {
-        lessonId,
-        title,
-        content,
-        orderIndex
-      });
-      return { success: true, data: hint };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
-  // Update hint
-  async updateHint(hintId, title, content, orderIndex) {
-    try {
-      const hint = await apiCall(`/lessonhint/${hintId}`, "PUT", {
-        title,
-        content,
-        orderIndex
-      });
-      return { success: true, data: hint };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
-  // Delete hint
-  async deleteHint(hintId) {
-    try {
-      await apiCall(`/lessonhint/${hintId}`, "DELETE");
-      return { success: true, message: "Hint deleted successfully" };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-
-  // Delete all hints for a lesson
-  async deleteHintsByLessonId(lessonId) {
-    try {
-      await apiCall(`/lessonhint/lesson/${lessonId}`, "DELETE");
-      return { success: true, message: "All hints deleted successfully" };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
-  },
-};
-

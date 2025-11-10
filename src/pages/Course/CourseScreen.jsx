@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useCourse } from "../../hooks/useCourses";
 import { lessonService, userProgressService } from "../../services/apiClient";
 import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
@@ -7,13 +7,40 @@ import LoadingScreen from "../../components/LoadingScreen";
 import ProblemDescription from "../../components/ProblemDescription";
 import "../../assets/CSS/coursescreen.css";
 
+// Map course names to their image files (same as MainMenu)
+const courseImageMap = {
+  python: "python_background.gif",  
+  java: "Java_background.gif",
+  javascript: "html_course.jpg",
+  "c++": "C_background.gif",
+  "c#": "csharp_background.gif",
+  css: "C_background.gif",
+  html: "html_course.jpg",
+  c: "csharp_background.gif",
+};
+
+const getCourseImage = (courseName) => {
+  const name = courseName?.toLowerCase() || "";
+  for (const [key, image] of Object.entries(courseImageMap)) {
+    if (name.includes(key)) {
+      return `/images/${image}`;
+    }
+  }
+  return `/images/python_background.gif`;
+};
+
 export default function CourseScreen() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { courseId } = useParams();
   const { course, loading: courseLoading } = useCourse(courseId);
   const { profile } = useUserProfile();
   const { stats } = useUserStats();
   const { rankData } = useUserRank();
+  
+  // Lấy courseName từ location state (truyền từ MainMenu)
+  const courseName = location.state?.courseName || course?.name;
+  const heroImageUrl = getCourseImage(courseName);
   
   const [lessons, setLessons] = useState([]);
   const [lessonsLoading, setLessonsLoading] = useState(true);
@@ -117,6 +144,34 @@ export default function CourseScreen() {
   return (
     <div className="course-screen-container">
       <LoadingScreen isVisible={isLoading} message={loadingMessage} />
+      
+      {/* Hero Section with Course Banner */}
+      <div className="course-hero-section" style={{
+        backgroundImage: `url('${heroImageUrl}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}>
+        <div className="course-hero-overlay"></div>
+        <div className="course-hero-content">
+          <div className="course-hero-info">
+            <span className="course-badge">COURSE</span>
+            <h1 className="course-hero-title">{course.name}</h1>
+            <p className="course-hero-description">
+              {course.description || "Learn programming fundamentals with this comprehensive course"}
+            </p>
+            <button className="course-hero-cta" onClick={() => {
+              if (lessons.length > 0) {
+                setExpandedLessonId(lessons[0].lessonId);
+              }
+            }}>
+              Start Learning
+              <i className="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
       <div className="course-background"></div>
       
       <nav className="course-navbar">

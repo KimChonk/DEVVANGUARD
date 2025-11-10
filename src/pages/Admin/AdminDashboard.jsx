@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { userService, courseService, lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
+import { userService, courseService, lessonService, userProgressService } from "../../services/apiClient";
 import { authService } from "../../services/supabaseClient";
 import "../../assets/CSS/admindashboard.css";
 
@@ -21,17 +21,13 @@ export default function AdminDashboard() {
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [users, setUsers] = useState([]);
-  const [hints, setHints] = useState([]);
   const [userProgress, setUserProgress] = useState({});
 
   // UI states
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showCourseForm, setShowCourseForm] = useState(false);
   const [showLessonForm, setShowLessonForm] = useState(false);
-  const [showHintForm, setShowHintForm] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [selectedLesson, setSelectedLesson] = useState(null);
-  const [editingHint, setEditingHint] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -50,13 +46,6 @@ export default function AdminDashboard() {
     problemDescription: "",
     solutionTemplate: "",
     testCases: ""
-  });
-
-  const [hintForm, setHintForm] = useState({
-    lessonId: "",
-    title: "",
-    content: "",
-    orderIndex: ""
   });
 
   // Fetch all data
@@ -100,12 +89,6 @@ export default function AdminDashboard() {
       if (lessonsResult.success && Array.isArray(lessonsResult.data)) {
         setLessons(lessonsResult.data);
         setTotalLessons(lessonsResult.data.length);
-      }
-
-      // Fetch hints
-      const hintsResult = await lessonHintService.getAllHints();
-      if (hintsResult.success && Array.isArray(hintsResult.data)) {
-        setHints(hintsResult.data);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -220,104 +203,6 @@ export default function AdminDashboard() {
         setLoading(false);
       }
     }
-  };
-
-  // Handle hint creation
-  const handleCreateHint = async (e) => {
-    e.preventDefault();
-    if (!hintForm.lessonId || !hintForm.title || !hintForm.content) {
-      setMessage("Please fill in all required fields");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const result = await lessonHintService.createHint(
-        hintForm.lessonId,
-        hintForm.title,
-        hintForm.content,
-        parseInt(hintForm.orderIndex) || 0
-      );
-
-      if (result.success) {
-        setMessage("Hint created successfully!");
-        setHintForm({ lessonId: "", title: "", content: "", orderIndex: "" });
-        setShowHintForm(false);
-        fetchAllData();
-      } else {
-        setMessage("Error: " + (result.message || "Unable to create hint"));
-      }
-    } catch (err) {
-      setMessage("Error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle hint update
-  const handleUpdateHint = async (e) => {
-    e.preventDefault();
-    if (!editingHint || !hintForm.title || !hintForm.content) {
-      setMessage("Please fill in all required fields");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const result = await lessonHintService.updateHint(
-        editingHint.hintId,
-        hintForm.title,
-        hintForm.content,
-        parseInt(hintForm.orderIndex) || 0
-      );
-
-      if (result.success) {
-        setMessage("Hint updated successfully!");
-        setHintForm({ lessonId: "", title: "", content: "", orderIndex: "" });
-        setEditingHint(null);
-        setShowHintForm(false);
-        fetchAllData();
-      } else {
-        setMessage("Error: " + (result.message || "Unable to update hint"));
-      }
-    } catch (err) {
-      setMessage("Error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle hint deletion
-  const handleDeleteHint = async (hintId) => {
-    if (window.confirm("Are you sure you want to delete this hint?")) {
-      try {
-        setLoading(true);
-        const result = await lessonHintService.deleteHint(hintId);
-
-        if (result.success) {
-          setMessage("Hint deleted successfully!");
-          fetchAllData();
-        } else {
-          setMessage("Error: " + (result.message || "Unable to delete hint"));
-        }
-      } catch (err) {
-        setMessage("Error: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  // Handle hint edit
-  const handleEditHint = (hint) => {
-    setEditingHint(hint);
-    setHintForm({
-      lessonId: hint.lessonId,
-      title: hint.title,
-      content: hint.content,
-      orderIndex: hint.orderIndex
-    });
-    setShowHintForm(true);
   };
 
   // Handle logout
@@ -540,7 +425,6 @@ export default function AdminDashboard() {
               <li><a href="#" className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>Dashboard</a></li>
               <li><a href="#" className={activeTab === "courses" ? "active" : ""} onClick={() => setActiveTab("courses")}>Courses</a></li>
               <li><a href="#" className={activeTab === "lessons" ? "active" : ""} onClick={() => setActiveTab("lessons")}>Lessons</a></li>
-              <li><a href="#" className={activeTab === "hints" ? "active" : ""} onClick={() => setActiveTab("hints")}>Hints</a></li>
               <li><a href="#" className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>Users</a></li>
             </ul>
           </div>
@@ -1004,187 +888,6 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 ))
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Hints Tab */}
-        {activeTab === "hints" && (
-          <div className="admin-tab-content">
-            <div className="section-header">
-              <h2 className="section-title">
-                <i className="fas fa-lightbulb"></i>
-                Manage Lesson Hints
-              </h2>
-              <button
-                type="button"
-                className="add-btn"
-                onClick={() => {
-                  setEditingHint(null);
-                  setHintForm({ lessonId: "", title: "", content: "", orderIndex: "" });
-                  setShowHintForm(!showHintForm);
-                }}
-              >
-                <i className="fas fa-plus"></i>
-                {showHintForm ? "Cancel" : "Add Hint"}
-              </button>
-            </div>
-
-            {/* Hint Creation/Edit Form */}
-            {showHintForm && (
-              <div className="admin-form-container">
-                <form onSubmit={editingHint ? handleUpdateHint : handleCreateHint} className="admin-form-grid">
-                  <div className="admin-form-group">
-                    <label className="admin-label">Select Lesson *</label>
-                    <select
-                      className="admin-input"
-                      value={hintForm.lessonId}
-                      onChange={(e) =>
-                        setHintForm({
-                          ...hintForm,
-                          lessonId: e.target.value,
-                        })
-                      }
-                      disabled={editingHint !== null}
-                      required
-                    >
-                      <option value="">-- Select a lesson --</option>
-                      {lessons.map((lesson) => (
-                        <option key={lesson.lessonId} value={lesson.lessonId}>
-                          {lesson.lessonTitle}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label className="admin-label">Hint Title *</label>
-                    <input
-                      type="text"
-                      className="admin-input"
-                      placeholder="E.g.: Read the Problem Carefully"
-                      value={hintForm.title}
-                      onChange={(e) =>
-                        setHintForm({
-                          ...hintForm,
-                          title: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label className="admin-label">Order Index</label>
-                    <input
-                      type="number"
-                      className="admin-input"
-                      placeholder="E.g.: 0"
-                      value={hintForm.orderIndex}
-                      onChange={(e) =>
-                        setHintForm({
-                          ...hintForm,
-                          orderIndex: e.target.value,
-                        })
-                      }
-                      min="0"
-                    />
-                  </div>
-
-                  <div className="admin-form-group" style={{ gridColumn: "1 / -1" }}>
-                    <label className="admin-label">Hint Content *</label>
-                    <textarea
-                      className="admin-input textarea"
-                      placeholder="Enter the hint content here..."
-                      value={hintForm.content}
-                      onChange={(e) =>
-                        setHintForm({
-                          ...hintForm,
-                          content: e.target.value,
-                        })
-                      }
-                      rows="5"
-                      required
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="admin-submit"
-                    disabled={loading}
-                    style={{ gridColumn: "1 / -1" }}
-                  >
-                    {loading ? (editingHint ? "Updating..." : "Creating...") : (editingHint ? "Update Hint" : "Create Hint")}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* Hints List */}
-            <div className="hints-list">
-              {loading && hints.length === 0 ? (
-                <div className="loading-state">
-                  <div className="spinner"></div>
-                  <p>Loading hints...</p>
-                </div>
-              ) : hints.length === 0 ? (
-                <div className="empty-state">
-                  <i className="fas fa-lightbulb"></i>
-                  <p>No hints available</p>
-                </div>
-              ) : (
-                hints.map((hint) => {
-                  const lesson = lessons.find(l => l.lessonId === hint.lessonId);
-                  return (
-                    <div key={hint.hintId} className="hint-item-card">
-                      <div className="hint-item-header">
-                        <h3 className="hint-item-name">{hint.title}</h3>
-                        <span className="hint-lesson-badge">{lesson?.lessonTitle || "Unknown Lesson"}</span>
-                      </div>
-                      <p className="hint-item-content">{hint.content}</p>
-                      <div className="hint-item-footer">
-                        <span className="hint-order-badge">Order #{hint.orderIndex}</span>
-                        <div className="hint-item-actions">
-                          <button
-                            type="button"
-                            className="action-btn edit"
-                            disabled={loading}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleEditHint(hint);
-                            }}
-                          >
-                            <i className="fas fa-edit"></i>
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="action-btn delete"
-                            disabled={loading}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleDeleteHint(hint.hintId);
-                            }}
-                          >
-                            <i className="fas fa-trash"></i>
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
               )}
             </div>
           </div>

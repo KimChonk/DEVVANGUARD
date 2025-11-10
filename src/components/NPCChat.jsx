@@ -55,7 +55,7 @@ export default function NPCChat({
     const messageToSend = question || userInput.trim();
     
     if (!messageToSend) {
-      setCurrentMessage('Ask me something , Knight!');
+      setCurrentMessage('Vui lòng hỏi tôi điều gì đó, Knight!');
       setIsVisible(true);
       return;
     }
@@ -68,28 +68,28 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log(' Asking NPC:', messageToSend);
+      console.log('📨 Asking NPC:', messageToSend);
       const result = await getNPCResponse(
         messageToSend,
         problemDescription,
         userCode
       );
 
-      console.log(' NPC Response:', result);
+      console.log('📩 NPC Response:', result);
 
       if (result.success && result.reply) {
-        console.log('Setting AI reply:', result.reply);
+        console.log('✅ Setting AI reply:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
-        console.warn(' NPC failed but has reply:', result.reply);
+        console.warn('⚠️ NPC failed but has reply:', result.reply);
         setDisplayedText('');
-        setCurrentMessage(result.reply || 'Hmm... My magic was interrupted. Please try again.');
+        setCurrentMessage(result.reply || 'Hmm... Phép thuật của tôi bị gián đoạn. Vui lòng thử lại.');
       }
     } catch (error) {
       console.error('Error getting NPC response:', error);
       setDisplayedText('');
-      setCurrentMessage('Oh no! Connection lost. Please try again later.');
+      setCurrentMessage('Ôi không! Kết nối bị mất. Hãy thử lại sau.');
     } finally {
       setIsLoading(false);
     }
@@ -104,24 +104,24 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log(' Asking for hint...');
+      console.log('💡 Asking for hint...');
       const result = await getNPCHint(problemDescription, userCode);
       
-      console.log(' Hint Response:', result);
+      console.log('💡 Hint Response:', result);
       
       if (result.success && result.reply) {
-        console.log(' Setting hint:', result.reply);
+        console.log('✅ Setting hint:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
-        console.warn(' Hint failed but has reply:', result.reply);
+        console.warn('⚠️ Hint failed but has reply:', result.reply);
         setDisplayedText('');
-        setCurrentMessage(result.reply || 'Hmm... I have no hints right now.');
+        setCurrentMessage(result.reply || 'Hmm... Tôi không có gợi ý gì lúc này.');
       }
     } catch (error) {
       console.error('Error getting hint:', error);
       setDisplayedText('');
-      setCurrentMessage('Unable to get hints. Please try again.');
+      setCurrentMessage('Không thể lấy gợi ý. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -136,24 +136,24 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log(' Asking for code feedback...');
+      console.log('📝 Asking for code feedback...');
       const result = await getNPCCodeFeedback(problemDescription, userCode);
       
-      console.log(' Feedback Response:', result);
+      console.log('📝 Feedback Response:', result);
       
       if (result.success && result.reply) {
-        console.log(' Setting feedback:', result.reply);
+        console.log('✅ Setting feedback:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
-        console.warn(' Feedback failed but has reply:', result.reply);
+        console.warn('⚠️ Feedback failed but has reply:', result.reply);
         setDisplayedText('');
-        setCurrentMessage(result.reply || 'Your code seems... in need of improvement.');
+        setCurrentMessage(result.reply || 'Code của bạn có vẻ... cần cải thiện.');
       }
     } catch (error) {
       console.error('Error getting feedback:', error);
       setDisplayedText('');
-      setCurrentMessage('Unable to analyze code. Please try again.');
+      setCurrentMessage('Không thể phân tích code. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -230,7 +230,7 @@ export default function NPCChat({
         <div className="npc-header-info">
           <h3 className="npc-title">Mystery Wizard</h3>
           <p className="npc-status">
-            {isLoading ? ' Thinking...' : (conversationMode ? ' AI Mode' : 'Ready')}
+            {isLoading ? '💭 Thinking...' : (conversationMode ? '💬 AI Mode' : 'Ready')}
           </p>
         </div>
       </div>
@@ -249,7 +249,7 @@ export default function NPCChat({
             )}
           </>
         ) : (
-          <p className="npc-placeholder">Waiting for your command, Knight...</p>
+          <p className="npc-placeholder">Đợi lệnh của bạn, Knight...</p>
         )}
       </div>
 
@@ -262,17 +262,17 @@ export default function NPCChat({
               className="npc-btn-hint"
               onClick={handleGetHint}
               disabled={isLoading}
-              title="Get a hint from the NPC"
+              title="Nhận một gợi ý từ NPC"
             >
-               Hint
+              💡 Gợi ý
             </button>
             <button 
               className="npc-btn-feedback"
               onClick={handleGetFeedback}
               disabled={isLoading}
-              title="Get code feedback from the NPC"
+              title="Nhận phản hồi về code"
             >
-               Feedback
+              📝 Phản hồi
             </button>
           </div>
 
@@ -281,7 +281,7 @@ export default function NPCChat({
             <input
               type="text"
               className="npc-input"
-              placeholder="Ask the NPC a question..."
+              placeholder="Hỏi NPC một câu hỏi..."
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               onKeyPress={(e) => {
@@ -295,7 +295,7 @@ export default function NPCChat({
               className="npc-send-btn"
               onClick={() => handleAskNPC()}
               disabled={isLoading || !userInput.trim()}
-              title="Send a message to the NPC"
+              title="Gửi tin nhắn cho NPC"
             >
               {isLoading ? '⏳' : '➤'}
             </button>
@@ -308,9 +308,9 @@ export default function NPCChat({
         <button
           className="npc-toggle-chat"
           onClick={() => setConversationMode(true)}
-          title="Start a conversation with the NPC"
+          title="Bắt đầu nói chuyện với NPC"
         >
-           Ask NPC
+          💬 Hỏi NPC
         </button>
       )}
     </div>

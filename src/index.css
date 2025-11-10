@@ -5,11 +5,19 @@
   box-sizing: border-box;
 }
 
+/* Áp dụng font cơ bản cho toàn trang */
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', sans-serif; /* Font chữ thường */
+  font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Áp dụng font tiêu đề cho các thẻ h1, h2, h3 và logo */
+h1, h2, h3, h4, h5, h6, .logo-text, .hero-title, .course-title, .feature-title, .developer-name {
+  font-family: 'Merriweather', serif; /* Font tiêu đề */
+  font-weight: 700;
 }
 
 #root {
