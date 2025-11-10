@@ -205,18 +205,25 @@ export default function CourseScreen() {
                   const isCompleted = completedLessons[lesson.lessonId];
                   const isExpanded = expandedLessonId === lesson.lessonId;
                   
+                  // Check if lesson is locked (first lesson is always unlocked, others need previous lesson completed)
+                  const isFirstLesson = index === 0;
+                  const previousLessonCompleted = index === 0 ? true : completedLessons[lessons[index - 1].lessonId];
+                  const isLocked = !isFirstLesson && !previousLessonCompleted;
+                  
                   return (
                     <div
                       key={lesson.lessonId}
-                      className={`lesson-card-new ${isCompleted ? 'completed' : ''}`}
+                      className={`lesson-card-new ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`}
                     >
                       <div
                         className="lesson-card-header-new"
-                        onClick={() => setExpandedLessonId(isExpanded ? null : lesson.lessonId)}
+                        onClick={() => !isLocked && setExpandedLessonId(isExpanded ? null : lesson.lessonId)}
                       >
                         <div className="lesson-index-new">
                           {isCompleted ? (
                             <i className="fas fa-check"></i>
+                          ) : isLocked ? (
+                            <i className="fas fa-lock"></i>
                           ) : (
                             <span>{index + 1}</span>
                           )}
@@ -225,7 +232,7 @@ export default function CourseScreen() {
                         <div className="lesson-info-new">
                           <h4>{lesson.lessonTitle}</h4>
                           <p className="lesson-status-text">
-                            {isCompleted ? '✓ Completed' : 'Not completed'}
+                            {isCompleted ? '✓ Completed' : isLocked ? 'Locked' : 'Not completed'}
                           </p>
                         </div>
 
@@ -233,15 +240,16 @@ export default function CourseScreen() {
                           className="expand-btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setExpandedLessonId(isExpanded ? null : lesson.lessonId);
+                            !isLocked && setExpandedLessonId(isExpanded ? null : lesson.lessonId);
                           }}
+                          disabled={isLocked}
                         >
                           <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
                         </button>
                       </div>
 
                       {/* Expandable Description */}
-                      {isExpanded && (
+                      {isExpanded && !isLocked && (
                         <div className="lesson-card-expanded">
                           <div className="expanded-content">
                             {lesson.problemDescription ? (
@@ -272,6 +280,14 @@ export default function CourseScreen() {
                               {isCompleted ? 'Completed' : 'Start Lesson'}
                             </button>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Lock message for locked lessons */}
+                      {isLocked && (
+                        <div className="lesson-locked-message">
+                          <i className="fas fa-lock"></i>
+                          <p>Complete the previous lesson to unlock this one</p>
                         </div>
                       )}
                     </div>

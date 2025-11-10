@@ -5,9 +5,9 @@
   gap: 20px;
   margin-bottom: 40px;
   padding: 20px;
-  background: rgba(30, 41, 59, 0.5);
+  background: transparent;
   border-radius: 12px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  border: none;
 }
 
 /* Greeting Character */
@@ -51,28 +51,20 @@
 /* Greeting Bubble */
 .greeting-bubble {
   flex: 1;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: transparent;
+  border: none;
   border-radius: 12px;
   padding: 20px;
   position: relative;
   min-height: 80px;
   display: flex;
   align-items: center;
-  box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.1);
+  box-shadow: none;
 }
 
 /* Speech bubble pointer */
 .greeting-bubble::before {
-  content: '';
-  position: absolute;
-  left: -10px;
-  top: 20px;
-  width: 0;
-  height: 0;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 10px solid rgba(59, 130, 246, 0.2);
+  display: none;
 }
 
 /* Greeting Text */

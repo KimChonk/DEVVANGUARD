@@ -103,6 +103,8 @@ export default function MainMenu() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [inviteStatus, setInviteStatus] = useState(""); // "success", "error", ""
 
   const handleCourseClick = useCallback(
     (courseId, courseName) => {
@@ -131,6 +133,42 @@ export default function MainMenu() {
       navigate("/login");
     }
   }, [navigate]);
+
+  const handleInviteFriend = useCallback(async () => {
+    if (!inviteEmail || !inviteEmail.trim()) {
+      setInviteStatus("error");
+      setInviteMessage("Please enter a valid email address");
+      setTimeout(() => setInviteStatus(""), 5000);
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(inviteEmail)) {
+      setInviteStatus("error");
+      setInviteMessage("Please enter a valid email address");
+      setTimeout(() => setInviteStatus(""), 5000);
+      return;
+    }
+
+    try {
+      const result = await authService.inviteUser(inviteEmail);
+      if (result.success) {
+        setInviteStatus("success");
+        setInviteMessage(`✓ Invitation sent to ${inviteEmail}!`);
+        setInviteEmail("");
+        setTimeout(() => setInviteStatus(""), 5000);
+      } else {
+        setInviteStatus("error");
+        setInviteMessage(result.message || "Failed to send invitation");
+        setTimeout(() => setInviteStatus(""), 5000);
+      }
+    } catch (error) {
+      setInviteStatus("error");
+      setInviteMessage("An error occurred while sending the invitation");
+      setTimeout(() => setInviteStatus(""), 5000);
+    }
+  }, [inviteEmail]);
 
   const xpPercentage = useMemo(() => {
     return (user.currentXP / user.nextLevelXP) * 100;
@@ -170,15 +208,20 @@ export default function MainMenu() {
             </a>
 
             <ul className="main-nav-links">
-              <li className="nav-dropdown">
+              <li 
+                className="nav-dropdown"
+                onMouseEnter={() => setShowLearnDropdown(true)}
+              >
                 <a 
-                  onClick={() => setShowLearnDropdown(!showLearnDropdown)}
                   className="dropdown-toggle"
                 >
                   Learn <i className="fas fa-chevron-down"></i>
                 </a>
                 {showLearnDropdown && (
-                  <div className="dropdown-menu learn-dropdown">
+                  <div 
+                    className="dropdown-menu learn-dropdown"
+                    onMouseLeave={() => setShowLearnDropdown(false)}
+                  >
                     <div className="dropdown-content">
                       <div className="dropdown-left">
                         <h4 className="dropdown-title">Recommended</h4>
@@ -396,27 +439,24 @@ export default function MainMenu() {
                   onChange={(e) => setInviteEmail(e.target.value)}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
-                      alert(`Sending invite to: ${inviteEmail}`);
-                      setInviteEmail("");
+                      handleInviteFriend();
                     }
                   }}
                 />
                 <button 
                   className="invite-send-btn"
-                  onClick={() => {
-                    if (inviteEmail) {
-                      alert(`Sending invite to: ${inviteEmail}`);
-                      setInviteEmail("");
-                    } else {
-                      alert("Please enter an email address");
-                    }
-                  }}
+                  onClick={handleInviteFriend}
                 >
                   <i className="fas fa-paper-plane"></i> Invite
                 </button>
               </div>
             </div>
           </div>
+          {inviteMessage && (
+            <div className={`invite-message ${inviteStatus}`}>
+              {inviteMessage}
+            </div>
+          )}
         </div>
       </div>
 

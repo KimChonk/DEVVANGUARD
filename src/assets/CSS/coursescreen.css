@@ -314,6 +314,70 @@ body {
   background: rgba(76, 175, 80, 0.25);
 }
 
+/* Locked lesson styles */
+.lesson-card-new.locked {
+  background: rgba(100, 100, 120, 0.3);
+  border-color: rgba(150, 150, 170, 0.4);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.lesson-card-new.locked:hover {
+  border-color: rgba(150, 150, 170, 0.4);
+  background: rgba(100, 100, 120, 0.3);
+  box-shadow: none;
+}
+
+.lesson-card-new.locked .lesson-card-header-new {
+  cursor: not-allowed;
+}
+
+.lesson-card-new.locked .lesson-card-header-new:hover {
+  background: transparent;
+}
+
+.lesson-card-new.locked .lesson-index-new {
+  background: linear-gradient(135deg, #8b8b9a, #6b6b7a);
+  color: white;
+  font-size: 1.3rem;
+}
+
+.lesson-card-new.locked .lesson-info-new h4 {
+  color: rgba(232, 232, 232, 0.5);
+}
+
+.lesson-card-new.locked .expand-btn {
+  color: rgba(150, 150, 170, 0.6);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.lesson-card-new.locked .expand-btn:hover {
+  color: rgba(150, 150, 170, 0.6);
+  transform: none;
+}
+
+.lesson-locked-message {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(150, 150, 170, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(232, 232, 232, 0.6);
+  font-size: 0.95rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.lesson-locked-message i {
+  font-size: 1.5rem;
+  color: rgba(150, 150, 170, 0.7);
+}
+
+.lesson-locked-message p {
+  margin: 0;
+}
+
 .lesson-card-header-new {
   display: flex;
   align-items: center;
