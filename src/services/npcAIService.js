@@ -29,15 +29,15 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
     const authToken = session?.access_token;
 
     if (!authToken) {
-      console.error('❌ No Supabase auth token found');
+      console.error(' No Supabase auth token found');
       return {
         success: false,
         error: 'Authentication required',
-        reply: 'Vui lòng đăng nhập để sử dụng NPC.'
+        reply: 'Please log in to use the NPC features.'
       };
     }
 
-    console.log('🧙‍♂️ Sending to NPC AI:', { userMessage, problemDescription: problemDescription.substring(0, 100) + '...' });
+    console.log('Sending to NPC AI:', { userMessage, problemDescription: problemDescription.substring(0, 100) + '...' });
 
     const response = await fetch(EDGE_FUNCTION_URL, {
       method: 'POST',
@@ -53,32 +53,32 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
       }),
     });
 
-    console.log('📡 Response status:', response.status, response.statusText);
+    console.log('Response status:', response.status, response.statusText);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('❌ NPC API Error:', response.status, errorData);
+      console.error(' NPC API Error:', response.status, errorData);
       
       // Return error but with fallback reply
       return {
         success: false,
         error: errorData.error || `HTTP ${response.status}`,
-        reply: `Lỗi từ server (${response.status}): ${errorData.error || response.statusText}. Vui lòng kiểm tra kết nối.`
+        reply: `Server error (${response.status}): ${errorData.error || response.statusText}. Please check your connection.`
       };
     }
 
     const data = await response.json();
 
-    console.log('📦 Response data:', data);
+    console.log('Response data:', data);
 
     if (data.reply) {
-      console.log('✅ NPC Reply:', data.reply);
+      console.log(' NPC Reply:', data.reply);
       return {
         success: true,
         reply: data.reply
       };
     } else if (data.error) {
-      console.error('❌ NPC Error:', data.error);
+      console.error(' NPC Error:', data.error);
       return {
         success: false,
         error: data.error,
@@ -89,16 +89,16 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
     }
 
   } catch (error) {
-    console.error('❌ NPC Service Error:', error.message);
+    console.error(' NPC Service Error:', error.message);
     console.error('Error details:', error);
     
     // Determine error type
-    let userFriendlyMessage = 'Không thể kết nối với NPC. Vui lòng thử lại.';
+    let userFriendlyMessage = 'Cannot connect to NPC. Please try again.';
     
     if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
-      userFriendlyMessage = 'Lỗi kết nối: CORS policy. Kiểm tra lại edge function configuration.';
+      userFriendlyMessage = 'Connection error: CORS policy. Please check edge function configuration.';
     } else if (error.message.includes('timeout')) {
-      userFriendlyMessage = 'Timeout: Edge Function không phản hồi. Thử lại sau.';
+      userFriendlyMessage = 'Timeout: Edge Function not responding. Please try again later.';
     }
     
     return {
@@ -126,7 +126,7 @@ export async function getNPCHint(problemDescription = '', userCode = '') {
  * @returns {Promise<{success: boolean, reply: string}>}
  */
 export async function getNPCCodeFeedback(problemDescription = '', userCode = '') {
-  return getNPCResponse('Bạn có nhận xét gì về code của tôi không?', problemDescription, userCode);
+  return getNPCResponse('Do you have any feedback on my code?', problemDescription, userCode);
 }
 
 /**
@@ -138,8 +138,8 @@ export async function getNPCCodeFeedback(problemDescription = '', userCode = '')
  */
 export async function getNPCErrorHelp(errorMessage = '', problemDescription = '', userCode = '') {
   const message = errorMessage 
-    ? `Tôi gặp lỗi: "${errorMessage}". Bạn có thể giúp tôi không?`
-    : 'Tôi không hiểu tại sao code của tôi không chạy được?';
+    ? `I encountered an error: "${errorMessage}". Can you help me?`
+    : "I don't understand why my code isn't running.";
   
   return getNPCResponse(message, problemDescription, userCode);
 }

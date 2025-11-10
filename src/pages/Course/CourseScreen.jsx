@@ -136,7 +136,7 @@ export default function CourseScreen() {
     fetchLessons();
   }, [courseId]);
 
-  if (courseLoading || !course) return <div>Loading...</div>;
+  if (courseLoading || !course) return <LoadingScreen isVisible={true} message="Loading course..." />;
 
   const completedCount = Object.values(completedLessons).filter(Boolean).length;
   const progressPercentage = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;

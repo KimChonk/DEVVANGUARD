@@ -40,7 +40,7 @@ export async function executeCode(language, code, input = "") {
       throw new Error("Language parameter is required for code execution");
     }
     
-    console.log(`🚀 Executing ${language} code via Piston API...`);
+    console.log(` Executing ${language} code via Piston API...`);
     const startTime = performance.now();
 
     const pistonLang = LANGUAGE_MAP[language] || language;
@@ -76,7 +76,7 @@ export async function executeCode(language, code, input = "") {
     const endTime = performance.now();
     const executionTime = Math.round(endTime - startTime);
 
-    console.log("✅ Piston API Response:", result);
+    console.log("Piston API Response:", result);
 
     // Extract output from result
     const stdout = result.run?.stdout || "";
@@ -84,7 +84,7 @@ export async function executeCode(language, code, input = "") {
     const exitCode = result.run?.code || 0;
 
     if (stderr) {
-      console.error("❌ Stderr:", stderr);
+      console.error("Stderr:", stderr);
       return {
         success: false,
         stdout: stdout,
@@ -104,7 +104,7 @@ export async function executeCode(language, code, input = "") {
       executionTime: executionTime,
     };
   } catch (error) {
-    console.error("❌ Piston API Error:", error);
+    console.error("Piston API Error:", error);
     return {
       success: false,
       stdout: "",
@@ -208,20 +208,16 @@ export function validateTestCases(actualOutput, testCases) {
 export function formatTestResults(validationResult) {
   const { passed, total, results } = validationResult;
 
-  let output = `\n📊 Test Results: ${passed}/${total} passed\n`;
-  output += "=".repeat(40) + "\n\n";
+  let output = `\nTest Results: ${passed}/${total} passed\n`;
 
   results.forEach((result) => {
-    const status = result.passed ? "✅ PASS" : "❌ FAIL";
+    const status = result.passed ? "PASS" : "FAIL";
     output += `${status}: ${result.name}\n`;
 
-    if (result.description) {
-      output += `  Description: ${result.description}\n`;
+    if (!result.passed) {
+      output += `  Expected: ${result.expected}\n`;
+      output += `  Actual:   ${result.actual}\n`;
     }
-
-    output += `  Expected: ${result.expected}\n`;
-    output += `  Actual:   ${result.actual}\n`;
-    output += "\n";
   });
 
   return output;
@@ -242,13 +238,11 @@ export async function executeAndValidate(language, code, testCases = []) {
       execution: { success: false, stdout: "", stderr: "Language parameter is required" },
       validation: { passed: 0, total: 0, results: [] },
       passed: false,
-      message: "❌ Lỗi: Ngôn ngữ lập trình không được xác định",
+      message: " Error: Language parameter is required",
       output: "Error: Language parameter is required",
       formattedResults: "",
     };
   }
-
-  console.log(`📝 Starting code execution with language: ${language}`);
   
   // Filter only public test cases
   const publicTests = testCases.filter(tc => !tc.hidden);
@@ -351,8 +345,8 @@ export async function executeAndValidate(language, code, testCases = []) {
     validation,
     passed: allPassed,
     message: allPassed
-      ? `🎉 All ${publicTests.length} tests passed!`
-      : `❌ ${publicTests.length - passedCount} test(s) failed`,
+      ? `All ${publicTests.length} tests passed!`
+      : `${publicTests.length - passedCount} test(s) failed`,
     output: allOutputs,
     formattedResults: formatTestResults(validation),
   };

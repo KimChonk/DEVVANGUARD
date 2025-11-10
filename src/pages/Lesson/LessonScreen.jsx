@@ -44,7 +44,7 @@ export default function LessonScreen() {
   const [error, setError] = useState(null);
 
   const [code, setCode] = useState("");
-  const [output, setOutput] = useState("Kết quả sẽ hiển thị ở đây...");
+  const [output, setOutput] = useState("Output will display here...");
   const [isRunning, setIsRunning] = useState(false);
   const [testResults, setTestResults] = useState(null);
   const [executionTime, setExecutionTime] = useState(0);
@@ -488,22 +488,6 @@ export default function LessonScreen() {
             <div className="editor-header-right">
               <button
                 className="icon-btn"
-                onClick={() => navigate(-1)}
-                aria-label="Back"
-              >
-                ← Back
-              </button>
-
-              <button
-                className="icon-btn"
-                onClick={() => navigate(1)}
-                aria-label="Forward"
-              >
-                Forward →
-              </button>
-
-              <button
-                className="icon-btn"
                 onClick={() => setIsFullscreenEditor(!isFullscreenEditor)}
                 aria-label={isFullscreenEditor ? "Exit Fullscreen" : "Fullscreen"}
               >
@@ -600,13 +584,13 @@ export default function LessonScreen() {
               <div className="results-header">
                 {testResults.success ? (
                   <>
-                    <span className="result-icon">Success!</span>
-                    <span>ALL TESTS PASSED!</span>
+                    <span className="result-icon success-icon">✓</span>
+                    <span className="result-text">ALL TESTS PASSED</span>
                   </>
                 ) : (
                   <>
-                    <span className="result-icon">Failed</span>
-                    <span>{testResults.passed}/{testResults.total} Tests Passed</span>
+                    <span className="result-icon fail-icon">✗</span>
+                    <span className="result-text">{testResults.passed}/{testResults.total} Tests Passed</span>
                   </>
                 )}
               </div>
@@ -614,14 +598,10 @@ export default function LessonScreen() {
                 <div className="results-body">
                   {testResults.results.map((result, idx) => (
                     <div key={idx} className={`result-item ${result.passed ? 'pass' : 'fail'}`}>
-                      <span className="result-status">{result.passed ? "Pass" : "Fail"}</span>
+                      <span className={`result-badge ${result.passed ? 'pass' : 'fail'}`}>
+                        {result.passed ? '✓' : '✗'}
+                      </span>
                       <span className="result-name">Test {idx + 1}</span>
-                      {!result.passed && (
-                        <div className="result-details">
-                          <div>Expected: <code>{result.expected}</code></div>
-                          <div>Got: <code>{result.actual}</code></div>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>

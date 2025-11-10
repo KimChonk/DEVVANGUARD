@@ -571,3 +571,79 @@ export const userStatsService = {
     }
   },
 };
+
+// ========== LESSON HINT SERVICES ==========
+export const lessonHintService = {
+  // Lấy tất cả hints
+  async getAllHints() {
+    try {
+      const hints = await apiCall("/lessonhint");
+      const mappedHints = Array.isArray(hints) ? hints.map(hint => ({
+        hintId: hint.hintId,
+        lessonId: hint.lessonId,
+        title: hint.title,
+        content: hint.content,
+        createdAt: hint.createdAt,
+        updatedAt: hint.updatedAt
+      })) : [];
+      return { success: true, data: mappedHints };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Lấy hints theo lesson ID
+  async getHintsByLessonId(lessonId) {
+    try {
+      const hints = await apiCall(`/lessonhint/lesson/${lessonId}`);
+      const mappedHints = Array.isArray(hints) ? hints.map(hint => ({
+        hintId: hint.hintId,
+        lessonId: hint.lessonId,
+        title: hint.title,
+        content: hint.content,
+        createdAt: hint.createdAt,
+        updatedAt: hint.updatedAt
+      })) : [];
+      return { success: true, data: mappedHints };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Tạo hint mới
+  async createHint(lessonId, title, content) {
+    try {
+      const hint = await apiCall("/lessonhint", "POST", {
+        lessonId,
+        title,
+        content
+      });
+      return { success: true, data: hint };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Cập nhật hint
+  async updateHint(hintId, title, content) {
+    try {
+      const hint = await apiCall(`/lessonhint/${hintId}`, "PUT", {
+        title,
+        content
+      });
+      return { success: true, data: hint };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Xóa hint
+  async deleteHint(hintId) {
+    try {
+      await apiCall(`/lessonhint/${hintId}`, "DELETE");
+      return { success: true, message: "Hint deleted successfully" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+};

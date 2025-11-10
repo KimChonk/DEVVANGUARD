@@ -55,6 +55,12 @@ export default function CodeEditor({
       return;
     });
 
+    // Chặn Ctrl+X (Cut)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX, () => {
+      // Không làm gì - chặn cut
+      return;
+    });
+
     // Chặn Ctrl+V (Paste)
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, () => {
       // Không làm gì - chặn paste

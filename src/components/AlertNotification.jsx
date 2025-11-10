@@ -35,12 +35,12 @@ const AlertNotification = ({ isVisible, message, onClose, onClosedComplete }) =>
 
         {/* Alert Content */}
         <div className="alert-content">
-          <div className="alert-icon">⚠️</div>
-          <h2 className="alert-title">Bài Đã Hoàn Thành!</h2>
+          <div className="alert-icon"></div>
+          <h2 className="alert-title">You already completed this lesson</h2>
           <p className="alert-message">{message}</p>
           
           {/* Action Hint */}
-          <p className="alert-hint">💡 Hãy thử các bài khác để nâng cao kỹ năng!</p>
+          <p className="alert-hint">Try other lessons to improve your skills!</p>
         </div>
 
         {/* Decorative Elements */}

@@ -1,23 +1,22 @@
 /* Discussion Component Styles */
 
 :root {
-  --primary-gold: #d4af37;
-  --secondary-gold: #b8941f;
-  --dark-blue: #1a1a2e;
-  --medium-blue: #16213e;
-  --light-blue: #0f3460;
-  --text-light: #e8e8e8;
-  --text-gold: #f4e4bc;
+  --primary-blue: #3b82f6;
+  --primary-dark: #1e293b;
+  --primary-light: #0f172a;
+  --text-light: #e2e8f0;
+  --text-muted: #cbd5e0;
+  --border-color: rgba(59, 130, 246, 0.2);
 }
 
 .discussion-container {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
-  background: rgba(26, 26, 46, 0.7);
+  background: rgba(15, 23, 42, 0.8);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
 }
 
@@ -27,14 +26,14 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .discussion-header h2 {
   margin: 0;
-  color: var(--text-gold);
+  color: var(--text-light);
   font-size: 24px;
-  font-family: "MedievalSharp", cursive;
+  font-weight: 700;
 }
 
 /* Buttons */
@@ -50,45 +49,47 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-gold);
-  color: var(--dark-blue);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--secondary-gold);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
 }
 
 .btn-success {
-  background-color: #4caf50;
+  background-color: #10b981;
   color: white;
 }
 
 .btn-success:hover:not(:disabled) {
-  background-color: #45a049;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  background-color: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .btn-secondary {
-  background-color: rgba(212, 175, 55, 0.2);
-  color: var(--text-gold);
-  border: 1px solid var(--primary-gold);
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: rgba(212, 175, 55, 0.3);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+  background-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .btn-danger {
-  background-color: #ff6b6b;
+  background-color: #ef4444;
   color: white;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #ff5252;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  background-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .btn:disabled {
@@ -103,7 +104,7 @@
   font-size: 16px;
   padding: 5px 8px;
   transition: transform 0.2s ease;
-  color: var(--text-gold);
+  color: var(--text-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,30 +112,29 @@
 
 .btn-icon:hover {
   transform: scale(1.2);
-  color: var(--primary-gold);
+  color: var(--primary-blue);
 }
 
 .icon-img {
   width: 18px;
   height: 18px;
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(75%) sepia(62%) saturate(360%) hue-rotate(7deg) brightness(101%) contrast(98%);
 }
 
 /* Create Post Form */
 .create-post-form {
-  background: rgba(22, 33, 62, 0.5);
+  background: rgba(30, 41, 59, 0.8);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--border-color);
 }
 
 .create-post-form h3 {
   margin-top: 0;
-  color: var(--text-gold);
-  font-family: "MedievalSharp", cursive;
+  color: var(--text-light);
+  font-weight: 700;
 }
 
 .create-post-form form {
@@ -146,30 +146,58 @@
 .create-post-form input,
 .create-post-form textarea {
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   font-family: inherit;
   font-size: 14px;
   resize: vertical;
+  background: rgba(15, 23, 42, 0.8);
+  color: var(--text-light);
 }
 
 .create-post-form input:focus,
 .create-post-form textarea:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .create-post-form button {
   align-self: flex-start;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.create-post-form button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
+}
+
+.create-post-form button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+.create-post-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Error and Loading Messages */
 .error-message {
-  background-color: rgba(255, 107, 107, 0.2);
-  color: #ff9999;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
   padding: 12px 16px;
-  border: 1px solid rgba(255, 107, 107, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 5px;
   margin-bottom: 15px;
 }
@@ -179,7 +207,7 @@
 .discussion-message {
   text-align: center;
   padding: 40px 20px;
-  color: rgba(232, 232, 232, 0.6);
+  color: var(--text-muted);
   font-size: 16px;
 }
 
@@ -192,17 +220,17 @@
 
 /* Post Card */
 .post-card {
-  background: rgba(22, 33, 62, 0.6);
+  background: rgba(30, 41, 59, 0.8);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
   transition: all 0.3s ease;
-  border: 1px solid rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--border-color);
 }
 
 .post-card:hover {
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
-  border-color: rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
 }
 
 .post-header {
@@ -218,14 +246,14 @@
 
 .post-card h3 {
   margin: 0 0 5px 0;
-  color: var(--text-gold);
+  color: var(--text-light);
   font-size: 18px;
   font-weight: 600;
 }
 
 .post-meta {
   margin: 0;
-  color: rgba(232, 232, 232, 0.5);
+  color: var(--text-muted);
   font-size: 12px;
 }
 
@@ -249,7 +277,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  border-top: 1px solid var(--border-color);
 }
 
 .post-stats {
@@ -463,8 +491,27 @@
 
 .create-comment-form button {
   align-self: flex-start;
-  padding: 8px 16px;
-  font-size: 13px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.create-comment-form button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.create-comment-form button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 /* Responsive Design */
