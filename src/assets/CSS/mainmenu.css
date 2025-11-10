@@ -676,6 +676,7 @@
 }
 
 .course-label {
+  display: none;
   font-size: 0.7rem;
   color: var(--primary-gold);
   font-weight: 700;
@@ -719,6 +720,7 @@
 }
 
 .course-level-badge i {
+  display: none;
   color: var(--primary-gold);
   font-size: 0.9rem;
 }

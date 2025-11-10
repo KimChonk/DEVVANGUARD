@@ -454,6 +454,15 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+.facebook-btn {
+    background: linear-gradient(135deg, #1877F2 0%, #0A66C2 100%);
+    color: white;
+}
+
+.facebook-btn:hover {
+    background: rgba(24, 119, 242, 0.1);
+}
+
 /* ===== AUTHENTICATION FOOTER ===== */
 .auth-footer {
     text-align: center;

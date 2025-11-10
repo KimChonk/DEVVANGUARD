@@ -4,6 +4,7 @@ import { useCourses } from "../../hooks/useCourses";
 import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
 import { authService } from "../../services/supabaseClient";
 import LoadingScreen from "../../components/LoadingScreen";
+import InteractiveGreeting from "../../components/InteractiveGreeting";
 import "../../assets/CSS/mainmenu.css";
 
 // Map course names to their image files
@@ -258,20 +259,8 @@ export default function MainMenu() {
 
       {/* Main Content */}
       <div className="main-content-wrapper">
-        {/* Compni Greeting Section */}
-        <div className="compni-greeting-section">
-          <img 
-            src="/images/compni.png" 
-            alt="Compni" 
-            className="compni-character"
-            onError={(e) => {
-              e.target.style.display = "none";
-            }}
-          />
-          <div className="greeting-bubble">
-            <p className="greeting-text">{compniGreeting}</p>
-          </div>
-        </div>
+        {/* Interactive Greeting Section */}
+        <InteractiveGreeting />
 
         {/* User Profile Card - Right Side */}
         <div className="user-profile-card">
