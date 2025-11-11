@@ -10,7 +10,6 @@ export const LANGUAGE_VERSIONS = {
   java: "15.0.2",
   c: "10.2.0",
   cpp: "10.2.0",
-  csharp: "11.0.0",
   go: "1.20.0",
   rust: "1.70.0",
 };
@@ -22,7 +21,6 @@ const LANGUAGE_MAP = {
   java: "java",
   c: "c",
   cpp: "cpp",
-  csharp: "csharp",
   go: "go",
   rust: "rust",
 };
