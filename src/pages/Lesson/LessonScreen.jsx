@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
+import { lessonService, userProgressService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
 import { convertDbToEditorLanguage, convertDbToPistonLanguage, getLanguageDisplayName } from "../../utils/languageMapping";
-import { formatProblemDescription } from "../../utils/problemDescriptionParser";
 import NPCChat from "../../components/NPCChat";
 import CodeEditor from "../../components/CodeEditor";
 import ProblemDescription from "../../components/ProblemDescription";
@@ -12,28 +11,6 @@ import SuccessNotification from "../../components/SuccessNotification";
 import AlertNotification from "../../components/AlertNotification";
 import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/lessongame.css";
-
-// SVG Icons
-const ExpandIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-  </svg>
-);
-const CompressIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-     <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-14v3h3v2h-5V5z"/>
-  </svg>
-);
-const ChevronUpIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/>
-  </svg>
-);
-const ChevronDownIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>
-  </svg>
-);
 
 // NPC feedback for different lesson types
 const npcFeedback = {
@@ -67,14 +44,10 @@ export default function LessonScreen() {
   const [error, setError] = useState(null);
 
   const [code, setCode] = useState("");
-  const [output, setOutput] = useState("Result will show here...");
+  const [output, setOutput] = useState("Output will display here...");
   const [isRunning, setIsRunning] = useState(false);
   const [testResults, setTestResults] = useState(null);
   const [executionTime, setExecutionTime] = useState(0);
-  
-  // Hints state
-  const [hints, setHints] = useState([]);
-  const [hintsLoading, setHintsLoading] = useState(false);
   
   // NPC Guide states
   const [npcMessage, setNpcMessage] = useState("");
@@ -100,41 +73,20 @@ export default function LessonScreen() {
   // Sidebar panel state
   const [activeSidebarTab, setActiveSidebarTab] = useState(null); // null, 'description', 'discussion', 'hints', 'npc'
 
-  // Editor and Console layout states
-  const [isEditorFolded, setIsEditorFolded] = useState(false);
-  const [isEditorMaximized, setIsEditorMaximized] = useState(false);
-  const [isConsoleFolded, setIsConsoleFolded] = useState(false);
-  const [isConsoleMaximized, setIsConsoleMaximized] = useState(false);
+  // Resizable state
+  const [isResizingHorizontal, setIsResizingHorizontal] = useState(false);
+  const [isResizingVertical, setIsResizingVertical] = useState(false);
 
-  // Layout Refs
-  const mainContainerRef = useRef(null);
-  const leftPanelRef = useRef(null);
-  const rightColumnRef = useRef(null); // Ref cho cột phải
-  const codeContainerRef = useRef(null); // Ref cho panel code (trên)
-  const testContainerRef = useRef(null); // Ref cho panel console (dưới)
+  // Fullscreen state
+  const [isFullscreenEditor, setIsFullscreenEditor] = useState(false);
 
-  // Resizer refs and states
-  const verticalResizerRef = useRef(null);
-  const horizontalResizerRef = useRef(null);
-  const isVerticalResizing = useRef(false);
-  const isHorizontalResizing = useRef(false);
-
-  // Layout state
-  const [leftPanelWidth, setLeftPanelWidth] = useState("1fr"); // '1fr' là giá trị mặc định
-
-  // Right column (code editor + console) resizing state
-  const [topRightPanelHeight, setTopRightPanelHeight] = useState('60%');
-
-
-
-  
   // Fetch lesson data
   useEffect(() => {
     const fetchLesson = async () => {
       try {
         setLoading(true);
         setError(null);
-        console.log(` Fetching lesson ${lessonId}...`);
+        console.log(`🔄 Fetching lesson ${lessonId}...`);
         const result = await lessonService.getLessonById(lessonId);
         
         if (result.success) {
@@ -150,30 +102,18 @@ export default function LessonScreen() {
           const progressResult = await userProgressService.getUserProgressByLessonId(lessonId);
           if (progressResult.success && progressResult.data) {
             setUserProgress(progressResult.data);
-            console.log(" User progress:", progressResult.data);
+            console.log("✓ User progress:", progressResult.data);
           }
-
-          // Fetch hints for this lesson
-          setHintsLoading(true);
-          const hintsResult = await lessonHintService.getHintsByLessonId(lessonId);
-          if (hintsResult.success) {
-            setHints(hintsResult.data || []);
-            console.log(" Hints fetched:", hintsResult.data);
-          } else {
-            console.warn(" Could not fetch hints:", hintsResult.message);
-            setHints([]);
-          }
-          setHintsLoading(false);
           
           // Show welcome message
           setNpcStatus("welcome");
           setShowNpc(true);
         } else {
-          console.error(" Fetch failed:", result.message);
+          console.error("✗ Fetch failed:", result.message);
           setError(result.message);
         }
       } catch (err) {
-        console.error(" Error:", err);
+        console.error("✗ Error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -196,6 +136,74 @@ export default function LessonScreen() {
     
     return npcFeedback.default;
   };
+
+  // Handle horizontal resize (left/right panels)
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizingHorizontal) return;
+      
+      const main = document.querySelector('.leetcode-main');
+      const problemPanel = document.querySelector('.problem-panel');
+      if (!main || !problemPanel) return;
+
+      const mainRect = main.getBoundingClientRect();
+      const newWidth = e.clientX - mainRect.left;
+      const percentage = (newWidth / mainRect.width) * 100;
+
+      // Constrain between 25% and 70%
+      if (percentage >= 25 && percentage <= 70) {
+        problemPanel.style.flex = `0 0 ${percentage}%`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingHorizontal(false);
+    };
+
+    if (isResizingHorizontal) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingHorizontal]);
+
+  // Handle vertical resize (code editor/output)
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizingVertical) return;
+      
+      const editorPanel = document.querySelector('.editor-panel');
+      const outputPanel = document.querySelector('.output-panel');
+      if (!editorPanel || !outputPanel) return;
+
+      const editorRect = editorPanel.getBoundingClientRect();
+      const newHeight = editorRect.bottom - e.clientY;
+      const percentage = (newHeight / editorRect.height) * 100;
+
+      // Constrain between 15% and 60%
+      if (percentage >= 15 && percentage <= 60) {
+        outputPanel.style.flex = `0 0 ${percentage}%`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingVertical(false);
+    };
+
+    if (isResizingVertical) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingVertical]);
 
   // Parse test cases
   const getTestCases = () => {
@@ -310,112 +318,8 @@ export default function LessonScreen() {
   };
 
 
-  const toggleEditorFold = () => {
-    if (!isEditorFolded) {
-      if (isEditorMaximized) setIsEditorMaximized(false);
-      if (isConsoleFolded) setIsConsoleFolded(false); // Mở panel kia
-    }
-    setIsEditorFolded(!isEditorFolded);
-  };
-  const toggleEditorMaximize = () => {
-    if (!isEditorMaximized) {
-      setIsEditorFolded(false);
-      setIsConsoleMaximized(false);
-    }
-    setIsEditorMaximized(!isEditorMaximized);
-  };
-  const toggleConsoleFold = () => {
-    if (!isConsoleFolded) {
-      if (isConsoleMaximized) setIsConsoleMaximized(false);
-      if (isEditorFolded) setIsEditorFolded(false); // Mở panel kia
-    }
-    setIsConsoleFolded(!isConsoleFolded);
-  };
-  const toggleConsoleMaximize = () => {
-    if (!isConsoleMaximized) {
-      setIsConsoleFolded(false);
-      setIsEditorMaximized(false);
-    }
-    setIsConsoleMaximized(!isConsoleMaximized);
-  };
-
-  const handleVerticalMouseDown = useCallback((e) => {
-    e.preventDefault();
-    isVerticalResizing.current = true;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-
-    const startX = e.clientX;
-    const startWidth = leftPanelRef.current.getBoundingClientRect().width;
-    const containerWidth = mainContainerRef.current.getBoundingClientRect().width;
-
-    const doDrag = (moveEvent) => {
-      if (!isVerticalResizing.current) return;
-      const newWidth = startWidth + (moveEvent.clientX - startX);
-      if (newWidth >= 300 && newWidth <= containerWidth - 300) {
-        leftPanelRef.current.style.flexBasis = `${newWidth}px`;
-      }
-    };
-    const stopDrag = () => {
-      isVerticalResizing.current = false;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      window.removeEventListener('mousemove', doDrag);
-      window.removeEventListener('mouseup', stopDrag);
-    };
-    window.addEventListener('mousemove', doDrag);
-    window.addEventListener('mouseup', stopDrag);
-  }, []);
-
-  const handleHorizontalMouseDown = useCallback((e) => {
-    e.preventDefault();
-        if (!testContainerRef.current || !rightColumnRef.current) return;
-
-        // Tự động mở Test Case nếu đang kéo khi nó đóng
-        if (isConsoleFolded) {
-            setIsConsoleFolded(false);
-        }
-
-        const startY = e.clientY;
-        const startHeight = testContainerRef.current.getBoundingClientRect().height;
-        const containerHeight = rightColumnRef.current.getBoundingClientRect().height;
-        
-        // --- LOGIC MỚI ---
-        const minHeightFolded = 45;   // Chiều cao tối thiểu (chiều cao của header khi đã gập)
-        const minHeightBeforeFold = 80; // Ngưỡng để kích hoạt gập tự động
-
-        document.body.style.cursor = 'row-resize';
-        document.body.style.userSelect = 'none';
-
-        const doDrag = (moveEvent) => {
-            const deltaY = startY - moveEvent.clientY; // Dương khi kéo LÊN
-            const newHeight = startHeight + deltaY;
-
-            // 1. Nếu đang kéo XUỐNG và chiều cao thấp hơn ngưỡng -> TỰ ĐỘNG GẬP
-            if (!isConsoleFolded && newHeight < minHeightBeforeFold) {
-                setIsConsoleFolded(true); // Kích hoạt trạng thái gập
-                stopDrag(); // Dừng kéo ngay lập tức
-            } 
-            // 2. Nếu kéo lên hoặc kéo xuống bình thường (vẫn trên ngưỡng)
-            else if (newHeight >= minHeightFolded && newHeight <= containerHeight * 0.8) {
-                testContainerRef.current.style.flexBasis = `${newHeight}px`;
-            }
-        };
-
-        const stopDrag = () => {
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-            window.removeEventListener('mousemove', doDrag);
-            window.removeEventListener('mouseup', stopDrag);
-        };
-
-        window.addEventListener('mousemove', doDrag);
-        window.addEventListener('mouseup', stopDrag);
-    }, [isConsoleFolded]);
-
 
   const testCases = getTestCases();
-  const publicTests = testCases.filter(tc => !tc.hidden);
 
   return (
     <div className="lesson-screen-leetcode">
@@ -439,12 +343,9 @@ export default function LessonScreen() {
       </header>
 
       {/* Main Container */}
-      <div className={`leetcode-main ${isEditorMaximized || isConsoleMaximized ? 'maximized-mode' : ''}`}
-        ref={mainContainerRef}
-        // style={{ gridTemplateColumns: `${leftPanelWidth} 10px 1fr` }}
-        >
+      <div className="leetcode-main">
         {/* Left: Problem Description + Sidebar Tabs */}
-        <div className="problem-panel" ref={leftPanelRef} style={{ flex: '0 0 50%' }}>
+        <div className="problem-panel">
           {/* Tab Buttons */}
           <div className="sidebar-tabs">
             <button
@@ -489,7 +390,29 @@ export default function LessonScreen() {
                   </div>
 
                   {/* Test Cases Preview */}
-                  
+                  {testCases.length > 0 && (
+                    <div className="test-cases-section">
+                      {(() => {
+                        const publicTests = testCases.filter(tc => !tc.hidden);
+                        return (
+                          <>
+                            <h3>Test Cases ({publicTests.length})</h3>
+                            <div className="test-cases-list">
+                              {publicTests.slice(0, 5).map((tc, idx) => (
+                                <div key={idx} className="test-case-item">
+                                  <div className="test-label">Example {idx + 1}:</div>
+                                  <div className="test-io">
+                                    <div><strong>Input:</strong> <code>{tc.input || "N/A"}</code></div>
+                                    <div><strong>Output:</strong> <code>{tc.expected || tc.expected_output || "N/A"}</code></div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -507,23 +430,22 @@ export default function LessonScreen() {
                 <div className="hints-box">
                   <h2>Hints & Tips</h2>
                   <div className="hints-content">
-                    {hintsLoading ? (
-                      <div className="loading-message">Loading hints...</div>
-                    ) : hints && hints.length > 0 ? (
-                      hints.map((hint, index) => (
-                        <div key={hint.hintId || index} className="hint-item">
-                          <h3>{hint.title}</h3>
-                          <div 
-                            className="hint-content-formatted"
-                            dangerouslySetInnerHTML={{ __html: formatProblemDescription(hint.content) }}
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <div className="no-hints-message">
-                        <p>No hints available for this lesson yet.</p>
-                      </div>
-                    )}
+                    <div className="hint-item">
+                      <h3>Step 1: Read the Problem Carefully</h3>
+                      <p>Make sure you understand all the requirements before you start coding.</p>
+                    </div>
+                    <div className="hint-item">
+                      <h3>Step 2: Plan Your Approach</h3>
+                      <p>Write down the steps to solve the problem before you start coding.</p>
+                    </div>
+                    <div className="hint-item">
+                      <h3>Step 3: Write Code Step by Step</h3>
+                      <p>Write code in small parts and test each part to find bugs more easily.</p>
+                    </div>
+                    <div className="hint-item">
+                      <h3>Hint for this problem:</h3>
+                      <p>{getFeedback().hint}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -547,212 +469,145 @@ export default function LessonScreen() {
             )}
           </div>
         </div>
-        
-        <div 
-          className="vertical-resizer-handle"
-          onMouseDown={handleVerticalMouseDown}
-        >
-        </div>
 
+        {/* Horizontal Resize Divider */}
         <div 
-          className="right-column-container" 
-          ref={rightColumnRef} /* Đổi ref ở đây */
-          style={{ gridTemplateRows: `${topRightPanelHeight} 10px 1fr` }} /* Style ở đây */
-        >
+          className="resize-divider-horizontal"
+          onMouseDown={() => setIsResizingHorizontal(true)}
+          style={{ display: isFullscreenEditor ? 'none' : 'block' }}
+        ></div>
+
         {/* Right: Code Editor */}
-          <div 
-            className={`editor-panel ${isEditorMaximized ? 'maximized' : ''} ${isEditorFolded ? 'folded' : ''}`}
-            ref={codeContainerRef}
-            style={{ flex: '1 1 60%' }} // Style flex mặc định
-          >
-            {/* Editor Header with Language and Buttons */}
-            <div className="editor-header">
-              <div className="editor-header-left">
-                <h2>Code Editor</h2>
-                <span className="lang-badge">{getLanguageDisplayName(lesson?.course?.language)}</span>
-              </div>
-              <div className="editor-header-right">
-                  <button onClick={toggleEditorMaximize} className="control-btn" title="Maximize/Restore">
-                      {isEditorMaximized ? <CompressIcon /> : <ExpandIcon />}
-                  </button>
-                  <button onClick={toggleEditorFold} className="control-btn" title="Fold/Unfold">
-                      {isEditorFolded ? <ChevronDownIcon /> : <ChevronUpIcon />}
-                  </button>
-              </div>
+        <div className={`editor-panel ${isFullscreenEditor ? 'fullscreen' : ''}`}>
+          {/* Editor Header with Language and Buttons */}
+          <div className="editor-header">
+            <div className="editor-header-left">
+              <h2>Code Editor</h2>
+              <span className="lang-badge">{getLanguageDisplayName(lesson?.course?.language)}</span>
             </div>
+            <div className="editor-header-right">
+              <button
+                className="icon-btn"
+                onClick={() => setIsFullscreenEditor(!isFullscreenEditor)}
+                aria-label={isFullscreenEditor ? "Exit Fullscreen" : "Fullscreen"}
+              >
+                {isFullscreenEditor ? "⛶ Exit" : "⛶ Fullscreen"}
+              </button>
 
-            {/* Code Editor */}
-            <div className={`editor-content-wrapper ${isEditorFolded ? 'hidden' : ''}`}>
-            <div className="code-editor-container">
-              <CodeEditor 
-                code={code}
-                onChange={setCode}
-                language={convertDbToEditorLanguage(lesson?.course?.language)}
+              <button
+                className="btn btn-run"
+                onClick={handleRunCode}
                 disabled={isRunning}
-                onSave={handleRunCode}
-              />
+                title="Run test cases"
+              >
+                ▶ {isRunning ? "Running..." : "Run"}
+              </button>
+              
+              <button
+                className="btn btn-submit"
+                onClick={async () => {
+                  if (!testResults?.success) {
+                    alert("Please make sure all test cases pass!");
+                    return;
+                  }
 
-              <div className="code-editor-actions">
-                <button
-                  className="btn btn-run"
-                  onClick={handleRunCode}
-                  disabled={isRunning}
-                  title="Run test cases"
-                >
-                  {isRunning ? "Running..." : "Run Code"}
-                </button>
-                
-                <button
-                  className="btn btn-submit"
-                  onClick={async () => {
-                    if (!testResults?.success) {
-                      alert("Please make sure all test cases pass!");
-                      return;
-                    }
+                  // Check if lesson already completed BEFORE submitting
+                  if (userProgress && userProgress.status === "completed") {
+                    setAlertMessage("This lesson is already completed!\nYou cannot submit again and will not receive additional XP.");
+                    setShowAlertNotification(true);
+                    return;
+                  }
 
-                    // Check if lesson already completed BEFORE submitting
-                    if (userProgress && userProgress.status === "completed") {
+                  // Submit lesson to backend
+                  const result = await userProgressService.submitLesson(lessonId);
+                  
+                  if (result.success) {
+                    const { xpReward, totalXp } = result.data;
+                    setSuccessXpReward(xpReward);
+                    setSuccessMessage(`You completed this lesson!\nTotal XP: ${totalXp}`);
+                    setShowSuccessNotification(true);
+                    
+                    // Navigate after success animation completes
+                    setTimeout(() => {
+                      navigate(-1);
+                    }, 3600);
+                  } else {
+                    // Check if lesson was already completed
+                    if (result.data?.alreadyCompleted) {
                       setAlertMessage("This lesson is already completed!\nYou cannot submit again and will not receive additional XP.");
                       setShowAlertNotification(true);
-                      return;
-                    }
-
-                    // Submit lesson to backend
-                    const result = await userProgressService.submitLesson(lessonId);
-                    
-                    if (result.success) {
-                      const { xpReward, totalXp } = result.data;
-                      setSuccessXpReward(xpReward);
-                      setSuccessMessage(`You completed this lesson!\nTotal XP: ${totalXp}`);
-                      setShowSuccessNotification(true);
-                      
-                      // Navigate after success animation completes
-                      setTimeout(() => {
-                        navigate(-1);
-                      }, 3600);
                     } else {
-                      // Check if lesson was already completed
-                      if (result.data?.alreadyCompleted) {
-                        setAlertMessage("This lesson is already completed!\nYou cannot submit again and will not receive additional XP.");
-                        setShowAlertNotification(true);
-                      } else {
-                        alert(`Error submitting lesson: ${result.message}`);
-                      }
+                      alert(`Error submitting lesson: ${result.message}`);
                     }
-                  }}
-                  disabled={isRunning || !testResults?.success}
-                  title="Submit when all tests pass"
-                >
-                  Submit
-                </button>
-              </div>
-                  
+                  }
+                }}
+                disabled={isRunning || !testResults?.success}
+                title="Submit when all tests pass"
+              >
+                ✓ Submit
+              </button>
             </div>
+          </div>
 
-            {/* Output Console */}
-            <div className="output-panel">
-              <div className="output-header">
-                <span className="output-label">Output</span>
-                <div className="output-info">
-                  <span className={`output-status ${isRunning ? 'running' : ''}`}>
-                    {isRunning ? "Running..." : "Ready"}
-                  </span>
-                  {executionTime > 0 && <span className="exec-time">Execution Time: {executionTime.toFixed(2)}ms</span>}
-                </div>
-              </div>
-              <pre className="output-content">{output}</pre>
+          {/* Code Editor */}
+          <div className="code-editor-container">
+            <CodeEditor 
+              code={code}
+              onChange={setCode}
+              language={convertDbToEditorLanguage(lesson?.course?.language)}
+              disabled={isRunning}
+              onSave={handleRunCode}
+            />
+          </div>
+
+          {/* Vertical Resize Divider */}
+          <div 
+            className="resize-divider-vertical"
+            onMouseDown={() => setIsResizingVertical(true)}
+          ></div>
+
+          {/* Output Console */}
+          <div className="output-panel">
+            <div className="output-header">
+              <span className="output-label">Output</span>
+              <span className={`output-status ${isRunning ? 'running' : ''}`}>
+                {isRunning ? "Running..." : "Ready"}
+              </span>
+              {executionTime > 0 && <span className="exec-time">{executionTime}ms</span>}
             </div>
+            <pre className="output-content">{output}</pre>
+          </div>
 
-            {/* Test Results */}
-            {testResults && (
-              <div className={`test-results ${testResults.success ? 'success' : 'failure'}`}>
-                <div className="results-header">
-                  {testResults.success ? (
-                    <>
-                      <span className="result-icon">Success!</span>
-                      <span>ALL TESTS PASSED!</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="result-icon">Failed</span>
-                      <span>{testResults.passed}/{testResults.total} Tests Passed</span>
-                    </>
-                  )}
-                </div>
-                {testResults.results && testResults.results.length > 0 && (
-                  <div className="results-body">
-                    {testResults.results.map((result, idx) => (
-                      <div key={idx} className={`result-item ${result.passed ? 'pass' : 'fail'}`}>
-                        <span className="result-status">{result.passed ? "Pass" : "Fail"}</span>
-                        <span className="result-name">Test {idx + 1}</span>
-                        {!result.passed && (
-                          <div className="result-details">
-                            <div>Expected: <code>{result.expected}</code></div>
-                            <div>Got: <code>{result.actual}</code></div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+          {/* Test Results */}
+          {testResults && (
+            <div className={`test-results ${testResults.success ? 'success' : 'failure'}`}>
+              <div className="results-header">
+                {testResults.success ? (
+                  <>
+                    <span className="result-icon success-icon">✓</span>
+                    <span className="result-text">ALL TESTS PASSED</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="result-icon fail-icon">✗</span>
+                    <span className="result-text">{testResults.passed}/{testResults.total} Tests Passed</span>
+                  </>
                 )}
               </div>
-            )}
-          </div>
-          </div>
-
-          {!isEditorFolded && !isEditorMaximized && !isConsoleMaximized && (
-          <div 
-            className="horizontal-resizer-handle"
-            // style={{ display: (isEditorFolded || isConsoleFolded || isEditorMaximized || isConsoleMaximized) ? 'none' : 'block' }}
-            onMouseDown={handleHorizontalMouseDown}
-          >
-          </div>
-          )}
-
-          <div 
-            className={`bottom-console-wrapper ${isConsoleMaximized ? 'maximized' : ''} ${isConsoleFolded ? 'folded' : ''}`}
-            ref={testContainerRef}
-            // style={{ flex: isEditorFolded ? '1 1 100%' : '1 1 40%' }}
-          >
-            <div className="console-header-controls">
-                <h3>Test Cases ({publicTests.length})</h3>
-                <div className="editor-header-right">
-                    <button onClick={toggleConsoleMaximize} className="control-btn" title="Maximize/Restore">
-                        {isConsoleMaximized ? <CompressIcon /> : <ExpandIcon />}
-                    </button>
-                    <button onClick={toggleConsoleFold} className="control-btn" title="Fold/Unfold">
-                        {isConsoleFolded ? <ChevronDownIcon /> : <ChevronUpIcon />}
-                    </button>
-                </div>
-            </div>
-
-                  <div className={`console-content-wrapper ${isConsoleFolded ? 'hidden' : ''}`}>
-                  {testCases.length > 0 && (
-                    <div className="test-cases-section">
-                      {(() => {
-                        
-                        return (
-                          <>
-                            
-                            <div className="test-cases-list">
-                              {publicTests.slice(0, 5).map((tc, idx) => (
-                                <div key={idx} className="test-case-item">
-                                  <div className="test-label">Example {idx + 1}:</div>
-                                  <div className="test-io">
-                                    <div><strong>Input:</strong> <code>{tc.input || "N/A"}</code></div>
-                                    <div><strong>Output:</strong> <code>{tc.expected || tc.expected_output || "N/A"}</code></div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </>
-                        );
-                      })()}
+              {testResults.results && testResults.results.length > 0 && (
+                <div className="results-body">
+                  {testResults.results.map((result, idx) => (
+                    <div key={idx} className={`result-item ${result.passed ? 'pass' : 'fail'}`}>
+                      <span className={`result-badge ${result.passed ? 'pass' : 'fail'}`}>
+                        {result.passed ? '✓' : '✗'}
+                      </span>
+                      <span className="result-name">Test {idx + 1}</span>
                     </div>
-                
-                  )}
+                  ))}
                 </div>
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

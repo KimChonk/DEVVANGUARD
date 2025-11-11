@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { userService, courseService, lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
 import { authService } from "../../services/supabaseClient";
+import LoadingScreen from "../../components/LoadingScreen";
 import "../../assets/CSS/admindashboard.css";
 
 export default function AdminDashboard() {
@@ -20,8 +21,8 @@ export default function AdminDashboard() {
   const [totalUsers, setTotalUsers] = useState(0);
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
-  const [users, setUsers] = useState([]);
   const [hints, setHints] = useState([]);
+  const [users, setUsers] = useState([]);
   const [userProgress, setUserProgress] = useState({});
 
   // UI states
@@ -30,8 +31,6 @@ export default function AdminDashboard() {
   const [showLessonForm, setShowLessonForm] = useState(false);
   const [showHintForm, setShowHintForm] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [selectedLesson, setSelectedLesson] = useState(null);
-  const [editingHint, setEditingHint] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -54,10 +53,13 @@ export default function AdminDashboard() {
 
   const [hintForm, setHintForm] = useState({
     lessonId: "",
-    title: "",
-    content: "",
-    orderIndex: ""
+    hintTitle: "",
+    hintContent: ""
   });
+
+  const [editingHintId, setEditingHintId] = useState(null);
+  const [editingLessonId, setEditingLessonId] = useState(null);
+  const [editingCourseId, setEditingCourseId] = useState(null);
 
   // Fetch all data
   useEffect(() => {
@@ -125,19 +127,31 @@ export default function AdminDashboard() {
 
     try {
       setLoading(true);
-      const result = await courseService.createCourse(
-        courseForm.name,
-        courseForm.language,
-        courseForm.description
-      );
+      let result;
+
+      if (editingCourseId) {
+        result = await courseService.updateCourse(
+          editingCourseId,
+          courseForm.name,
+          courseForm.language,
+          courseForm.description
+        );
+      } else {
+        result = await courseService.createCourse(
+          courseForm.name,
+          courseForm.language,
+          courseForm.description
+        );
+      }
 
       if (result.success) {
-        setMessage("✅ Tạo khóa học thành công!");
+        setMessage(editingCourseId ? "✅ Course updated successfully!" : "✅ Course created successfully!");
         setCourseForm({ name: "", language: "", description: "" });
+        setEditingCourseId(null);
         setShowCourseForm(false);
         fetchAllData();
       } else {
-        setMessage("Error: " + (result.message || "Unable to create course"));
+        setMessage("Error: " + (result.message || "Unable to save course"));
       }
     } catch (err) {
       setMessage("Error: " + err.message);
@@ -156,22 +170,36 @@ export default function AdminDashboard() {
 
     try {
       setLoading(true);
-      const result = await lessonService.createLesson(
-        lessonForm.courseId,
-        lessonForm.lessonTitle,
-        parseInt(lessonForm.lessonOrder) || 1,
-        lessonForm.problemDescription || null,
-        lessonForm.solutionTemplate || null,
-        lessonForm.testCases || null
-      );
+      let result;
+
+      if (editingLessonId) {
+        result = await lessonService.updateLesson(
+          editingLessonId,
+          lessonForm.lessonTitle,
+          parseInt(lessonForm.lessonOrder) || 1,
+          lessonForm.problemDescription || null,
+          lessonForm.solutionTemplate || null,
+          lessonForm.testCases || null
+        );
+      } else {
+        result = await lessonService.createLesson(
+          lessonForm.courseId,
+          lessonForm.lessonTitle,
+          parseInt(lessonForm.lessonOrder) || 1,
+          lessonForm.problemDescription || null,
+          lessonForm.solutionTemplate || null,
+          lessonForm.testCases || null
+        );
+      }
 
       if (result.success) {
-        setMessage(" Lesson created successfully!");
+        setMessage(editingLessonId ? "✅ Lesson updated successfully!" : "✅ Lesson created successfully!");
         setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
+        setEditingLessonId(null);
         setShowLessonForm(false);
         fetchAllData();
       } else {
-        setMessage("Error: " + (result.message || "Unable to create lesson"));
+        setMessage("Error: " + (result.message || "Unable to save lesson"));
       }
     } catch (err) {
       setMessage("Error: " + err.message);
@@ -201,6 +229,17 @@ export default function AdminDashboard() {
     }
   };
 
+  // Handle course edit
+  const handleEditCourse = (course) => {
+    setEditingCourseId(course.id || course.courseId);
+    setCourseForm({
+      name: course.name,
+      language: course.language,
+      description: course.description || ""
+    });
+    setShowCourseForm(true);
+  };
+
   // Handle lesson deletion
   const handleDeleteLesson = async (lessonId) => {
     if (window.confirm("Are you sure you want to delete this lesson?")) {
@@ -222,63 +261,54 @@ export default function AdminDashboard() {
     }
   };
 
+  // Handle lesson edit
+  const handleEditLesson = (lesson) => {
+    setEditingLessonId(lesson.lessonId);
+    setLessonForm({
+      courseId: lesson.courseId,
+      lessonTitle: lesson.lessonTitle,
+      lessonOrder: lesson.lessonOrder || "1",
+      problemDescription: lesson.problemDescription || "",
+      solutionTemplate: lesson.solutionTemplate || "",
+      testCases: lesson.testCases || ""
+    });
+    setShowLessonForm(true);
+  };
+
   // Handle hint creation
   const handleCreateHint = async (e) => {
     e.preventDefault();
-    if (!hintForm.lessonId || !hintForm.title || !hintForm.content) {
+    if (!hintForm.lessonId || !hintForm.hintTitle) {
       setMessage("Please fill in all required fields");
       return;
     }
 
     try {
       setLoading(true);
-      const result = await lessonHintService.createHint(
-        hintForm.lessonId,
-        hintForm.title,
-        hintForm.content,
-        parseInt(hintForm.orderIndex) || 0
-      );
-
-      if (result.success) {
-        setMessage("Hint created successfully!");
-        setHintForm({ lessonId: "", title: "", content: "", orderIndex: "" });
-        setShowHintForm(false);
-        fetchAllData();
+      let result;
+      
+      if (editingHintId) {
+        result = await lessonHintService.updateHint(
+          editingHintId,
+          hintForm.hintTitle,
+          hintForm.hintContent || null
+        );
       } else {
-        setMessage("Error: " + (result.message || "Unable to create hint"));
+        result = await lessonHintService.createHint(
+          hintForm.lessonId,
+          hintForm.hintTitle,
+          hintForm.hintContent || null
+        );
       }
-    } catch (err) {
-      setMessage("Error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle hint update
-  const handleUpdateHint = async (e) => {
-    e.preventDefault();
-    if (!editingHint || !hintForm.title || !hintForm.content) {
-      setMessage("Please fill in all required fields");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const result = await lessonHintService.updateHint(
-        editingHint.hintId,
-        hintForm.title,
-        hintForm.content,
-        parseInt(hintForm.orderIndex) || 0
-      );
 
       if (result.success) {
-        setMessage("Hint updated successfully!");
-        setHintForm({ lessonId: "", title: "", content: "", orderIndex: "" });
-        setEditingHint(null);
+        setMessage(editingHintId ? "✅ Hint updated successfully!" : "✅ Hint created successfully!");
+        setHintForm({ lessonId: "", hintTitle: "", hintContent: "" });
+        setEditingHintId(null);
         setShowHintForm(false);
         fetchAllData();
       } else {
-        setMessage("Error: " + (result.message || "Unable to update hint"));
+        setMessage("Error: " + (result.message || "Unable to save hint"));
       }
     } catch (err) {
       setMessage("Error: " + err.message);
@@ -295,7 +325,7 @@ export default function AdminDashboard() {
         const result = await lessonHintService.deleteHint(hintId);
 
         if (result.success) {
-          setMessage("Hint deleted successfully!");
+          setMessage("✅ Hint deleted successfully!");
           fetchAllData();
         } else {
           setMessage("Error: " + (result.message || "Unable to delete hint"));
@@ -310,14 +340,26 @@ export default function AdminDashboard() {
 
   // Handle hint edit
   const handleEditHint = (hint) => {
-    setEditingHint(hint);
+    setEditingHintId(hint.hintId);
     setHintForm({
       lessonId: hint.lessonId,
-      title: hint.title,
-      content: hint.content,
-      orderIndex: hint.orderIndex
+      hintTitle: hint.title,
+      hintContent: hint.content || ""
     });
     setShowHintForm(true);
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingHintId(null);
+    setEditingLessonId(null);
+    setEditingCourseId(null);
+    setHintForm({ lessonId: "", hintTitle: "", hintContent: "" });
+    setCourseForm({ name: "", language: "", description: "" });
+    setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
+    setShowHintForm(false);
+    setShowCourseForm(false);
+    setShowLessonForm(false);
   };
 
   // Handle logout
@@ -519,6 +561,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-dashboard-container">
+      <LoadingScreen isVisible={loading} message="Loading admin dashboard..." />
       <div className="admin-background"></div>
 
       {/* Admin Navigation */}
@@ -535,14 +578,6 @@ export default function AdminDashboard() {
                 Dev<span className="highlight">Vanguard</span> Admin
               </span>
             </div>
-            
-            <ul className="admin-nav-links">
-              <li><a href="#" className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>Dashboard</a></li>
-              <li><a href="#" className={activeTab === "courses" ? "active" : ""} onClick={() => setActiveTab("courses")}>Courses</a></li>
-              <li><a href="#" className={activeTab === "lessons" ? "active" : ""} onClick={() => setActiveTab("lessons")}>Lessons</a></li>
-              <li><a href="#" className={activeTab === "hints" ? "active" : ""} onClick={() => setActiveTab("hints")}>Hints</a></li>
-              <li><a href="#" className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>Users</a></li>
-            </ul>
           </div>
           
           <div className="admin-nav-right">
@@ -573,45 +608,88 @@ export default function AdminDashboard() {
 
       {/* Admin Dashboard Content */}
       <div className="admin-content">
-        {/* Message Display */}
-        {message && (
-          <div className={`admin-message ${!showMessage ? 'disappear' : ''} ${message.includes('❌') ? 'error' : 'success'}`}>
-            {message}
-            <button type="button" onClick={() => setMessage("")} className="close-btn">×</button>
-          </div>
-        )}
-
-        {/* Dashboard Tab */}
-        {activeTab === "dashboard" && (
-          <>
-            {/* Header */}
-            <div className="admin-header">
-              <div className="admin-welcome">
-                <h1 className="admin-title">
-                  <i className="fas fa-tachometer-alt"></i>
-                  Admin Dashboard
-                </h1>
-              </div>
-              
-              <div className="admin-date-time">
-                <div className="current-time">
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </div>
-                <div className="current-date">
-                  {new Date().toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-                </div>
-              </div>
+        {/* Sidebar Navigation */}
+        <div className="admin-sidebar">
+          <div className="sidebar-menu">
+            <div 
+              className={`sidebar-item ${activeTab === "dashboard" ? "active" : ""}`}
+              onClick={() => setActiveTab("dashboard")}
+            >
+              <i className="fas fa-chart-line"></i>
+              <span>Dashboard</span>
             </div>
+            <div 
+              className={`sidebar-item ${activeTab === "courses" ? "active" : ""}`}
+              onClick={() => setActiveTab("courses")}
+            >
+              <i className="fas fa-book"></i>
+              <span>Courses</span>
+            </div>
+            <div 
+              className={`sidebar-item ${activeTab === "lessons" ? "active" : ""}`}
+              onClick={() => setActiveTab("lessons")}
+            >
+              <i className="fas fa-chalkboard"></i>
+              <span>Lessons</span>
+            </div>
+            <div 
+              className={`sidebar-item ${activeTab === "hints" ? "active" : ""}`}
+              onClick={() => setActiveTab("hints")}
+            >
+              <i className="fas fa-lightbulb"></i>
+              <span>Hints</span>
+            </div>
+            <div 
+              className={`sidebar-item ${activeTab === "users" ? "active" : ""}`}
+              onClick={() => setActiveTab("users")}
+            >
+              <i className="fas fa-users"></i>
+              <span>Users</span>
+            </div>
+          </div>
+        </div>
 
-            {/* Quick Stats */}
+        {/* Main Content Area */}
+        <div className="admin-main-content">
+          {/* Message Display */}
+          {message && (
+            <div className={`admin-message ${!showMessage ? 'disappear' : ''} ${message.includes('❌') ? 'error' : 'success'}`}>
+              {message}
+              <button type="button" onClick={() => setMessage("")} className="close-btn">×</button>
+            </div>
+          )}
+
+          {/* Dashboard Tab */}
+          {activeTab === "dashboard" && (
+            <>
+              {/* Header */}
+              <div className="admin-header">
+                <div className="admin-welcome">
+                  <h1 className="admin-title">
+                    <i className="fas fa-tachometer-alt"></i>
+                    Admin Dashboard
+                  </h1>
+                </div>
+                
+                <div className="admin-date-time">
+                  <div className="current-time">
+                    {new Date().toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                  <div className="current-date">
+                    {new Date().toLocaleTimeString('en-US', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Stats */}
             <div className="admin-stats-grid">
               {quickStats.map((stat, index) => (
                 <div key={index} className={`admin-stat-card ${stat.color}`}>
@@ -722,7 +800,11 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 className="add-btn"
-                onClick={() => setShowCourseForm(!showCourseForm)}
+                onClick={() => {
+                  setEditingCourseId(null);
+                  setCourseForm({ name: "", language: "", description: "" });
+                  setShowCourseForm(!showCourseForm);
+                }}
               >
                 <i className="fas fa-plus"></i>
                 {showCourseForm ? "Cancel" : "Add Course"}
@@ -785,7 +867,7 @@ export default function AdminDashboard() {
                     className="admin-submit"
                     disabled={loading}
                   >
-                    {loading ? "Creating..." : "Create Course"}
+                    {loading ? (editingCourseId ? "Updating..." : "Creating...") : (editingCourseId ? "Update Course" : "Create Course")}
                   </button>
                 </form>
               </div>
@@ -813,8 +895,16 @@ export default function AdminDashboard() {
                     <div className="course-actions">
                       <button
                         type="button"
+                        className="action-btn edit"
+                        onClick={() => handleEditCourse(course)}
+                      >
+                        <i className="fas fa-edit"></i>
+                        Edit
+                      </button>
+                      <button
+                        type="button"
                         className="action-btn delete"
-                        onClick={() => handleDeleteCourse(course.id)}
+                        onClick={() => handleDeleteCourse(course.id || course.courseId)}
                       >
                         <i className="fas fa-trash"></i>
                         Delete
@@ -838,7 +928,11 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 className="add-btn"
-                onClick={() => setShowLessonForm(!showLessonForm)}
+                onClick={() => {
+                  setEditingLessonId(null);
+                  setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
+                  setShowLessonForm(!showLessonForm);
+                }}
               >
                 <i className="fas fa-plus"></i>
                 {showLessonForm ? "Cancel" : "Add Lesson"}
@@ -958,7 +1052,7 @@ export default function AdminDashboard() {
                     className="admin-submit"
                     disabled={loading}
                   >
-                    {loading ? "Creating..." : "Create Lesson"}
+                    {loading ? (editingLessonId ? "Updating..." : "Creating...") : (editingLessonId ? "Update Lesson" : "Create Lesson")}
                   </button>
                 </form>
               </div>
@@ -986,17 +1080,18 @@ export default function AdminDashboard() {
                     <div className="lesson-item-actions">
                       <button
                         type="button"
+                        className="action-btn edit"
+                        disabled={loading}
+                        onClick={() => handleEditLesson(lesson)}
+                      >
+                        <i className="fas fa-edit"></i>
+                        Edit
+                      </button>
+                      <button
+                        type="button"
                         className="action-btn delete"
                         disabled={loading}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleDeleteLesson(lesson.lessonId);
-                        }}
+                        onClick={() => handleDeleteLesson(lesson.lessonId)}
                       >
                         <i className="fas fa-trash"></i>
                         Delete
@@ -1015,14 +1110,14 @@ export default function AdminDashboard() {
             <div className="section-header">
               <h2 className="section-title">
                 <i className="fas fa-lightbulb"></i>
-                Manage Lesson Hints
+                Manage Hints
               </h2>
               <button
                 type="button"
                 className="add-btn"
                 onClick={() => {
-                  setEditingHint(null);
-                  setHintForm({ lessonId: "", title: "", content: "", orderIndex: "" });
+                  setEditingHintId(null);
+                  setHintForm({ lessonId: "", hintTitle: "", hintContent: "" });
                   setShowHintForm(!showHintForm);
                 }}
               >
@@ -1031,25 +1126,24 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Hint Creation/Edit Form */}
+            {/* Hint Form */}
             {showHintForm && (
               <div className="admin-form-container">
-                <form onSubmit={editingHint ? handleUpdateHint : handleCreateHint} className="admin-form-grid">
+                <form className="admin-form-grid" onSubmit={handleCreateHint}>
                   <div className="admin-form-group">
-                    <label className="admin-label">Select Lesson *</label>
+                    <label className="admin-label">Select Lesson</label>
                     <select
                       className="admin-input"
                       value={hintForm.lessonId}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         setHintForm({
                           ...hintForm,
                           lessonId: e.target.value,
-                        })
-                      }
-                      disabled={editingHint !== null}
+                        });
+                      }}
                       required
                     >
-                      <option value="">-- Select a lesson --</option>
+                      <option value="">-- Select lesson --</option>
                       {lessons.map((lesson) => (
                         <option key={lesson.lessonId} value={lesson.lessonId}>
                           {lesson.lessonTitle}
@@ -1059,16 +1153,16 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Hint Title *</label>
+                    <label className="admin-label">Hint Title</label>
                     <input
                       type="text"
                       className="admin-input"
-                      placeholder="E.g.: Read the Problem Carefully"
-                      value={hintForm.title}
+                      placeholder="E.g.: Look at the pattern"
+                      value={hintForm.hintTitle}
                       onChange={(e) =>
                         setHintForm({
                           ...hintForm,
-                          title: e.target.value,
+                          hintTitle: e.target.value,
                         })
                       }
                       required
@@ -1076,36 +1170,18 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-form-group">
-                    <label className="admin-label">Order Index</label>
-                    <input
-                      type="number"
-                      className="admin-input"
-                      placeholder="E.g.: 0"
-                      value={hintForm.orderIndex}
-                      onChange={(e) =>
-                        setHintForm({
-                          ...hintForm,
-                          orderIndex: e.target.value,
-                        })
-                      }
-                      min="0"
-                    />
-                  </div>
-
-                  <div className="admin-form-group" style={{ gridColumn: "1 / -1" }}>
-                    <label className="admin-label">Hint Content *</label>
+                    <label className="admin-label">Hint Content</label>
                     <textarea
                       className="admin-input textarea"
-                      placeholder="Enter the hint content here..."
-                      value={hintForm.content}
+                      placeholder="Enter hint content..."
+                      value={hintForm.hintContent}
                       onChange={(e) =>
                         setHintForm({
                           ...hintForm,
-                          content: e.target.value,
+                          hintContent: e.target.value,
                         })
                       }
-                      rows="5"
-                      required
+                      rows="4"
                     />
                   </div>
 
@@ -1113,9 +1189,8 @@ export default function AdminDashboard() {
                     type="submit"
                     className="admin-submit"
                     disabled={loading}
-                    style={{ gridColumn: "1 / -1" }}
                   >
-                    {loading ? (editingHint ? "Updating..." : "Creating...") : (editingHint ? "Update Hint" : "Create Hint")}
+                    {loading ? (editingHintId ? "Updating..." : "Creating...") : (editingHintId ? "Update Hint" : "Create Hint")}
                   </button>
                 </form>
               </div>
@@ -1130,7 +1205,7 @@ export default function AdminDashboard() {
                 </div>
               ) : hints.length === 0 ? (
                 <div className="empty-state">
-                  <i className="fas fa-lightbulb"></i>
+                  <i className="fas fa-inbox"></i>
                   <p>No hints available</p>
                 </div>
               ) : (
@@ -1139,48 +1214,29 @@ export default function AdminDashboard() {
                   return (
                     <div key={hint.hintId} className="hint-item-card">
                       <div className="hint-item-header">
-                        <h3 className="hint-item-name">{hint.title}</h3>
-                        <span className="hint-lesson-badge">{lesson?.lessonTitle || "Unknown Lesson"}</span>
+                        <h3 className="hint-item-title">{hint.title}</h3>
+                        <span className="hint-lesson">{lesson?.lessonTitle || "Unknown Lesson"}</span>
                       </div>
                       <p className="hint-item-content">{hint.content}</p>
-                      <div className="hint-item-footer">
-                        <span className="hint-order-badge">Order #{hint.orderIndex}</span>
-                        <div className="hint-item-actions">
-                          <button
-                            type="button"
-                            className="action-btn edit"
-                            disabled={loading}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleEditHint(hint);
-                            }}
-                          >
-                            <i className="fas fa-edit"></i>
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="action-btn delete"
-                            disabled={loading}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleDeleteHint(hint.hintId);
-                            }}
-                          >
-                            <i className="fas fa-trash"></i>
-                            Delete
-                          </button>
-                        </div>
+                      <div className="hint-item-actions">
+                        <button
+                          type="button"
+                          className="action-btn edit"
+                          disabled={loading}
+                          onClick={() => handleEditHint(hint)}
+                        >
+                          <i className="fas fa-edit"></i>
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="action-btn delete"
+                          disabled={loading}
+                          onClick={() => handleDeleteHint(hint.hintId)}
+                        >
+                          <i className="fas fa-trash"></i>
+                          Delete
+                        </button>
                       </div>
                     </div>
                   );
@@ -1246,6 +1302,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

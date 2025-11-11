@@ -3,7 +3,7 @@ import "../assets/CSS/problemdescription.css";
 
 export default function ProblemDescription({ description }) {
   if (!description) {
-    return <p className="no-description">No Description</p>;
+    return <p className="no-description">Không có mô tả đề bài</p>;
   }
 
   const formattedHtml = formatProblemDescription(description);

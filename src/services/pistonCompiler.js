@@ -74,47 +74,17 @@ export async function executeCode(language, code, input = "") {
 
     const result = await response.json();
     const endTime = performance.now();
-    const totalNetworkTime = Math.round(endTime - startTime);
+    const executionTime = Math.round(endTime - startTime);
 
-    console.log("✅ Piston API Response:", result);
-    console.log(`📊 Total API time: ${totalNetworkTime}ms`);
+    console.log("Piston API Response:", result);
 
-    // Extract output and execution time from result
+    // Extract output from result
     const stdout = result.run?.stdout || "";
     const stderr = result.run?.stderr || "";
     const exitCode = result.run?.code || 0;
-    
-    // Calculate execution time
-    // The Piston API includes compilation + execution time
-    // We estimate execution time by subtracting network overhead (approximately 20-30% of total time)
-    let executionTime = Math.max(5, Math.round(totalNetworkTime * 0.75));
-    
-    // If the response contains specific timing information, use it
-    if (result.run) {
-      console.log("📌 Run object keys:", Object.keys(result.run));
-      // Check for any time-related fields in the response
-      if (result.run.time) {
-        const timeValue = result.run.time;
-        // If it's a string like "123ms" or "0.123s", parse it
-        if (typeof timeValue === 'string') {
-          if (timeValue.includes('ms')) {
-            executionTime = Math.round(parseFloat(timeValue));
-          } else if (timeValue.includes('s')) {
-            executionTime = Math.round(parseFloat(timeValue) * 1000);
-          }
-        } else if (typeof timeValue === 'number') {
-          // If it's already a number, assume it's in milliseconds
-          executionTime = Math.round(timeValue);
-        }
-        console.log(`⏱️ Execution time from response: ${executionTime}ms`);
-      }
-    }
-    
-    // Ensure execution time is at least 1ms and at most the total network time
-    executionTime = Math.max(1, Math.min(executionTime, totalNetworkTime));
 
     if (stderr) {
-      console.error("❌ Stderr:", stderr);
+      console.error("Stderr:", stderr);
       return {
         success: false,
         stdout: stdout,
@@ -134,7 +104,7 @@ export async function executeCode(language, code, input = "") {
       executionTime: executionTime,
     };
   } catch (error) {
-    console.error("❌ Piston API Error:", error);
+    console.error("Piston API Error:", error);
     return {
       success: false,
       stdout: "",
@@ -238,20 +208,16 @@ export function validateTestCases(actualOutput, testCases) {
 export function formatTestResults(validationResult) {
   const { passed, total, results } = validationResult;
 
-  let output = `\n📊 Test Results: ${passed}/${total} passed\n`;
-  output += "=".repeat(40) + "\n\n";
+  let output = `\nTest Results: ${passed}/${total} passed\n`;
 
   results.forEach((result) => {
-    const status = result.passed ? "✅ PASS" : "❌ FAIL";
+    const status = result.passed ? "PASS" : "FAIL";
     output += `${status}: ${result.name}\n`;
 
-    if (result.description) {
-      output += `  Description: ${result.description}\n`;
+    if (!result.passed) {
+      output += `  Expected: ${result.expected}\n`;
+      output += `  Actual:   ${result.actual}\n`;
     }
-
-    output += `  Expected: ${result.expected}\n`;
-    output += `  Actual:   ${result.actual}\n`;
-    output += "\n";
   });
 
   return output;
@@ -272,13 +238,11 @@ export async function executeAndValidate(language, code, testCases = []) {
       execution: { success: false, stdout: "", stderr: "Language parameter is required" },
       validation: { passed: 0, total: 0, results: [] },
       passed: false,
-      message: "❌ Lỗi: Ngôn ngữ lập trình không được xác định",
+      message: " Error: Language parameter is required",
       output: "Error: Language parameter is required",
       formattedResults: "",
     };
   }
-
-  console.log(`📝 Starting code execution with language: ${language}`);
   
   // Filter only public test cases
   const publicTests = testCases.filter(tc => !tc.hidden);
@@ -287,12 +251,7 @@ export async function executeAndValidate(language, code, testCases = []) {
     // No test cases to run
     const execution = await executeCode(language, code);
     return {
-      execution: { 
-        success: execution.success, 
-        stdout: execution.stdout, 
-        stderr: execution.stderr, 
-        executionTime: execution.executionTime || 0 
-      },
+      execution,
       validation: { passed: 0, total: 0, results: [] },
       passed: false,
       message: "No public test cases to run",
@@ -303,7 +262,6 @@ export async function executeAndValidate(language, code, testCases = []) {
   const results = [];
   let passedCount = 0;
   let allOutputs = "";
-  let executionTimeMs = 0;
 
   for (let i = 0; i < publicTests.length; i++) {
     const testCase = publicTests[i];
@@ -311,12 +269,6 @@ export async function executeAndValidate(language, code, testCases = []) {
     
     // Execute code with this specific test input
     const execution = await executeCode(language, code, input);
-    
-    // Store execution time from first test (all tests use same code, so time is similar)
-    if (i === 0) {
-      executionTimeMs = execution.executionTime || 0;
-      console.log(`⏱️ Captured execution time from first test: ${executionTimeMs}ms`);
-    }
     
     if (!execution.success) {
       console.error(`Test ${i + 1} execution failed:`, execution.stderr);
@@ -389,12 +341,12 @@ export async function executeAndValidate(language, code, testCases = []) {
   };
 
   return {
-    execution: { success: true, stdout: allOutputs, stderr: "", executionTime: executionTimeMs },
+    execution: { success: true, stdout: allOutputs, stderr: "" },
     validation,
     passed: allPassed,
     message: allPassed
-      ? `🎉 All ${publicTests.length} tests passed!`
-      : `❌ ${publicTests.length - passedCount} test(s) failed`,
+      ? `All ${publicTests.length} tests passed!`
+      : `${publicTests.length - passedCount} test(s) failed`,
     output: allOutputs,
     formattedResults: formatTestResults(validation),
   };

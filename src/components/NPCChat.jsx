@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../assets/CSS/npcchat.css';
 import { getNPCResponse, getNPCHint, getNPCCodeFeedback } from '../services/npcAIService';
+import AuthContext from '../contexts/AuthContext';
 
 /**
  * NPC Chat Component - AI-powered with Supabase Edge Function
@@ -21,33 +22,35 @@ export default function NPCChat({
   const [userInput, setUserInput] = useState('');
   const [conversationMode, setConversationMode] = useState(false); // true = AI chat mode, false = auto feedback mode
 
+  const { user } = useContext(AuthContext);
+
   // Fallback NPC responses when AI not available
   const npcResponses = {
-    welcome: `Xin chào, Knight! Tôi là Mystery Wizard. Hôm nay chúng ta sẽ chiến đấu với bài toán này. Hãy lắng nghe lời khuyên của tôi để chiến thắng!`,
-    
+    welcome: (userName = 'Knight') => `Hello, ${userName}! I am the Mystery Wizard. Today we will battle this problem. Listen to my advice to win!`,
+
     hint: [
-      '💡 Tiếp! Bạn gần đã làm đúng rồi. Hãy suy nghĩ kỹ hơn!',
-      '💭 Mẹo: Hãy kiểm tra đầu vào và đầu ra của bạn.',
-      '🤔 Bạn cần xử lý các trường hợp đặc biệt!',
-      '✨ Bộ óc của bạn có sẵn những gì bạn cần.'
+      'Keep going! You are almost there. Think harder!',
+      'Tip: Check your input and output.',
+      'You need to handle special cases!',
+      'Your mind has what you need.'
     ],
 
     error: [
-      '❌ Ôi không! Có gì đó không đúng rồi...',
-      '😬 Output không khớp với yêu cầu.',
-      '🔥 Code của bạn bị vấn đề gì đó!',
-      '⚡ Hãy xem lại logic của bạn.'
+      'Oh no! Something is wrong...',
+      'Output does not match the requirements.',
+      'Your code has some issues!',
+      'Review your logic.'
     ],
 
     success: [
-      '🎉 Tuyệt vời! Bạn đã làm đúng!',
-      '✅ Hoàn hảo! Bài này bạn quá giỏi!',
-      '🏆 Wow! Bạn xứng đáng là một Knight thực thụ!',
-      '⭐ Sức mạnh của bạn ngày càng tăng!'
+      'Excellent! You got it right!',
+      'Perfect! You are great at this!',
+      'Wow! You are a true Knight!',
+      'Your strength is growing!'
     ],
 
-    thinking: '⚡ Để tôi xem xét code của bạn...',
-    aiThinking: '⚡ Mystery Wizard đang suy nghĩ...'
+    thinking: 'Let me examine your code...',
+    aiThinking: 'Mystery Wizard is thinking...'
   };
 
   // Handle asking NPC a question (AI mode)
@@ -55,7 +58,7 @@ export default function NPCChat({
     const messageToSend = question || userInput.trim();
     
     if (!messageToSend) {
-      setCurrentMessage('Ask me something , Knight!');
+      setCurrentMessage('Please ask me something, Knight!');
       setIsVisible(true);
       return;
     }
@@ -68,28 +71,28 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log(' Asking NPC:', messageToSend);
+      console.log('📨 Asking NPC:', messageToSend);
       const result = await getNPCResponse(
         messageToSend,
         problemDescription,
         userCode
       );
 
-      console.log(' NPC Response:', result);
+      console.log('📩 NPC Response:', result);
 
       if (result.success && result.reply) {
-        console.log('Setting AI reply:', result.reply);
+        console.log('✅ Setting AI reply:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
-        console.warn(' NPC failed but has reply:', result.reply);
+        console.warn('Warning: NPC failed but has reply:', result.reply);
         setDisplayedText('');
-        setCurrentMessage(result.reply || 'Hmm... My magic was interrupted. Please try again.');
+        setCurrentMessage(result.reply || 'Hmm... My magic is interrupted. Please try again.');
       }
     } catch (error) {
       console.error('Error getting NPC response:', error);
       setDisplayedText('');
-      setCurrentMessage('Oh no! Connection lost. Please try again later.');
+      setCurrentMessage('Oh no! Connection lost. Try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -104,24 +107,24 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log(' Asking for hint...');
+      console.log('💡 Asking for hint...');
       const result = await getNPCHint(problemDescription, userCode);
       
-      console.log(' Hint Response:', result);
+      console.log('💡 Hint Response:', result);
       
       if (result.success && result.reply) {
-        console.log(' Setting hint:', result.reply);
+        console.log('✅ Setting hint:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
-        console.warn(' Hint failed but has reply:', result.reply);
+        console.warn('Warning: Hint failed but has reply:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply || 'Hmm... I have no hints right now.');
       }
     } catch (error) {
       console.error('Error getting hint:', error);
       setDisplayedText('');
-      setCurrentMessage('Unable to get hints. Please try again.');
+      setCurrentMessage('Cannot get hint. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -136,24 +139,24 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log(' Asking for code feedback...');
+      console.log('📝 Asking for code feedback...');
       const result = await getNPCCodeFeedback(problemDescription, userCode);
       
-      console.log(' Feedback Response:', result);
+      console.log('📝 Feedback Response:', result);
       
       if (result.success && result.reply) {
-        console.log(' Setting feedback:', result.reply);
+        console.log('✅ Setting feedback:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
-        console.warn(' Feedback failed but has reply:', result.reply);
+        console.warn('Warning: Feedback failed but has reply:', result.reply);
         setDisplayedText('');
-        setCurrentMessage(result.reply || 'Your code seems... in need of improvement.');
+        setCurrentMessage(result.reply || 'Your code seems... needs improvement.');
       }
     } catch (error) {
       console.error('Error getting feedback:', error);
       setDisplayedText('');
-      setCurrentMessage('Unable to analyze code. Please try again.');
+      setCurrentMessage('Cannot analyze code. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -202,7 +205,7 @@ export default function NPCChat({
         ];
         messageToDisplay = hintMsg;
       } else if (status === 'welcome') {
-        messageToDisplay = npcResponses.welcome;
+        messageToDisplay = npcResponses.welcome(user?.name || 'Knight');
       }
 
       setCurrentMessage(messageToDisplay);
@@ -225,12 +228,12 @@ export default function NPCChat({
               }
             }}
           />
-          <div className="npc-fallback-small">🧙‍♂️</div>
+          <div className="npc-fallback-small">Wizard</div>
         </div>
         <div className="npc-header-info">
           <h3 className="npc-title">Mystery Wizard</h3>
           <p className="npc-status">
-            {isLoading ? ' Thinking...' : (conversationMode ? ' AI Mode' : 'Ready')}
+            {isLoading ? 'Thinking...' : (conversationMode ? 'AI Mode' : 'Ready')}
           </p>
         </div>
       </div>
@@ -258,21 +261,21 @@ export default function NPCChat({
         <div className="npc-ai-controls">
           {/* Quick Action Buttons */}
           <div className="npc-quick-actions">
-            <button 
+            <button
               className="npc-btn-hint"
               onClick={handleGetHint}
               disabled={isLoading}
-              title="Get a hint from the NPC"
+              title="Get a hint from NPC"
             >
-               Hint
+              Hint
             </button>
-            <button 
+            <button
               className="npc-btn-feedback"
               onClick={handleGetFeedback}
               disabled={isLoading}
-              title="Get code feedback from the NPC"
+              title="Get feedback on code"
             >
-               Feedback
+              Feedback
             </button>
           </div>
 
@@ -281,7 +284,7 @@ export default function NPCChat({
             <input
               type="text"
               className="npc-input"
-              placeholder="Ask the NPC a question..."
+              placeholder="Ask NPC a question..."
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               onKeyPress={(e) => {
@@ -295,9 +298,9 @@ export default function NPCChat({
               className="npc-send-btn"
               onClick={() => handleAskNPC()}
               disabled={isLoading || !userInput.trim()}
-              title="Send a message to the NPC"
+              title="Send message to NPC"
             >
-              {isLoading ? '⏳' : '➤'}
+              {isLoading ? 'Loading' : 'Send'}
             </button>
           </div>
         </div>
@@ -308,9 +311,9 @@ export default function NPCChat({
         <button
           className="npc-toggle-chat"
           onClick={() => setConversationMode(true)}
-          title="Start a conversation with the NPC"
+          title="Start talking to NPC"
         >
-           Ask NPC
+          Ask NPC
         </button>
       )}
     </div>
