@@ -178,6 +178,7 @@ export const lessonService = {
         problemDescription: lesson.problemDescription,
         solutionTemplate: lesson.solutionTemplate,
         testCases: lesson.testCases,
+        xpReward: lesson.xpReward || 0,
         createdAt: lesson.createdAt,
         updatedAt: lesson.updatedAt
       })) : [];
@@ -214,6 +215,7 @@ export const lessonService = {
         problemDescription: lesson.problemDescription,
         solutionTemplate: lesson.solutionTemplate,
         testCases: lesson.testCases,
+        xpReward: lesson.xpReward || 0,
         createdAt: lesson.createdAt,
         updatedAt: lesson.updatedAt,
         course: {
@@ -240,6 +242,7 @@ export const lessonService = {
         problemDescription: lesson.problemDescription,
         solutionTemplate: lesson.solutionTemplate,
         testCases: lesson.testCases,
+        xpReward: lesson.xpReward || 0,
         createdAt: lesson.createdAt,
         updatedAt: lesson.updatedAt
       })) : [];
@@ -250,7 +253,7 @@ export const lessonService = {
   },
 
   // Tạo lesson mới
-  async createLesson(courseId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases) {
+  async createLesson(courseId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases, xpReward = 0) {
     try {
       const lesson = await apiCall("/lesson", "POST", {
         courseId,
@@ -259,6 +262,7 @@ export const lessonService = {
         problemDescription: problemDescription || null,
         solutionTemplate: solutionTemplate || null,
         testCases: testCases || null,
+        xpReward: xpReward || 0,
       });
       return { success: true, data: lesson };
     } catch (error) {
@@ -267,7 +271,7 @@ export const lessonService = {
   },
 
   // Cập nhật lesson
-  async updateLesson(lessonId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases) {
+  async updateLesson(lessonId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases, xpReward = 0) {
     try {
       const lesson = await apiCall(`/lesson/${lessonId}`, "PUT", {
         lessonTitle,
@@ -275,6 +279,7 @@ export const lessonService = {
         problemDescription: problemDescription || null,
         solutionTemplate: solutionTemplate || null,
         testCases: testCases || null,
+        xpReward: xpReward || 0,
       });
       return { success: true, data: lesson };
     } catch (error) {
