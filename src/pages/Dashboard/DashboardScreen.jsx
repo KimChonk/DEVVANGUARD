@@ -11,6 +11,7 @@ export default function DashboardScreen() {
   const { rankData } = useUserRank();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
+  const [isNavigating, setIsNavigating] = useState(false);
   
   const [user, setUser] = useState({
     name: "Knight Coder",
@@ -195,6 +196,10 @@ export default function DashboardScreen() {
   const xpPercentage = useMemo(() => {
     return (user.currentXP / user.nextLevelXP) * 100;
   }, [user.currentXP, user.nextLevelXP]);
+
+  if (isNavigating) {
+    return <LoadingScreen isVisible={true} message="Loading..." />;
+  }
 
   return (
     <div className="dashboard-container">
@@ -410,7 +415,10 @@ export default function DashboardScreen() {
             <div className="quick-actions">
               <button 
                 className="action-btn primary"
-                onClick={() => navigate("/main-menu")}
+                onClick={() => {
+                  setIsNavigating(true);
+                  setTimeout(() => navigate("/main-menu"), 500);
+                }}
               >
                 <i className="fas fa-play"></i>
                 Continue Learning

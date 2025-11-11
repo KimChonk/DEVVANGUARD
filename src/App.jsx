@@ -13,6 +13,8 @@ import ProfileScreen from "./pages/Profile/ProfileScreen";
 import LeaderboardScreen from "./pages/Leaderboard/LeaderboardScreen";
 import DashboardScreen from "./pages/Dashboard/DashboardScreen";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import PvPLobby from "./pages/PvP/PvPLobby";
+import PvPBattle from "./pages/PvP/PvPBattle";
 
 function App() {
   return (
@@ -72,6 +74,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <LeaderboardScreen />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* PvP Routes */}
+          <Route 
+            path="/pvp/lobby" 
+            element={
+              <ProtectedRoute>
+                <PvPLobby />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/pvp/battle/:matchId" 
+            element={
+              <ProtectedRoute>
+                <PvPBattle />
               </ProtectedRoute>
             } 
           />

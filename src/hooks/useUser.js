@@ -195,3 +195,15 @@ export const useUserRank = () => {
 
   return { rankData, loading, error };
 };
+
+export const useUser = () => {
+  const userProfile = useUserProfile();
+  const userStats = useUserStats();
+
+  return {
+    user: userProfile.profile,
+    userStats: userStats.stats,
+    loading: userProfile.loading || userStats.loading,
+    error: userProfile.error || userStats.error,
+  };
+};
