@@ -68,7 +68,7 @@ export default function Intro() {
 
     // Observe all sections and cards for scroll animations
     const elementsToAnimate = document.querySelectorAll(
-      '.courses-section, .features-section, .developers-section, .stats-section, .cta-section, .footer, ' +
+      '.courses-section, .features-section, .why-choose-section, .developers-section, .stats-section, .cta-section, .footer, .why-feature-main, .why-feature-sub-item, ' +
       '.course-card, .feature-card, .developer-card, .stat-card'
     );
     
@@ -230,108 +230,58 @@ export default function Intro() {
             </button>
           </div>
 
-          {/* <div className="courses-grid">
-            <div className="course-card">
-              <div className="course-image" style={{ backgroundImage: "url('/images/python_course.jpg')" }}></div>
-              <div className="course-content">
-                <span className="course-label">COURSE</span>
-                <h3 className="course-title">Python</h3>
-                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-                <p className="course-description">
-                  Learn programming fundamentals such as variables, control flow, and loops with the powerful Python language.
-                </p>
-              </div>
-            </div>
-
-            <div className="course-card">
-              <div className="course-image" style={{ backgroundImage: "url('/images/csharp_course.png')" }}></div>
-              <div className="course-content">
-                <span className="course-label">COURSE</span>
-                <h3 className="course-title">C#</h3>
-                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-                <p className="course-description">
-                  Build powerful applications with C#, a versatile programming language for web, desktop, and mobile development.
-                </p>
-              </div>
-            </div>
-
-            <div className="course-card">
-              <div className="course-image" style={{ backgroundImage: "url('/images/c_course.png')" }}></div>
-              <div className="course-content">
-                <span className="course-label">COURSE</span>
-                <h3 className="course-title">C</h3>
-                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-                <p className="course-description">
-                  Master the fundamentals of programming with C, the foundation language that powers modern computing.
-                </p>
-              </div>
-            </div>
-
-            <div className="course-card">
-              <div className="course-image" style={{ backgroundImage: "url('/images/java_course.png')" }}></div>
-              <div className="course-content">
-                <span className="course-label">COURSE</span>
-                <h3 className="course-title">Java</h3>
-                <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-                <p className="course-description">
-                  Learn object-oriented programming with Java, one of the most popular languages for enterprise applications.
-                </p>
-              </div>
-            </div>
-          </div> */}
-
           <div className="courses-grid-container" ref={gridContainerRef}>
           {activeFilter === 'Popular' && (
-  <div className="courses-grid">
-    {/* Python */}
-    <div className="course-card">
-      <div className="course-image" style={{ backgroundImage: "url('/images/python_course.jpg')" }}></div>
-      <div className="course-content">
-        <span className="course-label">COURSE</span>
-        <h3 className="course-title">Python</h3>
-        <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-        <p className="course-description">
-          Learn programming fundamentals such as variables, control flow, and loops with the powerful Python language.
-        </p>
-      </div>
-    </div>
-    {/* C# */}
-    <div className="course-card">
-      <div className="course-image" style={{ backgroundImage: "url('/images/csharp_course.png')" }}></div>
-      <div className="course-content">
-        <span className="course-label">COURSE</span>
-        <h3 className="course-title">C#</h3>
-        <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-        <p className="course-description">
-          Build powerful applications with C#, a versatile programming language for web, desktop, and mobile development.
-        </p>
-      </div>
-    </div>
-    {/* C */}
-    <div className="course-card">
-      <div className="course-image" style={{ backgroundImage: "url('/images/c_course.png')" }}></div>
-      <div className="course-content">
-        <span className="course-label">COURSE</span>
-        <h3 className="course-title">C</h3>
-        <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-        <p className="course-description">
-          Master the fundamentals of programming with C, the foundation language that powers modern computing.
-        </p>
-      </div>
-    </div>
-    {/* Java */}
-    <div className="course-card">
-      <div className="course-image" style={{ backgroundImage: "url('/images/java_course.png')" }}></div>
-      <div className="course-content">
-        <span className="course-label">COURSE</span>
-        <h3 className="course-title">Java</h3>
-        <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
-        <p className="course-description">
-          Learn object-oriented programming with Java, one of the most popular languages for enterprise applications.
-        </p>
-      </div>
-    </div>
-  </div>
+            <div className="courses-grid">
+              {/* Python */}
+              <div className="course-card">
+                <div className="course-image" style={{ backgroundImage: "url('/images/python_course.jpg')" }}></div>
+                <div className="course-content">
+                  <span className="course-label">COURSE</span>
+                  <h3 className="course-title">Python</h3>
+                  <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
+                  <p className="course-description">
+                    Learn programming fundamentals such as variables, control flow, and loops with the powerful Python language.
+                  </p>
+                </div>
+              </div>
+              {/* C# */}
+              <div className="course-card">
+                <div className="course-image" style={{ backgroundImage: "url('/images/csharp_course.png')" }}></div>
+                <div className="course-content">
+                  <span className="course-label">COURSE</span>
+                  <h3 className="course-title">C#</h3>
+                  <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
+                  <p className="course-description">
+                    Build powerful applications with C#, a versatile programming language for web, desktop, and mobile development.
+                  </p>
+                </div>
+              </div>
+              {/* C */}
+              <div className="course-card">
+                <div className="course-image" style={{ backgroundImage: "url('/images/c_course.png')" }}></div>
+                <div className="course-content">
+                  <span className="course-label">COURSE</span>
+                  <h3 className="course-title">C</h3>
+                  <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
+                  <p className="course-description">
+                    Master the fundamentals of programming with C, the foundation language that powers modern computing.
+                  </p>
+                </div>
+              </div>
+              {/* Java */}
+              <div className="course-card">
+                <div className="course-image" style={{ backgroundImage: "url('/images/java_course.png')" }}></div>
+                <div className="course-content">
+                  <span className="course-label">COURSE</span>
+                  <h3 className="course-title">Java</h3>
+                  <span className="course-level"><i className="fas fa-star"></i> BEGINNER</span>
+                  <p className="course-description">
+                    Learn object-oriented programming with Java, one of the most popular languages for enterprise applications.
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* --- 2. Tab Web Development (NỘI DUNG MỚI) --- */}
@@ -495,6 +445,137 @@ export default function Intro() {
                 Gain XP and collect badges as you complete bite-sized lessons in Python, HTML, JavaScript, and more.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="why-choose" className="why-choose-section">
+        <div className="section-container">
+          {/* Tiêu đề và phụ đề */}
+          <h2 className="section-title">Why Begin Your Quest?</h2>
+          <p className="section-subtitle">
+            Our realm is built to forge legendary developers. Here’s your arsenal.
+          </p>
+
+          <div className="why-choose-content">
+            
+            {/* === FEATURE ROW 1: Learning Path (Chữ trái, Hình phải) === */}
+            <div className="why-feature-row">
+              {/* CỘT TRÁI: TEXT */}
+              <div className="why-feature-text">
+                {/* Khối nội dung chính */}
+                <div className="why-feature-main">
+                  <div className="why-feature-title-wrapper">
+                    <i className="fas fa-map-signs why-feature-icon"></i>
+                    <h3 className="why-feature-title">Interactive Learning Path</h3>
+                  </div>
+                  <p className="why-feature-description">
+                      Advance through your **Quest Log** from Newbie to Grandmaster. Each quest builds upon the last, ensuring you never feel lost.
+                  </p>
+                  <ul className="why-feature-checklist">
+                      <li><i className="fas fa-check"></i> Guided quests and story-driven lessons (like "Magical Power"!).</li>
+                      <li><i className="fas fa-check"></i> Unlock the next chapter of your adventure.</li>
+                      <li><i className="fas fa-check"></i> Track all completed quests in your personal log.</li>
+                  </ul>
+                </div>
+
+                {/* Khối nội dung phụ (giống "Batch Price Checking" trong Heta) */}
+                <div className="why-feature-sub-items">
+                  <div className="why-feature-sub-item">
+                      <h4><i className="fas fa-book-reader"></i> Lore-Based Lessons</h4>
+                      <p>Learn topics like "Variables" framed as "Magical Power" in engaging, story-driven quests.</p>
+                  </div>
+                  <div className="why-feature-sub-item">
+                      <h4><i className="fas fa-magic"></i> Specialization Paths</h4>
+                      <p>Focus your craft by filtering specialized paths like Python, Java, or C#.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CỘT PHẢI: IMAGE */}
+              <div className="why-feature-image">
+                <img src="/images/interactive_learning_path.jpg" alt="Interactive Learning Path" />
+              </div>
+            </div>
+
+            {/* === FEATURE ROW 2: Achievements (Hình trái, Chữ phải) === */}
+            {/* Thêm class "row-reverse" để đảo ngược */}
+            <div className="why-feature-row row-reverse">
+              {/* CỘT PHẢI: TEXT */}
+              <div className="why-feature-text">
+                <div className="why-feature-main">
+                  <div className="why-feature-title-wrapper">
+                    <i className="fas fa-trophy why-feature-icon"></i>
+                    <h3 className="why-feature-title">Climb the Leaderboard</h3>
+                  </div>
+                  <p className="why-feature-description">
+                    Stay motivated by earning XP from lessons, leveling up, and climbing the global Knight Leaderboard. Show off your rank!
+                  </p>
+                  <ul className="why-feature-checklist">
+                    <li><i className="fas fa-check"></i> Compete for the #1 spot against other Knights.</li>
+                    <li><i className="fas fa-check"></i> Gain XP for every lesson to fuel your progress.</li>
+                    <li><i className="fas fa-check"></i> Advance from "Newbie" to "Apprentice" and beyond.</li>
+                  </ul>
+                </div>
+                
+                {/* Khối nội dung phụ (Đã cập nhật) */}
+                <div className="why-feature-sub-items">
+                  <div className="why-feature-sub-item">
+                    <h4><i className="fas fa-hat-wizard"></i> Choose Your Avatar</h4>
+                    <p>Select your unique avatar to represent you on the leaderboard.</p>
+                  </div>
+                  <div className="why-feature-sub-item">
+                    <h4><i className="fas fa-users"></i> Guild System (Coming Soon)</h4>
+                    <p>Join guilds to compete in group quests and leaderboards.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CỘT TRÁI: IMAGE */}
+              <div className="why-feature-image">
+                <img src="/images/levelup-leaderboard.avif" alt="Climb the Leaderboard" />
+              </div>
+            </div>
+            
+            {/* === FEATURE ROW 3: Portfolio (Chữ trái, Hình phải) === */}
+            <div className="why-feature-row">
+              {/* CỘT TRÁI: TEXT */}
+              <div className="why-feature-text">
+                <div className="why-feature-main">
+                  <div className="why-feature-title-wrapper">
+                    {/* Đổi Icon sang cây búa rèn */}
+                    <i className="fas fa-hammer why-feature-icon"></i>
+                    <h3 className="why-feature-title">Forge & Fight: Projects & Arena</h3>
+                  </div>
+                  <p className="why-feature-description">
+                    Apply your knowledge. Forge powerful "artifacts" (real projects) for your portfolio, then sharpen your algorithm skills in the Code Arena.
+                  </p>
+                  <ul className="why-feature-checklist">
+                    <li><i className="fas fa-check"></i> Build guided projects to showcase your abilities.</li>
+                    <li><i className="fas fa-check"></i> Practice live algorithm challenges in the Arena.</li>
+                    <li><i className="fas fa-check"></i> Prove your skills through both building and problem-solving.</li>
+                  </ul>
+                </div>
+                
+                {/* Khối nội dung phụ (Đã cập nhật) */}
+                <div className="why-feature-sub-items">
+                  <div className="why-feature-sub-item">
+                    <h4><i className="fas fa-project-diagram"></i> Project "Blueprints"</h4>
+                    <p>Get starter templates for complex portfolio projects.</p>
+                  </div>
+                  <div className="why-feature-sub-item">
+                    <h4><i className="fas fa-stopwatch"></i> Timed Challenges</h4>
+                    <p>Test your speed and accuracy in timed Code Arena duels.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CỘT PHẢI: IMAGE */}
+              <div className="why-feature-image">
+                <img src="/images/coder-1vs1.jpeg" alt="Projects & Arena" />
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
