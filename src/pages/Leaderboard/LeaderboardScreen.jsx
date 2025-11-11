@@ -11,6 +11,7 @@ export default function LeaderboardScreen() {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // Fetch leaderboard data from API
   useEffect(() => {
@@ -67,7 +68,13 @@ export default function LeaderboardScreen() {
       {/* Header */}
       <header className="leaderboard-header">
         <div className="leaderboard-header-content">
-          <button className="back-btn" onClick={() => navigate("/main-menu")}>
+          <button 
+            className="back-btn" 
+            onClick={() => {
+              setIsNavigating(true);
+              setTimeout(() => navigate("/main-menu"), 500);
+            }}
+          >
             <i className="fas fa-arrow-left"></i>
           </button>
           <div className="header-title">
@@ -79,10 +86,14 @@ export default function LeaderboardScreen() {
 
       {/* Main Content */}
       <div className="leaderboard-container">
+        {isNavigating && <LoadingScreen isVisible={true} message="Loading..." />}
         {error ? (
           <div className="error-container">
             <p className="error-message"> {error}</p>
-            <button onClick={() => navigate("/main-menu")}>Return to Menu</button>
+            <button onClick={() => {
+              setIsNavigating(true);
+              setTimeout(() => navigate("/main-menu"), 500);
+            }}>Return to Menu</button>
           </div>
         ) : leaderboardData.length === 0 ? (
           <div className="no-data">

@@ -184,6 +184,7 @@ export default function navbar() {
                   </div>
                 )}
               </li>
+              <li><button onClick={() => handleMobileNav("/pvp/lobby")} className="nav-button">Battle PvP</button></li>
               <li><button onClick={() => handleMobileNav("/practice")} className="nav-button">Practice</button></li>
               <li><button onClick={() => handleMobileNav("/build")} className="nav-button">Build</button></li>
               <li><button onClick={() => handleMobileNav("/leaderboards")} className="nav-button">Leaderboards</button></li>
@@ -345,6 +346,7 @@ export default function navbar() {
                 </a>
               </li>
               
+              <li><a onClick={() => handleMobileNav('/pvp/lobby')}><i className="fas fa-gamepad icon-padding"></i> Battle PvP</a></li>
               <li><a onClick={() => handleMobileNav('/practice')}><i className="fas fa-dumbbell icon-padding"></i> Practice</a></li>
               <li><a onClick={() => handleMobileNav('/build')}><i className="fas fa-hammer icon-padding"></i> Build</a></li>
               <li><a onClick={() => handleMobileNav('/leaderboards')}><i className="fas fa-trophy icon-padding"></i> Leaderboards</a></li>
