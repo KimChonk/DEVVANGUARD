@@ -48,7 +48,8 @@ export default function AdminDashboard() {
     lessonOrder: "",
     problemDescription: "",
     solutionTemplate: "",
-    testCases: ""
+    testCases: "",
+    xpReward: ""
   });
 
   const [hintForm, setHintForm] = useState({
@@ -179,7 +180,8 @@ export default function AdminDashboard() {
           parseInt(lessonForm.lessonOrder) || 1,
           lessonForm.problemDescription || null,
           lessonForm.solutionTemplate || null,
-          lessonForm.testCases || null
+          lessonForm.testCases || null,
+          parseInt(lessonForm.xpReward) || 0
         );
       } else {
         result = await lessonService.createLesson(
@@ -188,13 +190,14 @@ export default function AdminDashboard() {
           parseInt(lessonForm.lessonOrder) || 1,
           lessonForm.problemDescription || null,
           lessonForm.solutionTemplate || null,
-          lessonForm.testCases || null
+          lessonForm.testCases || null,
+          parseInt(lessonForm.xpReward) || 0
         );
       }
 
       if (result.success) {
         setMessage(editingLessonId ? "✅ Lesson updated successfully!" : "✅ Lesson created successfully!");
-        setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
+        setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "", xpReward: "" });
         setEditingLessonId(null);
         setShowLessonForm(false);
         fetchAllData();
@@ -270,7 +273,8 @@ export default function AdminDashboard() {
       lessonOrder: lesson.lessonOrder || "1",
       problemDescription: lesson.problemDescription || "",
       solutionTemplate: lesson.solutionTemplate || "",
-      testCases: lesson.testCases || ""
+      testCases: lesson.testCases || "",
+      xpReward: lesson.xpReward || ""
     });
     setShowLessonForm(true);
   };
@@ -1044,6 +1048,23 @@ export default function AdminDashboard() {
                         })
                       }
                       rows="4"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-label">XP Reward</label>
+                    <input
+                      type="number"
+                      className="admin-input"
+                      placeholder="E.g.: 100"
+                      value={lessonForm.xpReward}
+                      onChange={(e) =>
+                        setLessonForm({
+                          ...lessonForm,
+                          xpReward: e.target.value,
+                        })
+                      }
+                      min="0"
                     />
                   </div>
 
