@@ -24,9 +24,9 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
     const headers = await getAuthHeader();
     const fullUrl = `${API_BASE_URL}/api${endpoint}`;
 
-    console.log(`🚀 API Call: ${method} ${fullUrl}`);
-    console.log(`📌 API Base URL: ${API_BASE_URL}`);
-    console.log(`📋 Headers:`, headers);
+    console.log(`API Call: ${method} ${fullUrl}`);
+    console.log(`API Base URL: ${API_BASE_URL}`);
+    console.log(`Headers:`, headers);
 
     const options = {
       method,
@@ -35,12 +35,12 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
 
     if (data) {
       options.body = JSON.stringify(data);
-      console.log(`📦 Body:`, data);
+      console.log(`Body:`, data);
     }
 
     const response = await fetch(fullUrl, options);
 
-    console.log(`✅ Response Status: ${response.status}`);
+    console.log(`Response Status: ${response.status}`);
 
     if (!response.ok) {
       try {
@@ -49,7 +49,7 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
       } catch (parseError) {
         // Response không phải JSON (có thể là HTML exception page)
         const errorText = await response.text();
-        console.error("❌ Error Response Text:", errorText.substring(0, 200));
+        console.error("Error Response Text:", errorText.substring(0, 200));
         throw new Error(`API error: ${response.status} - ${errorText.substring(0, 100)}`);
       }
     }
@@ -60,7 +60,7 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
 
     return await response.json();
   } catch (error) {
-    console.error(`❌ API call error [${method} ${endpoint}]:`, error);
+    console.error(`API call error [${method} ${endpoint}]:`, error);
     throw error;
   }
 };
@@ -178,6 +178,7 @@ export const lessonService = {
         problemDescription: lesson.problemDescription,
         solutionTemplate: lesson.solutionTemplate,
         testCases: lesson.testCases,
+        xpReward: lesson.xpReward || 0,
         createdAt: lesson.createdAt,
         updatedAt: lesson.updatedAt
       })) : [];
@@ -198,7 +199,7 @@ export const lessonService = {
         try {
           const course = await apiCall(`/course/${lesson.courseId}`);
           courseLanguage = course.language || null;
-          console.log(`✅ Course language fetched: ${courseLanguage}`);
+          console.log(`Course language fetched: ${courseLanguage}`);
         } catch (err) {
           console.warn("Could not fetch course language:", err);
         }
@@ -214,6 +215,7 @@ export const lessonService = {
         problemDescription: lesson.problemDescription,
         solutionTemplate: lesson.solutionTemplate,
         testCases: lesson.testCases,
+        xpReward: lesson.xpReward || 0,
         createdAt: lesson.createdAt,
         updatedAt: lesson.updatedAt,
         course: {
@@ -240,6 +242,7 @@ export const lessonService = {
         problemDescription: lesson.problemDescription,
         solutionTemplate: lesson.solutionTemplate,
         testCases: lesson.testCases,
+        xpReward: lesson.xpReward || 0,
         createdAt: lesson.createdAt,
         updatedAt: lesson.updatedAt
       })) : [];
@@ -250,7 +253,7 @@ export const lessonService = {
   },
 
   // Tạo lesson mới
-  async createLesson(courseId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases) {
+  async createLesson(courseId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases, xpReward = 0) {
     try {
       const lesson = await apiCall("/lesson", "POST", {
         courseId,
@@ -259,6 +262,7 @@ export const lessonService = {
         problemDescription: problemDescription || null,
         solutionTemplate: solutionTemplate || null,
         testCases: testCases || null,
+        xpReward: xpReward || 0,
       });
       return { success: true, data: lesson };
     } catch (error) {
@@ -267,7 +271,7 @@ export const lessonService = {
   },
 
   // Cập nhật lesson
-  async updateLesson(lessonId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases) {
+  async updateLesson(lessonId, lessonTitle, lessonOrder, problemDescription, solutionTemplate, testCases, xpReward = 0) {
     try {
       const lesson = await apiCall(`/lesson/${lessonId}`, "PUT", {
         lessonTitle,
@@ -275,6 +279,7 @@ export const lessonService = {
         problemDescription: problemDescription || null,
         solutionTemplate: solutionTemplate || null,
         testCases: testCases || null,
+        xpReward: xpReward || 0,
       });
       return { success: true, data: lesson };
     } catch (error) {
@@ -642,6 +647,253 @@ export const lessonHintService = {
     try {
       await apiCall(`/lessonhint/${hintId}`, "DELETE");
       return { success: true, message: "Hint deleted successfully" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+};
+
+// ========== PvP PROBLEMS SERVICES ==========
+export const pvpProblemService = {
+  // Get all PvP problems
+  async getAllProblems() {
+    try {
+      const problems = await apiCall("/pvpproblem");
+      const mappedProblems = Array.isArray(problems) ? problems.map(p => ({
+        problemId: p.problemId,
+        title: p.title,
+        problemDescription: p.problemDescription,
+        solutionTemplate: p.solutionTemplate,
+        testCases: p.testCases,
+        xpReward: p.xpReward,
+        createdAt: p.createdAt
+      })) : [];
+      return { success: true, data: mappedProblems };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get PvP problem by ID
+  async getProblemById(problemId) {
+    try {
+      const problem = await apiCall(`/pvpproblem/${problemId}`);
+      return { success: true, data: problem };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get random PvP problem
+  async getRandomProblem() {
+    try {
+      const problem = await apiCall("/pvpproblem/random/problem");
+      return { success: true, data: problem };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Create PvP problem (admin only)
+  async createProblem(title, problemDescription, solutionTemplate, testCases, xpReward = 20) {
+    try {
+      const problem = await apiCall("/pvpproblem", "POST", {
+        title,
+        problemDescription,
+        solutionTemplate,
+        testCases,
+        xpReward
+      });
+      return { success: true, data: problem };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Update PvP problem (admin only)
+  async updateProblem(problemId, title, problemDescription, solutionTemplate, testCases, xpReward) {
+    try {
+      const problem = await apiCall(`/pvpproblem/${problemId}`, "PUT", {
+        title,
+        problemDescription,
+        solutionTemplate,
+        testCases,
+        xpReward
+      });
+      return { success: true, data: problem };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Delete PvP problem (admin only)
+  async deleteProblem(problemId) {
+    try {
+      await apiCall(`/pvpproblem/${problemId}`, "DELETE");
+      return { success: true, message: "Problem deleted successfully" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+};
+
+// ========== PvP MATCHES SERVICES ==========
+export const pvpMatchService = {
+  // Get match by ID
+  async getMatchById(matchId) {
+    try {
+      const match = await apiCall(`/pvpmatch/${matchId}`);
+      return { success: true, data: match };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get all user matches
+  async getUserMatches() {
+    try {
+      const matches = await apiCall("/pvpmatch/user/all");
+      const mappedMatches = Array.isArray(matches) ? matches.map(m => ({
+        matchId: m.matchId,
+        problemId: m.problemId,
+        status: m.status,
+        player1Id: m.player1Id,
+        player2Id: m.player2Id,
+        winnerId: m.winnerId,
+        player1Code: m.player1Code,
+        player2Code: m.player2Code,
+        xpChangeP1: m.xpChangeP1,
+        xpChangeP2: m.xpChangeP2,
+        createdAt: m.createdAt,
+        startedAt: m.startedAt,
+        completedAt: m.completedAt
+      })) : [];
+      return { success: true, data: mappedMatches };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get user matches by status
+  async getUserMatchesByStatus(status) {
+    try {
+      const validStatuses = ["searching", "in_progress", "completed", "cancelled"];
+      if (!validStatuses.includes(status)) {
+        throw new Error("Invalid status");
+      }
+      const matches = await apiCall(`/pvpmatch/user/status/${status}`);
+      const mappedMatches = Array.isArray(matches) ? matches.map(m => ({
+        matchId: m.matchId,
+        problemId: m.problemId,
+        status: m.status,
+        player1Id: m.player1Id,
+        player2Id: m.player2Id,
+        winnerId: m.winnerId,
+        player1Code: m.player1Code,
+        player2Code: m.player2Code,
+        xpChangeP1: m.xpChangeP1,
+        xpChangeP2: m.xpChangeP2,
+        createdAt: m.createdAt,
+        startedAt: m.startedAt,
+        completedAt: m.completedAt
+      })) : [];
+      return { success: true, data: mappedMatches };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get user active match
+  async getUserActiveMatch() {
+    try {
+      const match = await apiCall("/pvpmatch/user/active");
+      return { success: true, data: match };
+    } catch (error) {
+      return { success: false, data: null, message: error.message };
+    }
+  },
+
+  // Get all searching matches (for matchmaking)
+  async getSearchingMatches() {
+    try {
+      const matches = await apiCall("/pvpmatch/search/available");
+      const mappedMatches = Array.isArray(matches) ? matches.map(m => ({
+        matchId: m.matchId,
+        problemId: m.problemId,
+        status: m.status,
+        player1Id: m.player1Id,
+        player2Id: m.player2Id,
+        winnerId: m.winnerId,
+        createdAt: m.createdAt,
+        startedAt: m.startedAt
+      })) : [];
+      return { success: true, data: mappedMatches };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Create a new match (player1 joins queue)
+  async createMatch() {
+    try {
+      const match = await apiCall("/pvpmatch/create", "POST");
+      return { success: true, data: match };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Join a searching match (player2 joins)
+  async joinMatch(matchId) {
+    try {
+      const match = await apiCall(`/pvpmatch/${matchId}/join`, "POST");
+      return { success: true, data: match };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Submit player code
+  async submitCode(matchId, code) {
+    try {
+      const match = await apiCall(`/pvpmatch/${matchId}/submit-code`, "POST", {
+        code
+      });
+      return { success: true, data: match };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Complete match with winner and XP changes
+  async completeMatch(matchId, winnerId, xpChangeP1, xpChangeP2) {
+    try {
+      const match = await apiCall(`/pvpmatch/${matchId}/complete`, "POST", {
+        winnerId,
+        xpChangeP1,
+        xpChangeP2
+      });
+      return { success: true, data: match };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Cancel match
+  async cancelMatch(matchId) {
+    try {
+      await apiCall(`/pvpmatch/${matchId}/cancel`, "POST");
+      return { success: true, message: "Match cancelled successfully" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Delete match (admin only)
+  async deleteMatch(matchId) {
+    try {
+      await apiCall(`/pvpmatch/${matchId}`, "DELETE");
+      return { success: true, message: "Match deleted successfully" };
     } catch (error) {
       return { success: false, message: error.message };
     }

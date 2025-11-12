@@ -127,6 +127,15 @@ export default function MainMenu() {
     }, 1000);
   }, [navigate]);
 
+  const handlePvPClick = useCallback(() => {
+    setIsLoading(true);
+    setLoadingMessage("Loading battle arena...");
+    setTimeout(() => {
+      navigate("/pvp/lobby");
+      setIsLoading(false);
+    }, 1000);
+  }, [navigate]);
+
   const handleLogout = useCallback(async () => {
     const result = await authService.signOut();
     if (result.success) {
@@ -282,7 +291,7 @@ export default function MainMenu() {
                 </a>
               </li>
               <li>
-                <a onClick={() => alert("Battle PvP coming soon!")}>
+                <a onClick={() => handlePvPClick()}>
                   Battle PvP
                 </a>
               </li>

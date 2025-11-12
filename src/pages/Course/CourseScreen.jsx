@@ -47,6 +47,7 @@ export default function CourseScreen() {
   const [expandedLessonId, setExpandedLessonId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
+  const [isNavigating, setIsNavigating] = useState(false);
   
   // Trạng thái hoàn thành bài học
   const [completedLessons, setCompletedLessons] = useState({});
@@ -138,6 +139,8 @@ export default function CourseScreen() {
 
   if (courseLoading || !course) return <LoadingScreen isVisible={true} message="Loading course..." />;
 
+  if (isNavigating) return <LoadingScreen isVisible={true} message="Loading..." />;
+
   const completedCount = Object.values(completedLessons).filter(Boolean).length;
   const progressPercentage = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
 
@@ -176,7 +179,13 @@ export default function CourseScreen() {
       
       <nav className="course-navbar">
         <div className="navbar-left">
-          <button className="back-btn" onClick={() => navigate("/main-menu")}>
+          <button 
+            className="back-btn" 
+            onClick={() => {
+              setIsNavigating(true);
+              setTimeout(() => navigate("/main-menu"), 500);
+            }}
+          >
             <i className="fas fa-arrow-left"></i>
           </button>
         </div>

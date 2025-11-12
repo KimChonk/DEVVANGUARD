@@ -12,17 +12,40 @@ dist
 dist-ssr
 *.local
 
-# Environment variables
+# Environment variables (CRITICAL - contains all secrets)
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
 
-# Supabase (local development - contains secrets)
+# Supabase (contains database credentials and API keys)
 supabase/
+supabase.json
 
-# Editor directories and files
+# API Keys and Credentials
+.env.supabase
+config.supabase.js
+.supabase/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Build and dependency files
+build/
+out/
+.next/
+.nuxt/
+dist/
+.cache/
+.turbo/
+
+# IDE and Editor
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -30,4 +53,61 @@ supabase/
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+*~
+.project
+.classpath
+*.c9/
+*.iml
+*.iws
+*.ipr
 
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.bak
+
+# Local development
+local/
+temp/
+tmp/
+*.tmp
+
+# Testing
+coverage/
+.nyc_output/
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Secrets and sensitive files
+secrets/
+.secrets/
+private/
+credentials/
+tokens/
+
+# Config files with sensitive data
+config.local.js
+config.development.js
+local.config.js
+settings.local.js
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+.db
+
+# API Documentation (if contains credentials)
+docs/api/credentials*
+docs/api/*secret*
+docs/api/*key*
