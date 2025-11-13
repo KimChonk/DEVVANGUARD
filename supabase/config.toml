@@ -1,4 +1,6 @@
 
+
+
 [functions.npc-chat]
 enabled = true
 verify_jwt = true

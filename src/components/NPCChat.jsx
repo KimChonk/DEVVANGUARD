@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import '../assets/CSS/npcchat.css';
 import { getNPCResponse, getNPCHint, getNPCCodeFeedback } from '../services/npcAIService';
+import { formatNPCResponse } from '../utils/npcResponseFormatter';
 import AuthContext from '../contexts/AuthContext';
 
 /**
@@ -242,7 +243,10 @@ export default function NPCChat({
       <div className={`npc-message ${status} ${isLoading ? 'loading' : ''}`}>
         {isVisible ? (
           <>
-            <p className="npc-text">{displayedText}</p>
+            <div 
+              className="npc-text"
+              dangerouslySetInnerHTML={{ __html: formatNPCResponse(displayedText) }}
+            />
             {displayedText.length < currentMessage.length && (
               <div className="typing-dots">
                 <span></span>
