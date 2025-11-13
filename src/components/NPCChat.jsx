@@ -273,14 +273,6 @@ export default function NPCChat({
             >
               Hint
             </button>
-            <button
-              className="npc-btn-feedback"
-              onClick={handleGetFeedback}
-              disabled={isLoading}
-              title="Get feedback on code"
-            >
-              Feedback
-            </button>
           </div>
 
           {/* Text Input */}
