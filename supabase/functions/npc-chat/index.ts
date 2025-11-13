@@ -6,23 +6,23 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
 import { corsHeaders } from '../_shared/cors.ts'
 
-// MỚI: Import createClient để đọc JWT
+// Import createClient to read JWT
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 
 
-// Lấy API Key bí mật của OpenAI
+// Get Google Gemini API Key
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 
 
 
-console.log("NPC Chat Function Initialized (Fantasy Version - OpenAI, JWT Secured)");
+console.log("NPC Chat Function Initialized (Fantasy Version - Google Gemini, JWT Secured)");
 
-console.log('🔑 OPENAI_API_KEY exists:', !!OPENAI_API_KEY);
+console.log('🔑 GEMINI_API_KEY exists:', !!GEMINI_API_KEY);
 
 
 
@@ -94,9 +94,29 @@ Deno.serve(async (req) => {
 
     console.log('👤 [NPC] Authenticated user:', user.id);
 
+    
+
+    // Lấy thông tin user từ database để có full name
+
+    const { data: userData, error: userError } = await supabaseClient
+
+      .from('users')
+
+      .select('full_name')
+
+      .eq('user_id', user.id)
+
+      .single()
+
+    
+
+    const userName = userData?.full_name || 'Knight'
+
+    console.log(' [NPC] User name:', userName);
 
 
-    console.log('📥 [NPC] Received request');
+
+    console.log(' [NPC] Received request');
 
     
 
@@ -112,79 +132,88 @@ Deno.serve(async (req) => {
 
 
 
-    // 2. "Linh hồn" của NPC (System Prompt)
+    // 2. "Linh hồn" của NPC (System Prompt) - IMPROVED VERSION
 
-    const systemPrompt = `
+    const systemPrompt = `You are "Merlin", a wise programming mentor wizard helping ${userName} learn to code.
 
-      Bạn là "Mystery Wizard", một NPC pháp sư bí ẩn trong một game học lập trình.
+CONTEXT:
+- Problem: ${problemDescription || 'General coding help'}
+- Student Code: ${userCode || 'None yet'}
 
-      Tên bạn là "Merlin". Người dùng là một "Hiệp sĩ tập sự" (Knight) có ID: ${user.id}.
+YOUR TEACHING RULES:
+1. Keep responses SHORT (max 100 words)
+2. Format code clearly with proper line breaks and indentation:
+   - Use triple backticks for code blocks
+   - One statement per line
+   - Show indentation clearly
+3. Give WORKING CODE EXAMPLES directly (not hints)
+4. Explain briefly WHY it works
+5. Be friendly and encouraging
+6. Address the specific question directly
 
-      
+CODE FORMAT EXAMPLE:
+\`\`\`python
+a = int(input())
+b = int(input())
+print(a + b)
+\`\`\`
+Then explain: "input() gets text, int() converts to numbers, + adds them, print() shows result"
 
-      BỐI CẢNH HIỆN TẠI (KHÔNG được nhắc lại bối cảnh này):
+Remember: Be concise, clear, and helpful. Use code blocks properly.`
 
-      - Đề bài: ${problemDescription || 'No problem description'}
-
-      - Code của Hiệp sĩ: ${userCode || 'No code yet'}
-
-
-
-      QUY TẮC CỦA BẠN:
-
-      1. Luôn nói chuyện với giọng điệu bí ẩn, cổ xưa, và khôn ngoan.
-
-      2. KHÔNG BAO GIỜ đưa ra đáp án code hoàn chỉnh.
-
-      3. Thay vào đó, hãy GỢI Ý. Phân tích code của họ và chỉ ra lỗi (nếu có).
-
-      4. Giữ câu trả lời ngắn gọn (dưới 50 từ).
-
-    `
-
-    console.log('🤖 [NPC] System prompt ready for user:', user.id);
-
+    console.log('🤖 [NPC] System prompt ready for user:', userName);
 
 
-    // 3. Cập nhật payload cho OpenAI
+
+    // 3. Update payload for Google Gemini
 
     const payload = {
 
-      model: 'gpt-3.5-turbo',
+      contents: [
 
-      messages: [
+        {
 
-        { role: 'system', content: systemPrompt },
+          role: 'user',
 
-        { role: 'user', content: userMessage }
+          parts: [
+
+            {
+
+              text: `System: ${systemPrompt}\n\nUser message: ${userMessage}`
+
+            }
+
+          ]
+
+        }
 
       ],
 
-      temperature: 0.7,
+      generationConfig: {
 
-      max_tokens: 150,
+        temperature: 0.7,
 
-      user: user.id, // MỚI: Gửi user_id cho OpenAI để cá nhân hóa
+        maxOutputTokens: 120,
+
+      },
 
     }
 
 
 
-    console.log('📤 [NPC] Calling OpenAI API...');
+    console.log('📤 [NPC] Calling Google Gemini API...');
 
 
 
-    // 4. Gọi API của OpenAI
+    // 4. Call Google Gemini API
 
-    const response = await fetch(OPENAI_API_URL, {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
 
       method: 'POST',
 
       headers: {
 
         'Content-Type': 'application/json',
-
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
 
       },
 
@@ -194,7 +223,7 @@ Deno.serve(async (req) => {
 
 
 
-    console.log('📩 [NPC] OpenAI response status:', response.status);
+    console.log('📩 [NPC] Gemini response status:', response.status);
 
 
 
@@ -202,9 +231,9 @@ Deno.serve(async (req) => {
 
       const errorText = await response.text();
 
-      console.error('❌ [NPC] OpenAI API error:', errorText);
+      console.error('❌ [NPC] Gemini API error:', errorText);
 
-      throw new Error(`OpenAI API error: ${response.statusText} - ${errorText}`);
+      throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`);
 
     }
 
@@ -214,7 +243,7 @@ Deno.serve(async (req) => {
 
     
 
-    const aiResponse = data.choices?.[0]?.message?.content || "Ta đang suy nghĩ... Hãy hỏi lại sau.";
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Ta đang suy nghĩ... Hãy hỏi lại sau.";
 
 
 
