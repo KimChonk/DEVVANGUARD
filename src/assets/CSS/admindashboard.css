@@ -740,13 +740,17 @@
 
 /* Form Styles */
 .admin-form-container {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 2px solid rgba(59, 130, 246, 0.25);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 2.5rem;
   margin-bottom: 2rem;
+  margin-top: 1.5rem;
   backdrop-filter: blur(10px);
   animation: slideDown 0.3s ease-in-out;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 @keyframes slideDown {
@@ -766,10 +770,77 @@
   gap: 1.5rem;
 }
 
+/* New Lesson Form Styles */
+.lesson-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.form-full-width {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
+  justify-content: flex-end;
+}
+
+@media (max-width: 1024px) {
+  .form-row-2col {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-row-2col {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
+
 .admin-form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .admin-form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .admin-label {
@@ -856,7 +927,6 @@ select.admin-input option:hover {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  grid-column: 1 / -1;
 }
 
 .admin-submit:hover:not(:disabled) {
@@ -866,6 +936,29 @@ select.admin-input option:hover {
 }
 
 .admin-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-submit-cancel {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-submit-cancel:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4b5563, #374151);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+}
+
+.admin-submit-cancel:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
