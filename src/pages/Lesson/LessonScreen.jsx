@@ -90,11 +90,9 @@ export default function LessonScreen() {
       try {
         setLoading(true);
         setError(null);
-        console.log(`🔄 Fetching lesson ${lessonId}...`);
         const result = await lessonService.getLessonById(lessonId);
         
         if (result.success) {
-          console.log("✓ Lesson fetched:", result.data);
           setLesson(result.data);
           
           // Initialize code with template
@@ -106,18 +104,15 @@ export default function LessonScreen() {
           const progressResult = await userProgressService.getUserProgressByLessonId(lessonId);
           if (progressResult.success && progressResult.data) {
             setUserProgress(progressResult.data);
-            console.log("✓ User progress:", progressResult.data);
           }
           
           // Show welcome message
           setNpcStatus("welcome");
           setShowNpc(true);
         } else {
-          console.error("✗ Fetch failed:", result.message);
           setError(result.message);
         }
       } catch (err) {
-        console.error("✗ Error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -142,28 +137,20 @@ export default function LessonScreen() {
   };
 
   useEffect(() => {
-    // Chỉ tải khi:
-    // 1. Tab 'hints' được kích hoạt
-    // 2. lessonId đã tồn tại
-    // 3. Danh sách hints đang rỗng (chưa tải)
     if (activeSidebarTab === 'hints' && lessonId && hintsList.length === 0) {
       const fetchHints = async () => {
         setHintsLoading(true);
         setHintsError(null);
-        console.log(`🔄 Fetching hints for lesson ${lessonId}...`);
         
         try {
           const result = await lessonHintService.getHintsByLessonId(lessonId);
           
           if (result.success) {
-            console.log("✓ Hints fetched:", result.data);
             setHintsList(result.data);
           } else {
-            console.error("✗ Fetch hints failed:", result.message);
             setHintsError(result.message);
           }
         } catch (err) {
-          console.error("✗ Error fetching hints:", err);
           setHintsError(err.message);
         } finally {
           setHintsLoading(false);
@@ -172,7 +159,6 @@ export default function LessonScreen() {
 
       fetchHints();
     }
-    // Phụ thuộc vào activeSidebarTab, lessonId, và độ dài của hintsList
   }, [activeSidebarTab, lessonId, hintsList.length]);
 
   // Handle horizontal resize (left/right panels)
@@ -251,7 +237,6 @@ export default function LessonScreen() {
         ? JSON.parse(lesson.testCases) 
         : lesson.testCases;
     } catch (err) {
-      console.warn("Could not parse test cases:", err);
       return [];
     }
   };
@@ -277,8 +262,7 @@ export default function LessonScreen() {
       const language = convertDbToPistonLanguage(dbLanguage);
       const testCases = getTestCases();
 
-      console.log(`Executing ${language} code with ${testCases.length} test cases...`);
-      console.log(`Course Language: ${dbLanguage} → Piston Language: ${language}`);
+
 
       // Execute code and validate
       const result = await executeAndValidate(language, code, testCases);
@@ -330,7 +314,6 @@ export default function LessonScreen() {
         });
       }
     } catch (err) {
-      console.error("✗ Error:", err);
       setOutput(`Error: ${err.message}`);
       setNpcMessage(`Error occurred: ${err.message}`);
       setNpcStatus("error");
