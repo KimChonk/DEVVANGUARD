@@ -973,15 +973,8 @@
   font-family: "Cinzel", serif;
 }
 
-<<<<<<< HEAD
-
-
-
-
-=======
 .profile-main-area {
   display: flex;
   flex-direction: column;
-  gap: 30px; /* <-- THÊM DÒNG NÀY VÀO */
+  gap: 30px;
 }
->>>>>>> 90f50202a871efc36e047239586e34ec2226f17d
