@@ -1,4 +1,4 @@
-/* ===== PROFILE PAGE STYLING ===== */
+﻿/* ===== PROFILE PAGE STYLING ===== */
 
 :root {
   --primary-gold: #d4af37;
@@ -667,18 +667,18 @@
 }
 
 .profile-background {
-  position: fixed; /* QUAN TRỌNG: Giữ nền cố định */
+  position: fixed; /* QUAN TRá»ŒNG: Giá»¯ ná»n cá»‘ Ä‘á»‹nh */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("/images/background_profile.png"); /* Đường dẫn đến ảnh của bạn */
+  background-image: url("/images/background_profile.png"); /* ÄÆ°á»ng dáº«n Ä‘áº¿n áº£nh cá»§a báº¡n */
   background-size: cover;
   background-position: center;
-  filter: brightness(0.4) contrast(1.2); /* Làm tối nền để chữ nổi bật */
-  z-index: -1; /* QUAN TRỌNG: Đẩy nền ra phía sau tất cả nội dung */
+  filter: brightness(0.4) contrast(1.2); /* LÃ m tá»‘i ná»n Ä‘á»ƒ chá»¯ ná»•i báº­t */
+  z-index: -1; /* QUAN TRá»ŒNG: Äáº©y ná»n ra phÃ­a sau táº¥t cáº£ ná»™i dung */
   
-  /* Hiệu ứng chuyển động (tùy chọn) */
+  /* Hiá»‡u á»©ng chuyá»ƒn Ä‘á»™ng (tÃ¹y chá»n) */
   animation: backgroundShift 30s ease-in-out infinite;
 }
 
@@ -695,8 +695,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  padding-top: 100px; /* Đảm bảo nội dung không bị navbar che */
-  color: var(--text-light); /* Dùng biến màu từ mainmenu.css */
+  padding-top: 100px; /* Äáº£m báº£o ná»™i dung khÃ´ng bá»‹ navbar che */
+  color: var(--text-light); /* DÃ¹ng biáº¿n mÃ u tá»« mainmenu.css */
   font-family: "Cinzel", serif;
 }
 
@@ -714,12 +714,12 @@
 }
 
 .profile-avatar-large {
-  width: 100px; /* Kích thước avatar lớn */
+  width: 100px; /* KÃ­ch thÆ°á»›c avatar lá»›n */
   height: 100px;
   border-radius: 50%;
   border: 3px solid var(--primary-gold);
   object-fit: cover;
-  clip-path: circle(50%); /* Đảm bảo avatar tròn */
+  clip-path: circle(50%); /* Äáº£m báº£o avatar trÃ²n */
   filter: drop-shadow(0 0 10px var(--glow-gold));
 }
 
@@ -739,7 +739,7 @@
 
 .profile-content {
   display: grid;
-  grid-template-columns: 1fr 2fr; /* Sidebar 1 phần, main 2 phần */
+  grid-template-columns: 1fr 2fr; /* Sidebar 1 pháº§n, main 2 pháº§n */
   gap: 40px;
 }
 
@@ -821,12 +821,12 @@
 }
 
 .edit-profile-btn {
-  /* 1. Di chuyển nút vào góc (ô đỏ) */
+  /* 1. Di chuyá»ƒn nÃºt vÃ o gÃ³c (Ã´ Ä‘á») */
   position: absolute;
   bottom: 20px;
   right: 20px;
   
-  /* 2. Style "Viền Vàng" cho đẹp */
+  /* 2. Style "Viá»n VÃ ng" cho Ä‘áº¹p */
   background: transparent;
   border: 2px solid var(--primary-gold);
   color: var(--primary-gold);
@@ -846,7 +846,7 @@
 }
 
 .edit-profile-btn:hover {
-  /* Hiệu ứng khi di chuột vào */
+  /* Hiá»‡u á»©ng khi di chuá»™t vÃ o */
   background: var(--primary-gold);
   color: var(--dark-blue);
   box-shadow: 0 0 15px var(--glow-gold);
@@ -855,13 +855,13 @@
 /* Responsive Design cho Profile Page */
 @media (max-width: 992px) {
   .profile-content {
-    grid-template-columns: 1fr; /* Stack sidebar và main content trên mobile */
+    grid-template-columns: 1fr; /* Stack sidebar vÃ  main content trÃªn mobile */
   }
   .profile-container {
-    padding-top: 80px; /* Điều chỉnh padding top cho màn hình nhỏ hơn */
+    padding-top: 80px; /* Äiá»u chá»‰nh padding top cho mÃ n hÃ¬nh nhá» hÆ¡n */
   }
   .edit-profile-btn {
-    position: static; /* Bỏ định vị tuyệt đối */
+    position: static; /* Bá» Ä‘á»‹nh vá»‹ tuyá»‡t Ä‘á»‘i */
     width: 100%;
     margin-top: 20px;
   }
@@ -879,48 +879,48 @@
     font-size: 1rem;
   }
   .stats-grid {
-    grid-template-columns: 1fr; /* Stack các stats trên mobile */
+    grid-template-columns: 1fr; /* Stack cÃ¡c stats trÃªn mobile */
   }
 }
 @media (max-width: 480px) {
 
-  /* Sửa lại padding cho toàn bộ container */
+  /* Sá»­a láº¡i padding cho toÃ n bá»™ container */
   .leaderboard-container {
-    /* Giảm padding ngang để có thêm không gian */
+    /* Giáº£m padding ngang Ä‘á»ƒ cÃ³ thÃªm khÃ´ng gian */
     padding: 20px 15px; 
   }
 
-  /* * Sửa lỗi "lệch" của header
-   * Cho icon cúp nằm trên, chữ nằm dưới 
+  /* * Sá»­a lá»—i "lá»‡ch" cá»§a header
+   * Cho icon cÃºp náº±m trÃªn, chá»¯ náº±m dÆ°á»›i 
   */
   .leaderboard-header {
-    flex-direction: column; /* Xếp chồng lên nhau */
-    align-items: center;    /* Căn giữa theo chiều ngang */
-    text-align: center;     /* Căn giữa chữ */
-    gap: 15px;              /* Giảm khoảng cách giữa cúp và chữ */
+    flex-direction: column; /* Xáº¿p chá»“ng lÃªn nhau */
+    align-items: center;    /* CÄƒn giá»¯a theo chiá»u ngang */
+    text-align: center;     /* CÄƒn giá»¯a chá»¯ */
+    gap: 15px;              /* Giáº£m khoáº£ng cÃ¡ch giá»¯a cÃºp vÃ  chá»¯ */
   }
 
-  /* Thu nhỏ icon cúp */
+  /* Thu nhá» icon cÃºp */
   .trophy-icon {
     width: 60px;
     height: 60px;
   }
 
-  /* * Sửa lỗi chữ "Leaderboards" quá to 
+  /* * Sá»­a lá»—i chá»¯ "Leaderboards" quÃ¡ to 
   */
   .leaderboard-title {
-    font-size: 2.5rem; /* Giảm cỡ chữ (bạn có thể chỉnh 2.2rem, 2.8rem, v.v.) */
+    font-size: 2.5rem; /* Giáº£m cá»¡ chá»¯ (báº¡n cÃ³ thá»ƒ chá»‰nh 2.2rem, 2.8rem, v.v.) */
   }
 
-  /* Thu nhỏ phụ đề */
+  /* Thu nhá» phá»¥ Ä‘á» */
   .leaderboard-subtitle {
     font-size: 0.9rem;
     line-height: 1.4;
   }
 
-  /* Tinh chỉnh lại các hàng cho gọn hơn */
+  /* Tinh chá»‰nh láº¡i cÃ¡c hÃ ng cho gá»n hÆ¡n */
   .leaderboard-item {
-    padding: 10px 15px; /* Giảm padding trong mỗi hàng */
+    padding: 10px 15px; /* Giáº£m padding trong má»—i hÃ ng */
   }
 
   .leaderboard-item .avatar {
@@ -938,32 +938,32 @@
 
   .leaderboard-item .xp {
     font-size: 1rem;
-    min-width: auto; /* Bỏ min-width để nó co lại */
+    min-width: auto; /* Bá» min-width Ä‘á»ƒ nÃ³ co láº¡i */
     text-align: right;
   }
   /* .edit-profile-btn span {
     display: none;} 
    */
   .edit-profile-btn i {
-    margin-right: 0; /* Bỏ khoảng cách */
+    margin-right: 0; /* Bá» khoáº£ng cÃ¡ch */
   }
 }
 
 .profile-main {
-  display: flex;             /* 1. Kích hoạt Flexbox */
-  flex-direction: column;    /* 2. Xếp các mục theo chiều dọc */
-  gap: 20px; /* 3. Tạo khoảng cách 20px giữa các mục */
+  display: flex;             /* 1. KÃ­ch hoáº¡t Flexbox */
+  flex-direction: column;    /* 2. Xáº¿p cÃ¡c má»¥c theo chiá»u dá»c */
+  gap: 20px; /* 3. Táº¡o khoáº£ng cÃ¡ch 20px giá»¯a cÃ¡c má»¥c */
   align-self: start;
 }
 
 .skills-list {
   display: flex;
-  flex-wrap: wrap; /* Cho phép các skill xuống hàng */
+  flex-wrap: wrap; /* Cho phÃ©p cÃ¡c skill xuá»‘ng hÃ ng */
   gap: 10px;
 }
 
 .skill-tag {
-  background-color: rgba(15, 52, 96, 0.7); /* Màu xanh từ theme */
+  background-color: rgba(15, 52, 96, 0.7); /* MÃ u xanh tá»« theme */
   border: 1px solid var(--primary-gold);
   color: var(--text-gold);
   padding: 5px 12px;
@@ -976,5 +976,5 @@
 .profile-main-area {
   display: flex;
   flex-direction: column;
-  gap: 30px; /* <-- THÊM DÒNG NÀY VÀO */
+  gap: 30px;
 }

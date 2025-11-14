@@ -1,4 +1,4 @@
-/* Dashboard Screen - Medieval Fantasy Theme */
+﻿/* Dashboard Screen - Medieval Fantasy Theme */
 .dashboard-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 50%, #1a1f3a 100%);
@@ -669,3 +669,8 @@
     padding: 1rem;
   }
 }
+
+
+
+
+

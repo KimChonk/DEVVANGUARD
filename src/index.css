@@ -1,4 +1,4 @@
-/* Global CSS Reset and Base Styles */
+﻿/* Global CSS Reset and Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -31,18 +31,18 @@
   scrollbar-width: thin;
 }
 
-/* Áp dụng font cơ bản cho toàn trang */
+/* Ãp dá»¥ng font cÆ¡ báº£n cho toÃ n trang */
 body {
-  font-family: 'Montserrat', sans-serif; /* Font chữ thường */
+  font-family: 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Color Emoji', 'Noto Emoji', sans-serif; /* Font chá»¯ thÆ°á»ng */
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Áp dụng font tiêu đề cho các thẻ h1, h2, h3 và logo */
+/* Ãp dá»¥ng font tiÃªu Ä‘á» cho cÃ¡c tháº» h1, h2, h3 vÃ  logo */
 h1, h2, h3, h4, h5, h6, .logo-text, .hero-title, .course-title, .feature-title, .developer-name {
-  font-family: 'Merriweather', serif; /* Font tiêu đề */
+  font-family: 'Noto Serif', 'Merriweather', serif; /* Font tiÃªu Ä‘á» */
   font-weight: 700;
 }
 

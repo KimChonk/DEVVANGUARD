@@ -1,17 +1,17 @@
-/* src/assets/CSS/editprofile.css */
+﻿/* src/assets/CSS/editprofile.css */
 
-/* * File này sử dụng các biến màu và font từ mainmenu.css
- * (ví dụ: --primary-gold, --dark-blue, "Cinzel", "MedievalSharp")
+/* * File nÃ y sá»­ dá»¥ng cÃ¡c biáº¿n mÃ u vÃ  font tá»« mainmenu.css
+ * (vÃ­ dá»¥: --primary-gold, --dark-blue, "Cinzel", "MedievalSharp")
 */
 
 .edit-profile-container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
-  padding-top: 100px; /* Dưới navbar */
+  padding-top: 100px; /* DÆ°á»›i navbar */
   color: var(--text-light);
   font-family: "Cinzel", serif;
-  position: relative; /* Để nằm trên background */
+  position: relative; /* Äá»ƒ náº±m trÃªn background */
   z-index: 1;
 }
 
@@ -32,11 +32,11 @@
 
 .edit-profile-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr; /* Cột trái 1, Cột phải 2 */
+  grid-template-columns: 1fr 2fr; /* Cá»™t trÃ¡i 1, Cá»™t pháº£i 2 */
   gap: 40px;
 }
 
-/* --- CỘT BÊN TRÁI --- */
+/* --- Cá»˜T BÃŠN TRÃI --- */
 .profile-left-col {
   display: flex;
   flex-direction: column;
@@ -69,7 +69,7 @@
   line-height: 1.4;
 }
 
-/* --- CỘT BÊN PHẢI & FORM CHUNG --- */
+/* --- Cá»˜T BÃŠN PHáº¢I & FORM CHUNG --- */
 .profile-right-col {
   display: flex;
   flex-direction: column;
@@ -93,7 +93,7 @@
 .form-group input[type="text"],
 .form-group textarea {
   width: 100%;
-  background-color: rgba(15, 52, 96, 0.5); /* Nền xanh đậm trong theme */
+  background-color: rgba(15, 52, 96, 0.5); /* Ná»n xanh Ä‘áº­m trong theme */
   border: 1px solid var(--primary-gold);
   border-radius: 8px;
   padding: 12px 15px;
@@ -107,7 +107,7 @@
 .form-group textarea:focus {
   outline: none;
   border-color: var(--secondary-gold);
-  box-shadow: 0 0 10px var(--glow-gold); /* Hiệu ứng phát sáng */
+  box-shadow: 0 0 10px var(--glow-gold); /* Hiá»‡u á»©ng phÃ¡t sÃ¡ng */
 }
 
 .form-group textarea {
@@ -116,7 +116,7 @@
 }
 
 .form-group .required {
-  color: #ff5555; /* Màu đỏ */
+  color: #ff5555; /* MÃ u Ä‘á» */
 }
 
 /* --- SKILLS SECTION --- */
@@ -146,9 +146,9 @@
   gap: 10px;
 }
 
-/* === SỬA LỖI: Sửa 'type_note' thành 'type' === */
+/* === Sá»¬A Lá»–I: Sá»­a 'type_note' thÃ nh 'type' === */
 .skill-item input[type="checkbox"] {
-  /* Style checkbox cho hợp theme */
+  /* Style checkbox cho há»£p theme */
   appearance: none;
   -webkit-appearance: none;
   width: 18px;
@@ -160,14 +160,14 @@
   position: relative;
 }
 
-/* === SỬA LỖI: Sửa 'type_note' thành 'type' === */
+/* === Sá»¬A Lá»–I: Sá»­a 'type_note' thÃ nh 'type' === */
 .skill-item input[type="checkbox"]:checked {
   background-color: var(--primary-gold);
 }
 
-/* === SỬA LỖI: Sửa 'type_note' thành 'type' === */
+/* === Sá»¬A Lá»–I: Sá»­a 'type_note' thÃ nh 'type' === */
 .skill-item input[type="checkbox"]:checked::before {
-  content: '✔';
+  content: 'âœ”';
   font-size: 12px;
   color: var(--dark-blue);
   position: absolute;
@@ -183,7 +183,7 @@
   cursor: pointer;
 }
 
-/* --- NÚT BẤM --- */
+/* --- NÃšT Báº¤M --- */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -227,21 +227,21 @@
 /* --- RESPONSIVE CHO EDIT FORM --- */
 @media (max-width: 768px) {
   .edit-profile-grid {
-    grid-template-columns: 1fr; /* 1 cột */
+    grid-template-columns: 1fr; /* 1 cá»™t */
   }
 
   .skills-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 cột */
+    grid-template-columns: repeat(2, 1fr); /* 2 cá»™t */
   }
 }
 
 @media (max-width: 480px) {
   .skills-grid {
-    grid-template-columns: 1fr; /* 1 cột */
+    grid-template-columns: 1fr; /* 1 cá»™t */
   }
 
   .form-actions {
-    flex-direction: column-reverse; /* Xếp chồng nút, Save ở trên */
+    flex-direction: column-reverse; /* Xáº¿p chá»“ng nÃºt, Save á»Ÿ trÃªn */
     width: 100%;
   }
 
@@ -249,3 +249,8 @@
     width: 100%;
   }
 }
+
+
+
+
+

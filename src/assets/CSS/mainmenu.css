@@ -1,4 +1,4 @@
-/* ===== MAIN MENU MODERN DESIGN ===== */
+﻿/* ===== MAIN MENU MODERN DESIGN ===== */
 
 :root {
   --primary-gold: #d4af37;
@@ -20,7 +20,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, var(--dark-blue) 0%, var(--darker-blue) 100%);
   color: var(--text-light);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Noto Sans', system-ui, 'Segoe UI', sans-serif;
 }
 
 /* ===== NAVIGATION ===== */
@@ -413,6 +413,7 @@
   font-size: 0.9rem;
   color: var(--text-light);
   font-weight: 600;
+  font-family: 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .profile-level {
@@ -1197,3 +1198,9 @@
     justify-content: center;
   }
 }
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-/* Leaderboard Screen - Medieval Fantasy Theme */
+﻿/* Leaderboard Screen - Medieval Fantasy Theme */
 .leaderboard-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 50%, #1a1f3a 100%);
@@ -414,3 +414,8 @@
     font-size: 1.2rem;
   }
 }
+
+
+
+
+

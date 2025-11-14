@@ -1,4 +1,4 @@
-/* Success Notification Styles - Fantasy Theme */
+﻿/* Success Notification Styles - Fantasy Theme */
 
 .success-notification-overlay {
   position: fixed;
@@ -311,7 +311,7 @@
 }
 
 .xp-text {
-  font-family: 'Arial Black', sans-serif;
+  font-family: 'Noto Sans', Arial, sans-serif;
   letter-spacing: 2px;
 }
 
@@ -441,3 +441,9 @@
     font-size: 24px;
   }
 }
+
+
+
+
+
+
