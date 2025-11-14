@@ -1,4 +1,4 @@
-/* ===== AUTHENTICATION PAGES FANTASY STYLING ===== */
+﻿/* ===== AUTHENTICATION PAGES FANTASY STYLING ===== */
 
 :root {
     --primary-gold: #d4af37;
@@ -325,7 +325,7 @@ body {
 }
 
 .checkbox-container input[type="checkbox"]:checked + .checkmark::after {
-    content: '✓';
+    content: 'âœ“';
     position: absolute;
     top: 50%;
     left: 50%;
@@ -645,3 +645,8 @@ body {
         height: 35px;
     }
 }
+
+
+
+
+

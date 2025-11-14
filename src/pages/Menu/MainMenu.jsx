@@ -12,11 +12,11 @@ const courseImageMap = {
   python: "python_background.gif",  
   java: "Java_background.gif",
   javascript: "html_course.jpg",
-  "c++": "C_background.gif",
-  "c#": "csharp_background.gif",
+  "c++": "Cpp_background.gif",
+  "c#": "c_background.gif",
   css: "C_background.gif",
   html: "html_course.jpg",
-  c: "csharp_background.gif",
+  c: "C_background.gif",
 };
 
 const getCourseImage = (courseName) => {
