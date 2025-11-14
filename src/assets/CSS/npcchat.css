@@ -1,4 +1,4 @@
-/* ===== NPC CHAT - FIXED IN QUEST PANEL ===== */
+﻿/* ===== NPC CHAT - FIXED IN QUEST PANEL ===== */
 
 .npc-chat-container {
     background: linear-gradient(135deg, rgba(20, 20, 35, 0.95) 0%, rgba(40, 25, 60, 0.9) 100%);
@@ -447,3 +447,9 @@
         width: 100%;
     }
 }
+
+
+
+
+
+

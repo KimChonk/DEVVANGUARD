@@ -1,4 +1,4 @@
-/* ===== LEETCODE-STYLE LESSON SCREEN ===== */
+﻿/* ===== LEETCODE-STYLE LESSON SCREEN ===== */
 
 :root {
   --primary-color: #1a1a1a;
@@ -57,23 +57,28 @@ body {
 }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background-color: var(--tertiary-color);
-  color: var(--text-primary);
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #d4af37, #b8941f);
+  border: none;
+  color: #1a1a2e;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
 }
 
 .back-btn:hover {
-  background-color: var(--border-color);
-  transform: translateX(-2px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+.back-btn:active {
+  transform: translateY(0);
 }
 
 .lesson-title {
@@ -985,3 +990,9 @@ body {
     padding: 6px 8px;
   }
 }
+
+
+
+
+
+

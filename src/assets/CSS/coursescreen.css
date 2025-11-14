@@ -1,4 +1,4 @@
-/* ===== COURSE SCREEN NEW LAYOUT (CODEDEX STYLE) ===== */
+﻿/* ===== COURSE SCREEN NEW LAYOUT (CODEDEX STYLE) ===== */
 
 :root {
   --primary-gold: #d4af37;
@@ -23,7 +23,7 @@
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: linear-gradient(
     135deg,
     var(--dark-blue) 0%,
@@ -109,7 +109,7 @@ body {
 }
 
 .course-hero-title {
-  font-family: 'MedievalSharp', cursive;
+  font-family: 'Noto Serif', 'MedievalSharp', cursive;
   font-size: 3.5rem;
   font-weight: 700;
   color: #ffffff;
@@ -117,11 +117,11 @@ body {
   margin: 10px 0 0 0;
   line-height: 1.1;
   letter-spacing: 1px;
-  max-width: 600px;
+  max-width: 1000px;
 }
 
 .course-hero-description {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Noto Sans', sans-serif;
   font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.95);
   max-width: 500px;
@@ -838,3 +838,8 @@ body {
 
 
 /* ===== KEEP OLD STYLES FOR COMPATIBILITY ===== */
+
+
+
+
+

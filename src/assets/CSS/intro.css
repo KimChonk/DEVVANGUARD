@@ -1,5 +1,5 @@
-:root {
-    /* Biến CSS cơ bản (giữ lại) */
+﻿:root {
+    /* Biáº¿n CSS cÆ¡ báº£n (giá»¯ láº¡i) */
     --primary-color: #4CAF50;
     --primary-dark: #3e8e41;
     --accent-color: #ff1100;
@@ -8,19 +8,19 @@
     --bg-dark: #0a0a0a;
     --bg-card: rgba(255, 255, 255, 0.1);
 
-    /* Biến CSS mới (Chủ đề Tím) */
-    --bg-realm: #0B0A1D;       /* Nền chính (Tím than đậm) */
-    --bg-card-new: #1D1B31;    /* Nền phụ (cho thẻ) */
-    --text-muted: #A0A0A0;     /* Chữ phụ, mô tả */
-    --accent-magic: #8A2BE2;   /* Màu nhấn (Tím) */
-    --accent-hover: #9932CC;   /* Màu nhấn khi hover */
+    /* Biáº¿n CSS má»›i (Chá»§ Ä‘á» TÃ­m) */
+    --bg-realm: #0B0A1D;       /* Ná»n chÃ­nh (TÃ­m than Ä‘áº­m) */
+    --bg-card-new: #1D1B31;    /* Ná»n phá»¥ (cho tháº») */
+    --text-muted: #A0A0A0;     /* Chá»¯ phá»¥, mÃ´ táº£ */
+    --accent-magic: #8A2BE2;   /* MÃ u nháº¥n (TÃ­m) */
+    --accent-hover: #9932CC;   /* MÃ u nháº¥n khi hover */
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
     scroll-behavior: smooth;
 }
 
@@ -30,7 +30,7 @@ body {
     overflow-x: hidden;
     font-size: 16px;
     line-height: 1.6;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
     font-weight: 400;
 }
 
@@ -118,7 +118,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-family: 'MedievalSharp', cursive; /* SỬA: Thêm font cho logo */
+    font-family: 'MedievalSharp', cursive; /* Sá»¬A: ThÃªm font cho logo */
 }
 
 .logo-icon {
@@ -149,7 +149,7 @@ body {
     position: relative;
     padding: 5px 0;
     transition: color 0.3s ease;
-    font-family: 'Cinzel', serif; /* SỬA: Thêm font cho link desktop */
+    font-family: 'Cinzel', serif; /* Sá»¬A: ThÃªm font cho link desktop */
 }
 
 .nav-links a::after {
@@ -283,7 +283,7 @@ body {
     60% { transform: translateY(-10px); }
 }
 
-/* ===== GLOW EFFECT (Thanh kiếm lóa sáng) ===== */
+/* ===== GLOW EFFECT (Thanh kiáº¿m lÃ³a sÃ¡ng) ===== */
 @keyframes glow-pulse {
     0% {
         text-shadow: 0 0 10px rgba(76, 175, 80, 0.5),
@@ -307,7 +307,7 @@ body {
     animation: glow-pulse 2s ease-in-out infinite;
 }
 
-/* ===== SHINE EFFECT (Bling sáng bóng chạy từ trái sang phải) ===== */
+/* ===== SHINE EFFECT (Bling sÃ¡ng bÃ³ng cháº¡y tá»« trÃ¡i sang pháº£i) ===== */
 @keyframes shine-sweep {
     0% {
         background-position: -200% 0;
@@ -946,13 +946,13 @@ body {
 .stat-card:nth-child(4) { transition-delay: 0.4s; }
 
 .hamburger-btn-intro {
-    display: none; /* Ẩn trên desktop */
+    display: none; /* áº¨n trÃªn desktop */
     background: none;
     border: none;
     color: white;
     font-size: 1.5rem;
     cursor: pointer;
-    z-index: 101; /* Đảm bảo nó ở trên menu */
+    z-index: 101; /* Äáº£m báº£o nÃ³ á»Ÿ trÃªn menu */
 }
 .mobile-menu-intro {
     display: none;
@@ -982,59 +982,59 @@ body {
         font-size: 1.2rem;
     }
 
-    /* THAY ĐỔI TỪ ĐÂY */
+    /* THAY Äá»”I Tá»ª ÄÃ‚Y */
     .nav-links {
         display: none !important ;
     }
-    /* 1. Biến nav-links thành menu mobile */
+    /* 1. Biáº¿n nav-links thÃ nh menu mobile */
     .mobile-menu-intro {
         display: flex;
         position: fixed;
         top: 0;
         right: 0;
 
-        /* Thay đổi: Không còn 100% width, mà co lại bên trái */
+        /* Thay Ä‘á»•i: KhÃ´ng cÃ²n 100% width, mÃ  co láº¡i bÃªn trÃ¡i */
         width: 80%;
-        max-width: 320px; /* Giới hạn chiều rộng tối đa */
+        max-width: 320px; /* Giá»›i háº¡n chiá»u rá»™ng tá»‘i Ä‘a */
 
         height: 100vh;
-        background-color: rgba(10, 10, 10, 0.98); /* Nền đậm hơn */
+        background-color: rgba(10, 10, 10, 0.98); /* Ná»n Ä‘áº­m hÆ¡n */
         backdrop-filter: blur(10px);
 
         flex-direction: column;
 
-        /* Thay đổi: Căn lề từ trên xuống, không phải giữa */
-        align-items: stretch; /* Kéo dài các mục con */
-        justify-content: flex-start; /* Bắt đầu từ trên xuống */
-        gap: 0; /* Bỏ gap */
+        /* Thay Ä‘á»•i: CÄƒn lá» tá»« trÃªn xuá»‘ng, khÃ´ng pháº£i giá»¯a */
+        align-items: stretch; /* KÃ©o dÃ i cÃ¡c má»¥c con */
+        justify-content: flex-start; /* Báº¯t Ä‘áº§u tá»« trÃªn xuá»‘ng */
+        gap: 0; /* Bá» gap */
 
         opacity: 0;
         visibility: hidden;
         transform: translateX(100%);
         transition: all 0.3s ease-in-out;
         z-index: 102;
-        border-left: 1px solid rgba(255, 255, 255, 0.1); /* Thêm viền phải */
+        border-left: 1px solid rgba(255, 255, 255, 0.1); /* ThÃªm viá»n pháº£i */
     }
 
-    /* 2. Khi có class 'open', hiện menu ra */
+    /* 2. Khi cÃ³ class 'open', hiá»‡n menu ra */
     .mobile-menu-intro.open {
         opacity: 1;
         visibility: visible;
         transform: translateX(0);
     }
 
-    /* 3. Style cho chữ trong menu mobile */
+    /* 3. Style cho chá»¯ trong menu mobile */
     
     .nav-links a::after {
-        display: none; /* Tắt gạch chân */
+        display: none; /* Táº¯t gáº¡ch chÃ¢n */
     }
 
-    /* 4. Hiện nút hamburger lên */
+    /* 4. Hiá»‡n nÃºt hamburger lÃªn */
     .hamburger-btn-intro {
-        display: block; /* Chỉ hiện trên mobile */
+        display: block; /* Chá»‰ hiá»‡n trÃªn mobile */
     }
 
-    /* ... (các style khác của bạn trong 768px) ... */
+    /* ... (cÃ¡c style khÃ¡c cá»§a báº¡n trong 768px) ... */
     .courses-grid, 
     .features-grid, 
     .developers-grid,
@@ -1042,15 +1042,15 @@ body {
         grid-template-columns: 1fr;
     }
 
-    /* --- Style cho Menu Mobile Mới --- */
+    /* --- Style cho Menu Mobile Má»›i --- */
 
-/* Header (Nút X, chữ Menu) */
+/* Header (NÃºt X, chá»¯ Menu) */
     .mobile-menu-header-intro {
         display: flex;
         align-items: center;
         padding: 15px 20px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        flex-shrink: 0; /* Không co lại */
+        flex-shrink: 0; /* KhÃ´ng co láº¡i */
     }
 
     .mobile-menu-header-intro span {
@@ -1068,14 +1068,14 @@ body {
         cursor: pointer;
     }
 
-    /* Danh sách các link */
+    /* Danh sÃ¡ch cÃ¡c link */
     
     .mobile-menu-list-intro {
         list-style: none;
         padding: 0;
         margin: 0;
-        flex-grow: 1; /* Chiếm hết không gian còn lại */
-        overflow-y: auto; /* Cho phép cuộn */
+        flex-grow: 1; /* Chiáº¿m háº¿t khÃ´ng gian cÃ²n láº¡i */
+        overflow-y: auto; /* Cho phÃ©p cuá»™n */
         padding-top: 10px;
         font-family: 'MedievalSharp', cursive;
     }
@@ -1083,11 +1083,11 @@ body {
     .mobile-menu-list-intro li a {
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Đẩy text/icon và mũi tên ra 2 bên */
+        justify-content: space-between; /* Äáº©y text/icon vÃ  mÅ©i tÃªn ra 2 bÃªn */
         padding: 16px 20px;
         text-decoration: none;
         color: var(--text-light);
-        font-size: 1rem; /* Cỡ chữ vừa phải */
+        font-size: 1rem; /* Cá»¡ chá»¯ vá»«a pháº£i */
         font-weight: 500;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         transition: background-color 0.2s ease;
@@ -1097,7 +1097,7 @@ body {
         background-color: rgba(255, 255, 255, 0.05);
     }
 
-    /* Căn lề cho text và icon bên trái */
+    /* CÄƒn lá» cho text vÃ  icon bÃªn trÃ¡i */
     .mobile-menu-list-intro li a span {
         display: flex;
         align-items: center;
@@ -1107,7 +1107,7 @@ body {
         margin-right: 15px;
         width: 20px;
         text-align: center;
-        color: #aaa; /* Màu icon hơi xám */
+        color: #aaa; /* MÃ u icon hÆ¡i xÃ¡m */
     }
 
     .mobile-menu-list-intro .arrow-right {
@@ -1115,7 +1115,7 @@ body {
         font-size: 0.8em;
     }
 
-    /* Vạch kẻ ngang */
+    /* Váº¡ch káº» ngang */
     .mobile-divider-intro {
         height: 1px;
         border: none;
@@ -1124,22 +1124,27 @@ body {
     }
 }
 
-/* Thu nhỏ logo và tiêu đề cho màn hình 480px */
+/* Thu nhá» logo vÃ  tiÃªu Ä‘á» cho mÃ n hÃ¬nh 480px */
 @media (max-width: 480px) {
     .logo {
-        font-size: 20px; /* Giảm cỡ chữ DevVanguard */
+        font-size: 20px; /* Giáº£m cá»¡ chá»¯ DevVanguard */
     }
 
     .logo-icon {
-        width: 30px; /* Giảm cỡ icon */
+        width: 30px; /* Giáº£m cá»¡ icon */
         height: 30px;
     }
 
     .navbar-container {
-        padding: 0 15px; /* Giảm padding ngang của navbar */
+        padding: 0 15px; /* Giáº£m padding ngang cá»§a navbar */
     }
 
     .hero-title {
-        font-size: 2.2rem; /* Giảm cỡ chữ tiêu đề */
+        font-size: 2.2rem; /* Giáº£m cá»¡ chá»¯ tiÃªu Ä‘á» */
     }
 }
+
+
+
+
+
