@@ -298,9 +298,9 @@ export default function MainMenu() {
             </ul>
           </div>
           <div className="main-nav-right">
-            <button className="nav-icon-btn search-btn" onClick={() => alert("Search coming soon!")}>
+            {/* <button className="nav-icon-btn search-btn" onClick={() => alert("Search coming soon!")}>
               <i className="fas fa-search"></i>
-            </button>
+            </button> */}
             <button className="nav-icon-btn notification-btn" onClick={() => alert("No new notifications")}>
               <i className="fas fa-bell"></i>
               <span className="notification-badge">3</span>

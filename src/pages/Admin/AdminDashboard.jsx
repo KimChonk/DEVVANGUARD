@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { userService, courseService, lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
 import { authService } from "../../services/supabaseClient";
 import LoadingScreen from "../../components/LoadingScreen";
+import TestCaseBuilder from "../../components/TestCaseBuilder";
 import "../../assets/CSS/admindashboard.css";
 
 export default function AdminDashboard() {
@@ -946,135 +947,156 @@ export default function AdminDashboard() {
             {/* Lesson Form */}
             {showLessonForm && (
               <div className="admin-form-container">
-                <form className="admin-form-grid" onSubmit={handleCreateLesson}>
-                  <div className="admin-form-group">
-                    <label className="admin-label">Select Course</label>
-                    <select
-                      className="admin-input"
-                      value={lessonForm.courseId}
-                      onChange={(e) => {
-                        setLessonForm({
-                          ...lessonForm,
-                          courseId: e.target.value,
-                        });
-                      }}
-                      required
-                    >
-                      <option value="">-- Select course --</option>
-                      {courses.map((course) => (
-                        <option key={course.id} value={course.id}>
-                          {course.name}
-                        </option>
-                      ))}
-                    </select>
+                <form className="lesson-form" onSubmit={handleCreateLesson}>
+                  {/* Top Row: Course, Lesson Name */}
+                  <div className="form-row-2col">
+                    <div className="admin-form-group">
+                      <label className="admin-label">Select Course *</label>
+                      <select
+                        className="admin-input"
+                        value={lessonForm.courseId}
+                        onChange={(e) => {
+                          setLessonForm({
+                            ...lessonForm,
+                            courseId: e.target.value,
+                          });
+                        }}
+                        required
+                      >
+                        <option value="">-- Select course --</option>
+                        {courses.map((course) => (
+                          <option key={course.id} value={course.id}>
+                            {course.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-label">Lesson Name *</label>
+                      <input
+                        type="text"
+                        className="admin-input"
+                        placeholder="E.g.: Variables and Data Types"
+                        value={lessonForm.lessonTitle}
+                        onChange={(e) =>
+                          setLessonForm({
+                            ...lessonForm,
+                            lessonTitle: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
                   </div>
 
-                  <div className="admin-form-group">
-                    <label className="admin-label">Lesson Name</label>
-                    <input
-                      type="text"
-                      className="admin-input"
-                      placeholder="E.g.: Variables and Data Types"
-                      value={lessonForm.lessonTitle}
-                      onChange={(e) =>
-                        setLessonForm({
-                          ...lessonForm,
-                          lessonTitle: e.target.value,
-                        })
-                      }
-                      required
-                    />
+                  {/* Row: Lesson Order, XP Reward */}
+                  <div className="form-row-2col">
+                    <div className="admin-form-group">
+                      <label className="admin-label">Lesson Order *</label>
+                      <input
+                        type="number"
+                        className="admin-input"
+                        placeholder="E.g.: 1"
+                        value={lessonForm.lessonOrder}
+                        onChange={(e) =>
+                          setLessonForm({
+                            ...lessonForm,
+                            lessonOrder: e.target.value,
+                          })
+                        }
+                        min="1"
+                        required
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-label">XP Reward *</label>
+                      <input
+                        type="number"
+                        className="admin-input"
+                        placeholder="E.g.: 100"
+                        value={lessonForm.xpReward}
+                        onChange={(e) =>
+                          setLessonForm({
+                            ...lessonForm,
+                            xpReward: e.target.value,
+                          })
+                        }
+                        min="0"
+                        required
+                      />
+                    </div>
                   </div>
 
-                  <div className="admin-form-group">
-                    <label className="admin-label">Lesson Order</label>
-                    <input
-                      type="number"
-                      className="admin-input"
-                      placeholder="E.g.: 1"
-                      value={lessonForm.lessonOrder}
-                      onChange={(e) =>
-                        setLessonForm({
-                          ...lessonForm,
-                          lessonOrder: e.target.value,
-                        })
-                      }
-                      min="1"
-                    />
+                  {/* Row: Problem Description, Starter Code (2 col) */}
+                  <div className="form-row-2col">
+                    <div className="admin-form-group">
+                      <label className="admin-label">Problem Description *</label>
+                      <textarea
+                        className="admin-input textarea"
+                        placeholder="Enter detailed problem description..."
+                        value={lessonForm.problemDescription}
+                        onChange={(e) =>
+                          setLessonForm({
+                            ...lessonForm,
+                            problemDescription: e.target.value,
+                          })
+                        }
+                        rows="5"
+                        required
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-label">Starter Code Template *</label>
+                      <textarea
+                        className="admin-input textarea"
+                        placeholder="Enter starter code for students..."
+                        value={lessonForm.solutionTemplate}
+                        onChange={(e) =>
+                          setLessonForm({
+                            ...lessonForm,
+                            solutionTemplate: e.target.value,
+                          })
+                        }
+                        rows="5"
+                        required
+                      />
+                    </div>
                   </div>
 
-                  <div className="admin-form-group">
-                    <label className="admin-label">Problem Description (HTML/Markdown)</label>
-                    <textarea
-                      className="admin-input textarea"
-                      placeholder="Enter detailed problem description..."
-                      value={lessonForm.problemDescription}
-                      onChange={(e) =>
-                        setLessonForm({
-                          ...lessonForm,
-                          problemDescription: e.target.value,
-                        })
-                      }
-                      rows="4"
-                    />
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label className="admin-label">Starter Code Template</label>
-                    <textarea
-                      className="admin-input textarea"
-                      placeholder="Enter starter code for students..."
-                      value={lessonForm.solutionTemplate}
-                      onChange={(e) =>
-                        setLessonForm({
-                          ...lessonForm,
-                          solutionTemplate: e.target.value,
-                        })
-                      }
-                      rows="4"
-                    />
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label className="admin-label">Test Cases (JSON)</label>
-                    <textarea
-                      className="admin-input textarea"
-                      placeholder='[{"input": "5", "output": "25"}]'
+                  {/* Full Width: Test Cases */}
+                  <div className="admin-form-group form-full-width">
+                    <TestCaseBuilder
                       value={lessonForm.testCases}
-                      onChange={(e) =>
+                      onChange={(jsonString) =>
                         setLessonForm({
                           ...lessonForm,
-                          testCases: e.target.value,
+                          testCases: jsonString,
                         })
                       }
-                      rows="4"
                     />
                   </div>
 
-                  <div className="admin-form-group">
-                    <label className="admin-label">XP Reward</label>
-                    <input
-                      type="number"
-                      className="admin-input"
-                      placeholder="E.g.: 100"
-                      value={lessonForm.xpReward}
-                      onChange={(e) =>
-                        setLessonForm({
-                          ...lessonForm,
-                          xpReward: e.target.value,
-                        })
-                      }
-                      min="0"
-                    />
+                  {/* Submit Button */}
+                  <div className="form-actions">
+                    <button
+                      type="submit"
+                      className="admin-submit"
+                      disabled={loading}
+                    >
+                      {loading ? (editingLessonId ? "Updating..." : "Creating...") : (editingLessonId ? "Update Lesson" : "Create Lesson")}
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-submit-cancel"
+                      onClick={() => setShowLessonForm(false)}
+                      disabled={loading}
+                    >
+                      Cancel
+                    </button>
                   </div>
-
-                  <button
-                    type="submit"
-                    className="admin-submit"
-                    disabled={loading}
-                  >
-                    {loading ? (editingLessonId ? "Updating..." : "Creating...") : (editingLessonId ? "Update Lesson" : "Create Lesson")}
-                  </button>
                 </form>
               </div>
             )}
