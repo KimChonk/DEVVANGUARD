@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { lessonService, userProgressService } from "../../services/apiClient";
+import { lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
 import { convertDbToEditorLanguage, convertDbToPistonLanguage, getLanguageDisplayName } from "../../utils/languageMapping";
 import NPCChat from "../../components/NPCChat";
@@ -65,6 +65,10 @@ export default function LessonScreen() {
 
   // User progress state
   const [userProgress, setUserProgress] = useState(null);
+  // Hint
+  const [hintsList, setHintsList] = useState([]);
+  const [hintsLoading, setHintsLoading] = useState(false);
+  const [hintsError, setHintsError] = useState(null);
 
   // Loading screen state
   const [isPageLoading, setIsPageLoading] = useState(false);
@@ -86,11 +90,9 @@ export default function LessonScreen() {
       try {
         setLoading(true);
         setError(null);
-        console.log(`🔄 Fetching lesson ${lessonId}...`);
         const result = await lessonService.getLessonById(lessonId);
         
         if (result.success) {
-          console.log("✓ Lesson fetched:", result.data);
           setLesson(result.data);
           
           // Initialize code with template
@@ -102,18 +104,15 @@ export default function LessonScreen() {
           const progressResult = await userProgressService.getUserProgressByLessonId(lessonId);
           if (progressResult.success && progressResult.data) {
             setUserProgress(progressResult.data);
-            console.log("✓ User progress:", progressResult.data);
           }
           
           // Show welcome message
           setNpcStatus("welcome");
           setShowNpc(true);
         } else {
-          console.error("✗ Fetch failed:", result.message);
           setError(result.message);
         }
       } catch (err) {
-        console.error("✗ Error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -136,6 +135,31 @@ export default function LessonScreen() {
     
     return npcFeedback.default;
   };
+
+  useEffect(() => {
+    if (activeSidebarTab === 'hints' && lessonId && hintsList.length === 0) {
+      const fetchHints = async () => {
+        setHintsLoading(true);
+        setHintsError(null);
+        
+        try {
+          const result = await lessonHintService.getHintsByLessonId(lessonId);
+          
+          if (result.success) {
+            setHintsList(result.data);
+          } else {
+            setHintsError(result.message);
+          }
+        } catch (err) {
+          setHintsError(err.message);
+        } finally {
+          setHintsLoading(false);
+        }
+      };
+
+      fetchHints();
+    }
+  }, [activeSidebarTab, lessonId, hintsList.length]);
 
   // Handle horizontal resize (left/right panels)
   useEffect(() => {
@@ -213,7 +237,6 @@ export default function LessonScreen() {
         ? JSON.parse(lesson.testCases) 
         : lesson.testCases;
     } catch (err) {
-      console.warn("Could not parse test cases:", err);
       return [];
     }
   };
@@ -239,8 +262,7 @@ export default function LessonScreen() {
       const language = convertDbToPistonLanguage(dbLanguage);
       const testCases = getTestCases();
 
-      console.log(`Executing ${language} code with ${testCases.length} test cases...`);
-      console.log(`Course Language: ${dbLanguage} → Piston Language: ${language}`);
+
 
       // Execute code and validate
       const result = await executeAndValidate(language, code, testCases);
@@ -292,7 +314,6 @@ export default function LessonScreen() {
         });
       }
     } catch (err) {
-      console.error("✗ Error:", err);
       setOutput(`Error: ${err.message}`);
       setNpcMessage(`Error occurred: ${err.message}`);
       setNpcStatus("error");
@@ -430,22 +451,44 @@ export default function LessonScreen() {
                 <div className="hints-box">
                   <h2>Hints & Tips</h2>
                   <div className="hints-content">
-                    <div className="hint-item">
-                      <h3>Step 1: Read the Problem Carefully</h3>
-                      <p>Make sure you understand all the requirements before you start coding.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Step 2: Plan Your Approach</h3>
-                      <p>Write down the steps to solve the problem before you start coding.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Step 3: Write Code Step by Step</h3>
-                      <p>Write code in small parts and test each part to find bugs more easily.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Hint for this problem:</h3>
-                      <p>{getFeedback().hint}</p>
-                    </div>
+
+                    {hintsLoading && (
+                      <div className="hint-item">
+                        <p>Loading hints...</p>
+                      </div>
+                    )}
+
+                    {hintsError && (
+                      <div className="hint-item error">
+                        <h3>Error</h3>
+                        <p>Could not load hints: {hintsError}</p>
+                      </div>
+                      )}
+
+                    {!hintsLoading && !hintsError && (
+                      <>
+                        {hintsList.length > 0 ? (
+                          hintsList.map((hint) => (
+                            <div key={hint.hintId} className="hint-item">
+                              <h3>{hint.title || "Hint"}</h3>
+                                {hint.content.split('\n').map((line, idx) => (
+                                <p key={idx}>{line || '\u00A0'}</p> 
+                              ))}
+                            </div>
+                          ))
+                         ) : (
+                          <div className="hint-item">
+                            <p>No specific hints available for this lesson yet.</p>
+                          </div>
+                        )}
+
+                       <div className="hint-item default-hint">
+                          <h3>Default Hint:</h3>
+                          <p>{getFeedback().hint}</p>
+                        </div>
+                        </>
+                    )}
+
                   </div>
                 </div>
               </div>
