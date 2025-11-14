@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { lessonService, userProgressService } from "../../services/apiClient";
+import { lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
 import { convertDbToEditorLanguage, convertDbToPistonLanguage, getLanguageDisplayName } from "../../utils/languageMapping";
 import NPCChat from "../../components/NPCChat";
@@ -65,6 +65,10 @@ export default function LessonScreen() {
 
   // User progress state
   const [userProgress, setUserProgress] = useState(null);
+  // Hint
+  const [hintsList, setHintsList] = useState([]);
+  const [hintsLoading, setHintsLoading] = useState(false);
+  const [hintsError, setHintsError] = useState(null);
 
   // Loading screen state
   const [isPageLoading, setIsPageLoading] = useState(false);
@@ -136,6 +140,40 @@ export default function LessonScreen() {
     
     return npcFeedback.default;
   };
+
+  useEffect(() => {
+    // Chỉ tải khi:
+    // 1. Tab 'hints' được kích hoạt
+    // 2. lessonId đã tồn tại
+    // 3. Danh sách hints đang rỗng (chưa tải)
+    if (activeSidebarTab === 'hints' && lessonId && hintsList.length === 0) {
+      const fetchHints = async () => {
+        setHintsLoading(true);
+        setHintsError(null);
+        console.log(`🔄 Fetching hints for lesson ${lessonId}...`);
+        
+        try {
+          const result = await lessonHintService.getHintsByLessonId(lessonId);
+          
+          if (result.success) {
+            console.log("✓ Hints fetched:", result.data);
+            setHintsList(result.data);
+          } else {
+            console.error("✗ Fetch hints failed:", result.message);
+            setHintsError(result.message);
+          }
+        } catch (err) {
+          console.error("✗ Error fetching hints:", err);
+          setHintsError(err.message);
+        } finally {
+          setHintsLoading(false);
+        }
+      };
+
+      fetchHints();
+    }
+    // Phụ thuộc vào activeSidebarTab, lessonId, và độ dài của hintsList
+  }, [activeSidebarTab, lessonId, hintsList.length]);
 
   // Handle horizontal resize (left/right panels)
   useEffect(() => {
@@ -430,22 +468,44 @@ export default function LessonScreen() {
                 <div className="hints-box">
                   <h2>Hints & Tips</h2>
                   <div className="hints-content">
-                    <div className="hint-item">
-                      <h3>Step 1: Read the Problem Carefully</h3>
-                      <p>Make sure you understand all the requirements before you start coding.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Step 2: Plan Your Approach</h3>
-                      <p>Write down the steps to solve the problem before you start coding.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Step 3: Write Code Step by Step</h3>
-                      <p>Write code in small parts and test each part to find bugs more easily.</p>
-                    </div>
-                    <div className="hint-item">
-                      <h3>Hint for this problem:</h3>
-                      <p>{getFeedback().hint}</p>
-                    </div>
+
+                    {hintsLoading && (
+                      <div className="hint-item">
+                        <p>Loading hints...</p>
+                      </div>
+                    )}
+
+                    {hintsError && (
+                      <div className="hint-item error">
+                        <h3>Error</h3>
+                        <p>Could not load hints: {hintsError}</p>
+                      </div>
+                      )}
+
+                    {!hintsLoading && !hintsError && (
+                      <>
+                        {hintsList.length > 0 ? (
+                          hintsList.map((hint) => (
+                            <div key={hint.hintId} className="hint-item">
+                              <h3>{hint.title || "Hint"}</h3>
+                                {hint.content.split('\n').map((line, idx) => (
+                                <p key={idx}>{line || '\u00A0'}</p> 
+                              ))}
+                            </div>
+                          ))
+                         ) : (
+                          <div className="hint-item">
+                            <p>No specific hints available for this lesson yet.</p>
+                          </div>
+                        )}
+
+                       <div className="hint-item default-hint">
+                          <h3>Default Hint:</h3>
+                          <p>{getFeedback().hint}</p>
+                        </div>
+                        </>
+                    )}
+
                   </div>
                 </div>
               </div>
