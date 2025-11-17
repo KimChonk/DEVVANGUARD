@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePvP } from '../../hooks/usePvP';
 import { useUserProfile, useUserStats } from '../../hooks/useUser';
+import { useCourses } from '../../hooks/useCourses';
 import SuccessNotification from '../../components/SuccessNotification';
 import AlertNotification from '../../components/AlertNotification';
 import LoadingScreen from '../../components/LoadingScreen';
 import '../../assets/CSS/pvplobby.css';
+import '../../assets/CSS/mainmenu.css';
 
 const POLL_INTERVAL = 2000;
 const COUNTDOWN_TIME = 5;
@@ -14,6 +16,7 @@ export default function PvPLobby() {
   const navigate = useNavigate();
   const { profile, loading: profileLoading } = useUserProfile();
   const { stats, loading: statsLoading } = useUserStats();
+  const { courses, loading: coursesLoading } = useCourses();
   const {
     joinQueue,
     getSearchingMatches,
@@ -41,6 +44,7 @@ export default function PvPLobby() {
   const [showSuccessNotif, setShowSuccessNotif] = useState(false);
   const [showErrorNotif, setShowErrorNotif] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showLearnDropdown, setShowLearnDropdown] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -205,6 +209,10 @@ export default function PvPLobby() {
     return match.status || 'unknown';
   };
 
+  const handleCourseClick = (courseId, courseName) => {
+    navigate(`/course/${courseId}`, { state: { courseName } });
+  };
+
   if (profileLoading || statsLoading) {
     return <LoadingScreen />;
   }
@@ -225,94 +233,217 @@ export default function PvPLobby() {
   };
 
   return (
-    <div className="pvp-lobby-container">
-      <div className="pvp-lobby-header">
-        <button
-          className="pvp-back-button"
-          onClick={handleBackClick}
-          title="Go back"
-        >
-          &larr; Back
-        </button>
-        <h1 className="pvp-page-title">Battle PvP</h1>
-        <div style={{ width: '100px' }} />
-      </div>
-
-      <div className="pvp-lobby-wrapper">
-        {/* Left Section - Profile */}
-        <div className="pvp-lobby-left">
-          <div className="pvp-profile-card">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="pvp-profile-avatar"
-              onError={(e) => {
-                e.target.src = '/images/avatars/default-avatar.jpg';
-              }}
-            />
-            <h2 className="pvp-profile-name">{user.name}</h2>
-            <p className="pvp-profile-level">Challenger</p>
-
-            <div className="pvp-profile-xp">
-              <div className="pvp-xp-item">
-                <div className="pvp-xp-value">{user.xp}</div>
-                <div className="pvp-xp-label">Total XP</div>
+    <div className="pvp-lobby-page-container">
+      <LoadingScreen isVisible={isNavigating} message="Loading..." />
+      
+      {/* Navigation */}
+      <nav className="main-navbar">
+        <div className="main-nav-container">
+          <div className="main-nav-left">
+            <a className="logo-link" onClick={() => navigate("/main-menu")}>
+              <div className="main-nav-logo">
+                <img
+                  src="/icons/knight_icon.png"
+                  alt="Knight Icon"
+                  className="main-logo-icon"
+                />
+                <span className="main-logo-text">
+                  Dev <span className="main-highlight">Vanguard</span>
+                </span>
               </div>
-              <div className="pvp-xp-item">
-                <div className="pvp-xp-value">{matchHistory.length}</div>
-                <div className="pvp-xp-label">Matches</div>
-              </div>
-            </div>
+            </a>
 
+            <ul className="main-nav-links">
+              <li 
+                className="nav-dropdown"
+                onMouseEnter={() => setShowLearnDropdown(true)}
+              >
+                <a 
+                  className="dropdown-toggle"
+                >
+                  Learn <i className="fas fa-chevron-down"></i>
+                </a>
+                {showLearnDropdown && (
+                  <div 
+                    className="dropdown-menu learn-dropdown"
+                    onMouseLeave={() => setShowLearnDropdown(false)}
+                  >
+                    <div className="dropdown-content">
+                      <div className="dropdown-left">
+                        <h4 className="dropdown-title">Recommended</h4>
+                        <div className="recommended-courses">
+                          {courses && courses.length > 0 && courses.slice(0, 2).map((course) => (
+                            <div 
+                              key={course.courseId} 
+                              className="recommended-item"
+                              onClick={() => {
+                                handleCourseClick(course.courseId, course.name);
+                                setShowLearnDropdown(false);
+                              }}
+                            >
+                              <div className="recommended-info">
+                                <span className="recommended-name">{course.name}</span>
+                                <span className="recommended-lang">{course.language}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="dropdown-right">
+                        <h4 className="dropdown-title">All Courses</h4>
+                        <div className="courses-list">
+                          {courses && courses.length > 0 && courses.map((course) => (
+                            <a 
+                              key={course.courseId}
+                              className="course-list-item"
+                              onClick={() => {
+                                handleCourseClick(course.courseId, course.name);
+                                setShowLearnDropdown(false);
+                              }}
+                            >
+                              <span className="course-list-name">{course.name}</span>
+                              <span className="course-list-lang">{course.language}</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </li>
+              <li>
+                <a onClick={() => navigate("/leaderboards")}>
+                  Leaderboards
+                </a>
+              </li>
+              <li>
+                <a onClick={() => alert("Practice mode coming soon!")}>
+                  Practice
+                </a>
+              </li>
+              <li>
+                <a className="nav-active">
+                  Battle PvP
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className="main-nav-right">
+            <button className="nav-icon-btn notification-btn" onClick={() => alert("No new notifications")}>
+              <i className="fas fa-bell"></i>
+              <span className="notification-badge">3</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="pvp-lobby-container">
+        {/* Hero Section */}
+        <div className="pvp-hero-section" style={{
+          backgroundImage: `url('/images/pvp_background.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}>
+          <div className="pvp-hero-overlay"></div>
+          <div className="pvp-hero-content">
+            <h1 className="pvp-hero-title">The Knight's Duel</h1>
+            <p className="pvp-hero-description">
+              Challenge other players, test your skills, and climb the rankings!
+            </p>
             <button
-              className="pvp-find-button"
-              onClick={isSearching ? handleCancelSearch : handleFindMatch}
-              disabled={pvpLoading}
-              style={{
-                background: isSearching ? '#ef4444' : undefined,
-                marginTop: '20px'
+              className="pvp-hero-cta"
+              onClick={() => {
+                navigate("/pvp-battle");
               }}
             >
-              {isSearching ? 'Cancel Search' : 'Find Match'}
+              {isSearching ? 'Searching...' : 'Enter Battle'}
             </button>
           </div>
         </div>
 
-        {/* Right Section - Match History */}
-        <div className="pvp-lobby-right">
-          <h3 className="pvp-history-title">Match History</h3>
-          {matchHistory.length === 0 ? (
-            <div className="pvp-empty-history">
-              No matches yet. Start your first battle!
-            </div>
-          ) : (
-            <div className="pvp-history-list">
-              {matchHistory.map((match) => (
-                <div key={match.matchId} className="pvp-match-card">
-                  <div className="pvp-match-header">
-                    <span className="pvp-match-date">
-                      {formatMatchTime(match.completedAt)}
-                    </span>
-                    <span className={`pvp-match-status ${getStatusClass(match)}`}>
-                      {getMatchResult(match)}
-                    </span>
-                  </div>
-                  <div className="pvp-match-result">
-                    <div className="pvp-result-item">
-                      <div className="pvp-result-label">XP Change</div>
-                      <div className={`pvp-result-value ${match.winnerId === user.userId ? 'positive' : 'negative'}`}>
-                        {match.winnerId === user.userId
-                          ? `+${match.xpChangeP1 || match.xpChangeP2 || 0}`
-                          : `${match.xpChangeP1 || match.xpChangeP2 || 0}`}
+        {/* Main Content - Left: Match History, Right: Profile */}
+        <div className="pvp-lobby-wrapper">
+          {/* Left Section - Match History */}
+          <div className="pvp-lobby-left">
+            <div className="pvp-history-panel-new">
+              <div className="pvp-history-header-new">
+                <h3 className="pvp-history-title">Match History</h3>
+              </div>
+              {matchHistory.length === 0 ? (
+                <div className="pvp-empty-history">
+                  No matches yet. Start your first battle!
+                </div>
+              ) : (
+                <div className="pvp-history-list-container-new">
+                  <div className="pvp-history-list">
+                    {matchHistory.map((match) => (
+                    <div key={match.matchId} className="pvp-match-card">
+                      <div className="pvp-match-header">
+                        <span className="pvp-match-date">
+                          {formatMatchTime(match.completedAt)}
+                        </span>
+                        <span className={`pvp-match-status ${getStatusClass(match)}`}>
+                          {getMatchResult(match)}
+                        </span>
+                      </div>
+                      <div className="pvp-match-result">
+                        <div className="pvp-result-item">
+                          <div className="pvp-result-label">XP Change</div>
+                          <div className={`pvp-result-value ${match.winnerId === user.userId ? 'positive' : 'negative'}`}>
+                            {match.winnerId === user.userId
+                              ? `+${match.xpChangeP1 || match.xpChangeP2 || 0}`
+                              : `${match.xpChangeP1 || match.xpChangeP2 || 0}`}
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  ))}
                   </div>
                 </div>
-              ))}
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Right Section - Profile Card */}
+          <div className="pvp-lobby-right">
+            <div className="pvp-profile-card">
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="pvp-profile-avatar"
+                onError={(e) => {
+                  e.target.src = '/images/avatars/default-avatar.jpg';
+                }}
+              />
+              <h2 className="pvp-profile-name">{user.name}</h2>
+              <p className="pvp-profile-level">Challenger</p>
+
+              <div className="pvp-profile-xp">
+                <div className="pvp-xp-item">
+                  <div className="pvp-xp-value">{user.xp}</div>
+                  <div className="pvp-xp-label">Total XP</div>
+                </div>
+                <div className="pvp-xp-item">
+                  <div className="pvp-xp-value">{matchHistory.length}</div>
+                  <div className="pvp-xp-label">Matches</div>
+                </div>
+              </div>
+
+              <button
+                className="pvp-find-button"
+                onClick={isSearching ? handleCancelSearch : handleFindMatch}
+                disabled={pvpLoading}
+                style={{
+                  background: isSearching ? '#ef4444' : undefined,
+                  marginTop: '20px'
+                }}
+              >
+                {isSearching ? 'Cancel Search' : 'Find Match'}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
 
       {/* Match Found Modal */}
       {showMatchFound && currentMatchId && (
@@ -372,6 +503,7 @@ export default function PvPLobby() {
           onClose={() => setShowErrorNotif(false)}
         />
       )}
+      </div>
     </div>
   );
 }

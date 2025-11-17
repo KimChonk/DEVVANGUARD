@@ -33,11 +33,33 @@ export default function PvPBattle() {
   const [showSuccessNotif, setShowSuccessNotif] = useState(false);
   const [showErrorNotif, setShowErrorNotif] = useState(false);
 
+  // Resizable state
+  const [isResizingHorizontal, setIsResizingHorizontal] = useState(false);
+  const [isResizingVertical, setIsResizingVertical] = useState(false);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(35);
+  const [outputPanelHeight, setOutputPanelHeight] = useState(35);
+  const [isFullscreenEditor, setIsFullscreenEditor] = useState(false);
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
+  const containerRef = useRef(null);
+
   const pollingIntervalRef = useRef(null);
 
   useEffect(() => {
     const loadBattle = async () => {
       try {
+        // If no matchId, skip loading from API (demo/design mode)
+        if (!matchId) {
+          setProblem({
+            problemId: 'demo-1',
+            title: 'Demo Problem',
+            description: 'This is a demo battle interface',
+            difficulty: 'medium',
+            solutionTemplate: '# Write your code here\nprint("Hello World")'
+          });
+          setCode('# Write your code here\nprint("Hello World")');
+          return;
+        }
+
         const matchData = await getMatchById(matchId);
         if (matchData) {
           setMatch(matchData);
@@ -175,13 +197,57 @@ export default function PvPBattle() {
     }
   };
 
+  // Resize handlers
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (isResizingHorizontal && containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const newWidth = ((e.clientX - rect.left) / rect.width) * 100;
+        
+        if (newWidth > 20 && newWidth < 70) {
+          setLeftPanelWidth(newWidth);
+        }
+      }
+      
+      if (isResizingVertical && containerRef.current) {
+        const editorPanel = document.querySelector('.pvp-editor-panel');
+        if (editorPanel) {
+          const rect = editorPanel.getBoundingClientRect();
+          const relativeY = e.clientY - rect.top;
+          const editorHeight = rect.height;
+          
+          // Calculate code editor height (from top of panel to cursor)
+          const codeEditorHeight = (relativeY / editorHeight) * 100;
+          
+          if (codeEditorHeight > 20 && codeEditorHeight < 80) {
+            setOutputPanelHeight(100 - codeEditorHeight);
+          }
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingHorizontal(false);
+      setIsResizingVertical(false);
+    };
+
+    if (isResizingHorizontal || isResizingVertical) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isResizingHorizontal, isResizingVertical]);
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (!match || !problem) {
+  if (!problem) {
     return (
       <div className="pvp-battle-container">
         <div style={{ textAlign: 'center', padding: '40px', color: '#a0a0a0' }}>
@@ -223,61 +289,117 @@ export default function PvPBattle() {
   }
 
   return (
-    <div className="pvp-battle-container">
-      <div className="pvp-battle-left">
-        <div className="pvp-battle-header">
-          <div className="pvp-player-header">
-            <div className="pvp-player-header-avatar">
-              {userStats?.user?.fullName?.charAt(0).toUpperCase() || 'P'}
+    <div className="pvp-screen-container">
+      {/* Header */}
+      <header className="pvp-header" style={{ display: isFullscreenEditor ? 'none' : 'block' }}>
+        <div className="header-left">
+          <button className="back-btn" onClick={handleQuitBattle} title="Quit Battle">
+            ←
+          </button>
+          <h1 className="battle-title">The Knight's Duel</h1>
+        </div>
+      </header>
+
+      {/* Main Container */}
+      <div className={`pvp-main ${isFullscreenEditor ? 'fullscreen-editor' : ''}`} ref={containerRef}>
+        {/* LEFT: Problem Description & Players */}
+        <div className="pvp-problem-panel" style={{ display: isFullscreenEditor ? 'none' : 'block', flex: `0 0 ${leftPanelWidth}%` }}>
+          {/* Players Header */}
+          <div className="pvp-players-section">
+            <div className="pvp-player-item">
+              <div className="pvp-player-box">
+                <div className="pvp-player-header">
+                  <div className="pvp-player-avatar">
+                    {userStats?.user?.fullName?.charAt(0).toUpperCase() || 'P'}
+                  </div>
+                  <div className="pvp-player-info">
+                    <h3>{userStats?.user?.fullName || 'You'}</h3>
+                    <p>XP: {userStats?.xp || 0}</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="pvp-player-header-info">
-              <h3>{userStats?.user?.fullName || 'You'}</h3>
-              <p>XP: {userStats?.xp || 0}</p>
+
+            {/* Timer */}
+            <div className="pvp-timer-box">
+              <div className={`pvp-timer ${timeRemaining <= 60 ? timeRemaining <= 30 ? 'danger' : 'warning' : ''}`}>
+                {formatTime(timeRemaining)}
+              </div>
+              <div className="pvp-timer-label">Time</div>
+            </div>
+
+            <div className="pvp-player-item">
+              <div className="pvp-player-box">
+                <div className="pvp-player-header">
+                  <div className="pvp-player-avatar opponent">
+                    {match?.player2Id ? 'O' : '?'}
+                  </div>
+                  <div className="pvp-player-info">
+                    <h3>{match?.player2Id ? 'Opponent' : 'Waiting'}</h3>
+                    <p>{match?.player2Id ? 'In Battle' : 'Connecting...'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Problem Description */}
+          <div className="pvp-problem-box">
+            <h2>Problem Description</h2>
+            <h4 style={{ textAlign: 'center', marginBottom: '16px' }}>Click the card to review Description</h4>
+            
+            {/* Flip Card */}
+            <div className="flip-card-container" onClick={() => setIsCardFlipped(!isCardFlipped)}>
+              <div className={`flip-card ${isCardFlipped ? 'flipped' : ''}`}>
+                {/* Card Front - Image */}
+                <div className="flip-card-front">
+                  <img src="/images/pvp_background.png" alt="PvP Battle" />
+                </div>
+                
+                {/* Card Back - Description */}
+                <div className="flip-card-back">
+                  <div className="card-back-content">
+                    <p>{problem?.problemDescription}</p>
+                    {problem?.testCases && (
+                      <>
+                        <h5>Test Cases</h5>
+                        <pre className="test-cases-code">{typeof problem.testCases === 'string' ? problem.testCases : JSON.stringify(problem.testCases, null, 2)}</pre>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Hidden content for reference */}
+            <div style={{ display: 'none' }}>
+              <div className="pvp-problem-content">
+                {problem?.testCases && (
+                  <>
+                    <h4>Test Cases</h4>
+                    <pre className="test-cases-code">{typeof problem.testCases === 'string' ? problem.testCases : JSON.stringify(problem.testCases, null, 2)}</pre>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="pvp-battle-timer">
-          <div className={`pvp-countdown ${timeRemaining <= 60 ? timeRemaining <= 30 ? 'danger' : 'warning' : ''}`}>
-            {formatTime(timeRemaining)}
-          </div>
-          <div className="pvp-battle-timer-text">Time Remaining</div>
-        </div>
+        {/* Resize Divider */}
+        <div
+          className="resize-divider-horizontal"
+          onMouseDown={() => setIsResizingHorizontal(true)}
+          style={{ display: isFullscreenEditor ? 'none' : 'block' }}
+        ></div>
 
-        <div className="pvp-battle-problem">
-          <div className="pvp-problem-title">{problem.title}</div>
-          <div className="pvp-problem-description">
-            <h4>Description</h4>
-            <p>{problem.problemDescription}</p>
-            {problem.testCases && (
-              <>
-                <h4>Test Cases</h4>
-                <code>{typeof problem.testCases === 'string' ? problem.testCases : JSON.stringify(problem.testCases, null, 2)}</code>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="pvp-battle-right">
-        <div className="pvp-battle-header">
-          <div className="pvp-player-header">
-            <div className="pvp-player-header-avatar">
-              {match?.player2Id ? 'O' : '?'}
-            </div>
-            <div className="pvp-player-header-info">
-              <h3>{match?.player2Id ? 'Opponent' : 'Waiting'}</h3>
-              <p>{match?.player2Id ? 'In Battle' : 'Connecting...'}</p>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem', borderTop: '1px solid #3a4a5a' }}>
-          <div className="pvp-editor-section">
-            <div className="pvp-language-selector">
-              <span className="pvp-language-label">Language:</span>
+        {/* RIGHT: Code Editor & Output */}
+        <div className={`pvp-editor-panel ${isFullscreenEditor ? 'fullscreen' : ''}`} style={{ flex: `1 1 ${isFullscreenEditor ? '100%' : `${100 - leftPanelWidth}%`}` }}>
+          {/* Editor Header */}
+          <div className="pvp-editor-header">
+            <div className="editor-header-left">
+              <h2>Code Editor</h2>
               <select
-                className="pvp-language-select"
+                className="language-select"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
                 disabled={submitted}
@@ -289,37 +411,61 @@ export default function PvPBattle() {
                 ))}
               </select>
             </div>
-
-            <div className="pvp-editor-wrapper">
-              <textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Write your code here..."
-                disabled={submitted}
-              />
-            </div>
-
-            <div className="pvp-output-section">
-              <div className="pvp-output-title">Output</div>
-              <div className="pvp-output-content">{output}</div>
-            </div>
-
-            <div className="pvp-editor-buttons">
+            <div className="editor-header-right">
               <button
-                className="pvp-btn-run"
+                className="icon-btn"
+                onClick={() => setIsFullscreenEditor(!isFullscreenEditor)}
+                aria-label={isFullscreenEditor ? "Exit Fullscreen" : "Fullscreen"}
+              >
+                {isFullscreenEditor ? "⛶ Exit" : "⛶ Fullscreen"}
+              </button>
+              <button
+                className="btn btn-run"
                 onClick={handleRunCode}
                 disabled={isRunning || submitted || timeRemaining === 0}
+                title="Run test cases"
               >
-                {isRunning ? 'Running...' : 'Run'}
+                ▶ {isRunning ? "Running..." : "Run"}
               </button>
               <button
-                className="pvp-btn-submit"
+                className="btn btn-submit"
                 onClick={handleSubmitCode}
                 disabled={isRunning || submitted || timeRemaining === 0}
+                title="Submit code"
               >
-                {submitted ? 'Submitted' : 'Submit'}
+                ✓ {submitted ? "Submitted" : "Submit"}
               </button>
             </div>
+          </div>
+
+          {/* Code Editor Container */}
+          <div className="code-editor-container" style={{ flex: `0 0 ${100 - outputPanelHeight}%` }}>
+            <textarea
+              className="code-editor"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Write your code here..."
+              disabled={submitted}
+            />
+          </div>
+
+          {/* Vertical Resize Divider */}
+          <div
+            className="resize-divider-vertical"
+            onMouseDown={() => setIsResizingVertical(true)}
+          ></div>
+
+          {/* Output Panel */}
+          <div className="pvp-output-panel" style={{ flex: `0 0 ${outputPanelHeight}%` }}>
+            <div className="output-header">
+              <span className="output-label">Output</span>
+              {isRunning && <span className="output-running">Running...</span>}
+            </div>
+            <pre className="output-content">{output}</pre>
+          </div>
+
+          {/* Bottom Buttons */}
+          <div className="editor-footer">
           </div>
         </div>
       </div>
