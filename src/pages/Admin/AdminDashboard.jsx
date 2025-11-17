@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { userService, courseService, lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
+import { userService, courseService, lessonService, userProgressService, lessonHintService, pvpProblemService } from "../../services/apiClient";
 import { authService } from "../../services/supabaseClient";
 import LoadingScreen from "../../components/LoadingScreen";
 import TestCaseBuilder from "../../components/TestCaseBuilder";
@@ -25,6 +25,7 @@ export default function AdminDashboard() {
   const [hints, setHints] = useState([]);
   const [users, setUsers] = useState([]);
   const [userProgress, setUserProgress] = useState({});
+  const [pvpProblems, setPvpProblems] = useState([]);
 
   // UI states
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
+  const [showPvpProblemForm, setShowPvpProblemForm] = useState(false);
 
   // Form states
   const [courseForm, setCourseForm] = useState({
@@ -59,9 +61,18 @@ export default function AdminDashboard() {
     hintContent: ""
   });
 
+  const [pvpProblemForm, setPvpProblemForm] = useState({
+    title: "",
+    problemDescription: "",
+    solutionTemplate: "",
+    testCases: "",
+    xpReward: "",
+  });
+
   const [editingHintId, setEditingHintId] = useState(null);
   const [editingLessonId, setEditingLessonId] = useState(null);
   const [editingCourseId, setEditingCourseId] = useState(null);
+  const [editingPvpProblemId, setEditingPvpProblemId] = useState(null);
 
   // Fetch all data
   useEffect(() => {
@@ -110,6 +121,12 @@ export default function AdminDashboard() {
       const hintsResult = await lessonHintService.getAllHints();
       if (hintsResult.success && Array.isArray(hintsResult.data)) {
         setHints(hintsResult.data);
+      }
+
+      // Fetch PvP Problems
+      const problemsResult = await pvpProblemService.getAllProblems();
+      if (problemsResult.success && Array.isArray(problemsResult.data)) {
+        setPvpProblems(problemsResult.data);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -212,6 +229,75 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleCreatePvpProblem = async (e) => {
+    e.preventDefault();
+    if (
+      !pvpProblemForm.title ||
+      !pvpProblemForm.problemDescription ||
+      !pvpProblemForm.xpReward
+    ) {
+      setMessage("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      let result;
+      const problemData = {
+        title: pvpProblemForm.title,
+        problemDescription: pvpProblemForm.problemDescription,
+        solutionTemplate: pvpProblemForm.solutionTemplate || null,
+        testCases: pvpProblemForm.testCases || null,
+        xpReward: parseInt(pvpProblemForm.xpReward) || 20,
+      };
+
+      if (editingPvpProblemId) {
+        result = await pvpProblemService.updateProblem(
+          editingPvpProblemId,
+          problemData.title,
+          problemData.problemDescription,
+          problemData.solutionTemplate,
+          problemData.testCases,
+          problemData.xpReward
+        );
+      } else {
+        result = await pvpProblemService.createProblem(
+          problemData.title,
+          problemData.problemDescription,
+          problemData.solutionTemplate,
+          problemData.testCases,
+          problemData.xpReward
+        );
+      }
+
+      if (result.success) {
+        setMessage(
+          editingPvpProblemId
+            ? "✅ PvP Problem updated successfully!"
+            : "✅ PvP Problem created successfully!"
+        );
+        setPvpProblemForm({
+          title: "",
+          problemDescription: "",
+          solutionTemplate: "",
+          testCases: "",
+          xpReward: "",
+        });
+        setEditingPvpProblemId(null);
+        setShowPvpProblemForm(false);
+        fetchAllData();
+      } else {
+        setMessage(
+          "Error: " + (result.message || "Unable to save PvP problem")
+        );
+      }
+    } catch (err) {
+      setMessage("Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle course deletion
   const handleDeleteCourse = async (courseId) => {
     if (window.confirm("Are you sure you want to delete this course?")) {
@@ -263,6 +349,40 @@ export default function AdminDashboard() {
         setLoading(false);
       }
     }
+  };
+
+  const handleDeletePvpProblem = async (problemId) => {
+    if (window.confirm("Are you sure you want to delete this PvP problem?")) {
+      try {
+        setLoading(true);
+        const result = await pvpProblemService.deleteProblem(problemId);
+
+        if (result.success) {
+          setMessage("✅ PvP Problem deleted successfully!");
+          fetchAllData();
+        } else {
+          setMessage(
+            "Error: " + (result.message || "Unable to delete PvP problem")
+          );
+        }
+      } catch (err) {
+        setMessage("Error: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  
+  const handleEditPvpProblem = (problem) => {
+    setEditingPvpProblemId(problem.problemId);
+    setPvpProblemForm({
+      title: problem.title,
+      problemDescription: problem.problemDescription || "",
+      solutionTemplate: problem.solutionTemplate || "",
+      testCases: problem.testCases || "",
+      xpReward: problem.xpReward || "20",
+    });
+    setShowPvpProblemForm(true);
   };
 
   // Handle lesson edit
@@ -359,12 +479,21 @@ export default function AdminDashboard() {
     setEditingHintId(null);
     setEditingLessonId(null);
     setEditingCourseId(null);
+    setEditingPvpProblemId(null);
     setHintForm({ lessonId: "", hintTitle: "", hintContent: "" });
     setCourseForm({ name: "", language: "", description: "" });
     setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
+    setPvpProblemForm({
+      title: "",
+      problemDescription: "",
+      solutionTemplate: "",
+      testCases: "",
+      xpReward: "",
+    });
     setShowHintForm(false);
     setShowCourseForm(false);
     setShowLessonForm(false);
+    setShowPvpProblemForm(false);
   };
 
   // Handle logout
@@ -643,6 +772,13 @@ export default function AdminDashboard() {
             >
               <i className="fas fa-lightbulb"></i>
               <span>Hints</span>
+            </div>
+            <div
+              className={`sidebar-item ${activeTab === "pvpProblems" ? "active" : ""}`}
+              onClick={() => setActiveTab("pvpProblems")}
+            >
+              <i className="fas fa-th"></i>
+              <span>PvP Problems</span>
             </div>
             <div 
               className={`sidebar-item ${activeTab === "users" ? "active" : ""}`}
@@ -1288,6 +1424,212 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {activeTab === "pvpProblems" && (
+            <div className="admin-tab-content">
+              <div className="section-header">
+                <h2 className="section-title">
+                  <i className="fas fa-swords"></i>
+                  Manage PvP Problems
+                </h2>
+                <button
+                  type="button"
+                  className="add-btn"
+                  onClick={() => {
+                    setEditingPvpProblemId(null);
+                    setPvpProblemForm({
+                      title: "",
+                      problemDescription: "",
+                      solutionTemplate: "",
+                      testCases: "",
+                      xpReward: "20",
+                    });
+                    setShowPvpProblemForm(!showPvpProblemForm);
+                  }}
+                >
+                  <i className="fas fa-plus"></i>
+                  {showPvpProblemForm ? "Cancel" : "Add Problem"}
+                </button>
+              </div>
+
+              {/* PvP Problem Form */}
+              {showPvpProblemForm && (
+                <div className="admin-form-container">
+                  <form
+                    className="lesson-form"
+                    onSubmit={handleCreatePvpProblem}
+                  >
+                    {/* Top Row: Title, XP Reward */}
+                    <div className="form-row-2col">
+                      <div className="admin-form-group">
+                        <label className="admin-label">Problem Title *</label>
+                        <input
+                          type="text"
+                          className="admin-input"
+                          placeholder="E.g.: Two Sum Challenge"
+                          value={pvpProblemForm.title}
+                          onChange={(e) =>
+                            setPvpProblemForm({
+                              ...pvpProblemForm,
+                              title: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div className="admin-form-group">
+                        <label className="admin-label">XP Reward *</label>
+                        <input
+                          type="number"
+                          className="admin-input"
+                          placeholder="E.g.: 20"
+                          value={pvpProblemForm.xpReward}
+                          onChange={(e) =>
+                            setPvpProblemForm({
+                              ...pvpProblemForm,
+                              xpReward: e.target.value,
+                            })
+                          }
+                          min="0"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Row: Problem Description, Starter Code (2 col) */}
+                    <div className="form-row-2col">
+                      <div className="admin-form-group">
+                        <label className="admin-label">
+                          Problem Description *
+                        </label>
+                        <textarea
+                          className="admin-input textarea"
+                          placeholder="Enter detailed problem description..."
+                          value={pvpProblemForm.problemDescription}
+                          onChange={(e) =>
+                            setPvpProblemForm({
+                              ...pvpProblemForm,
+                              problemDescription: e.target.value,
+                            })
+                          }
+                          rows="5"
+                          required
+                        />
+                      </div>
+
+                      <div className="admin-form-group">
+                        <label className="admin-label">
+                          Starter Code Template
+                        </label>
+                        <textarea
+                          className="admin-input textarea"
+                          placeholder="Enter starter code for students..."
+                          value={pvpProblemForm.solutionTemplate}
+                          onChange={(e) =>
+                            setPvpProblemForm({
+                              ...pvpProblemForm,
+                              solutionTemplate: e.target.value,
+                            })
+                          }
+                          rows="5"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Full Width: Test Cases */}
+                    <div className="admin-form-group form-full-width">
+                      <TestCaseBuilder
+                        value={pvpProblemForm.testCases}
+                        onChange={(jsonString) =>
+                          setPvpProblemForm({
+                            ...pvpProblemForm,
+                            testCases: jsonString,
+                          })
+                        }
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="form-actions">
+                      <button
+                        type="submit"
+                        className="admin-submit"
+                        disabled={loading}
+                      >
+                        {loading
+                          ? editingPvpProblemId
+                            ? "Updating..."
+                            : "Creating..."
+                          : editingPvpProblemId
+                          ? "Update Problem"
+                          : "Create Problem"}
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-submit-cancel"
+                        onClick={() => setShowPvpProblemForm(false)}
+                        disabled={loading}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* PvP Problems List (sử dụng style của .lessons-list) */}
+              <div className="lessons-list">
+                {loading && pvpProblems.length === 0 ? (
+                  <div className="loading-state">
+                    <div className="spinner"></div>
+                    <p>Loading PvP problems...</p>
+                  </div>
+                ) : pvpProblems.length === 0 ? (
+                  <div className="empty-state">
+                    <i className="fas fa-inbox"></i>
+                    <p>No PvP problems available</p>
+                  </div>
+                ) : (
+                  pvpProblems.map((problem) => (
+                    <div
+                      key={problem.problemId}
+                      className="lesson-item-card"
+                    >
+                      <div className="lesson-item-header">
+                        <h3 className="lesson-item-name">{problem.title}</h3>
+                        <span className="lesson-order">
+                          {problem.xpReward} XP
+                        </span>
+                      </div>
+                      <div className="lesson-item-actions">
+                        <button
+                          type="button"
+                          className="action-btn edit"
+                          disabled={loading}
+                          onClick={() => handleEditPvpProblem(problem)}
+                        >
+                          <i className="fas fa-edit"></i>
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="action-btn delete"
+                          disabled={loading}
+                          onClick={() =>
+                            handleDeletePvpProblem(problem.problemId)
+                          }
+                        >
+                          <i className="fas fa-trash"></i>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
 
         {/* Users Tab */}
         {activeTab === "users" && (

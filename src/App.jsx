@@ -88,6 +88,14 @@ function App() {
             } 
           />
           <Route 
+            path="/pvp-battle" 
+            element={
+              <ProtectedRoute>
+                <PvPBattle />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/pvp/battle/:matchId" 
             element={
               <ProtectedRoute>
