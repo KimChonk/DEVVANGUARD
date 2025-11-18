@@ -441,6 +441,12 @@ export default function PvPLobby() {
               >
                 {isSearching ? 'Cancel Search' : 'Find Match'}
               </button>
+              <button
+                className="view-profile-btn"
+                onClick={() => navigate('/profile')}
+              >
+                View Profile
+              </button>
             </div>
           </div>
         </div>
