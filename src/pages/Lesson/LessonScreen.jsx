@@ -481,11 +481,6 @@ export default function LessonScreen() {
                             <p>No specific hints available for this lesson yet.</p>
                           </div>
                         )}
-
-                       <div className="hint-item default-hint">
-                          <h3>Default Hint:</h3>
-                          <p>{getFeedback().hint}</p>
-                        </div>
                         </>
                     )}
 
