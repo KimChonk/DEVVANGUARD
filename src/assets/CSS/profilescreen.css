@@ -963,7 +963,7 @@
 }
 
 .skill-tag {
-  background-color: rgba(15, 52, 96, 0.7); /* MÃ u xanh tá»« theme */
+  background-color: rgba(15, 52, 96, 0.7); /* MÃ u xanh tá»« theme */
   border: 1px solid var(--primary-gold);
   color: var(--text-gold);
   padding: 5px 12px;
@@ -971,6 +971,55 @@
   font-size: 0.85rem;
   font-weight: 600;
   font-family: "Cinzel", serif;
+}
+
+/* Activity List Styling */
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.activity-title {
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.activity-course {
+  color: var(--text-light);
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.activity-xp {
+  color: var(--primary-gold);
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  margin-left: 20px;
 }
 
 .profile-main-area {

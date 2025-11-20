@@ -553,6 +553,30 @@
   transform: scale(1.05);
 }
 
+/* View Profile Button - Matching MainMenu Styling */
+.view-profile-btn {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  background: linear-gradient(135deg, #d4af37, #00d4ff);
+  color: #0f0f1e;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  margin-top: 12px;
+}
+
+.view-profile-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+.view-profile-btn:active {
+  transform: translateY(0);
+}
+
 
 
 

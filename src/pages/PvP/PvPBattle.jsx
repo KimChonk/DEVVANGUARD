@@ -6,6 +6,7 @@ import { executeAndValidate } from '../../services/pistonCompiler';
 import { convertDbToPistonLanguage } from '../../utils/languageMapping';
 import SuccessNotification from '../../components/SuccessNotification';
 import AlertNotification from '../../components/AlertNotification';
+import CodeEditor from '../../components/CodeEditor';
 import '../../assets/CSS/pvpbattle.css';
 
 const BATTLE_DURATION = 300;
@@ -440,12 +441,12 @@ export default function PvPBattle() {
 
           {/* Code Editor Container */}
           <div className="code-editor-container" style={{ flex: `0 0 ${100 - outputPanelHeight}%` }}>
-            <textarea
-              className="code-editor"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="Write your code here..."
+            <CodeEditor
+              code={code}
+              onChange={setCode}
+              language={language}
               disabled={submitted}
+              onSave={handleRunCode}
             />
           </div>
 
