@@ -202,6 +202,16 @@ export const usePvP = () => {
     }
   }, []);
 
+  // Get match by ID (for polling - doesn't set state to avoid re-renders)
+  const getMatchByIdForPolling = useCallback(async (matchId) => {
+    try {
+      const result = await pvpMatchService.getMatchById(matchId);
+      return result;
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  }, []);
+
   // Create match and join queue
   const createMatch = useCallback(async () => {
     setLoading(true);
@@ -223,20 +233,33 @@ export const usePvP = () => {
     }
   }, []);
 
-  // Join queue (create new match in queue, not join existing)
+  // Join queue (auto-match with XP range)
   const joinQueue = useCallback(async () => {
+    console.log('[usePvP] joinQueue called');
     setLoading(true);
     setError(null);
     try {
-      const result = await pvpMatchService.createMatch();
-      if (result.success) {
+      console.log('[usePvP] Calling pvpMatchService.joinQueue()');
+      const result = await pvpMatchService.joinQueue();
+      console.log('[usePvP] joinQueue result:', result);
+      
+      if (result.success && result.data) {
+        console.log('[usePvP] Setting currentMatch:', result.data);
         setCurrentMatch(result.data);
+        // Return the match data directly (not wrapped)
         return result.data;
+      } else if (result.matchId) {
+        // If service returns match directly (not wrapped in success/data)
+        console.log('[usePvP] Got match directly:', result);
+        setCurrentMatch(result);
+        return result;
       } else {
+        console.error('[usePvP] joinQueue failed:', result.message);
         setError(result.message);
         return null;
       }
     } catch (err) {
+      console.error('[usePvP] joinQueue error:', err);
       setError(err.message);
       return null;
     } finally {
@@ -251,20 +274,23 @@ export const usePvP = () => {
 
   // Submit code
   const submitCode = useCallback(async (matchId, code) => {
+    console.log('[usePvP] submitCode called with:', { matchId, codeLength: code?.length });
     setLoading(true);
     setError(null);
     try {
       const result = await pvpMatchService.submitCode(matchId, code);
+      console.log('[usePvP] submitCode result:', result);
+      
       if (result.success) {
-        setCurrentMatch(result.data);
-        return result.data;
+        return result; // Return full result with success and message
       } else {
         setError(result.message);
-        return null;
+        return result;
       }
     } catch (err) {
+      console.error('[usePvP] submitCode error:', err);
       setError(err.message);
-      return null;
+      return { success: false, message: err.message };
     } finally {
       setLoading(false);
     }
@@ -293,20 +319,24 @@ export const usePvP = () => {
 
   // Cancel match
   const cancelMatch = useCallback(async (matchId) => {
+    console.log('[usePvP] cancelMatch called with:', matchId);
     setLoading(true);
     setError(null);
     try {
       const result = await pvpMatchService.cancelMatch(matchId);
+      console.log('[usePvP] cancelMatch result:', result);
+      
       if (result.success) {
         setCurrentMatch(null);
-        return true;
+        return result;
       } else {
         setError(result.message);
-        return false;
+        return result;
       }
     } catch (err) {
+      console.error('[usePvP] cancelMatch error:', err);
       setError(err.message);
-      return false;
+      return { success: false, message: err.message };
     } finally {
       setLoading(false);
     }
@@ -340,6 +370,7 @@ export const usePvP = () => {
     loadSearchingMatches,
     getSearchingMatches,
     getMatchById,
+    getMatchByIdForPolling,
     createMatch,
     joinQueue,
     joinMatch,
