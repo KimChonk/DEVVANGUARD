@@ -61,11 +61,15 @@ export default function PvPBattle() {
           return;
         }
 
-        const matchData = await getMatchById(matchId);
-        if (matchData) {
+        console.log('[PvPBattle] Loading match:', matchId);
+        const matchResult = await getMatchById(matchId);
+        
+        if (matchResult && matchResult.success) {
+          const matchData = matchResult.data;
           setMatch(matchData);
 
           if (matchData.problemId) {
+            console.log('[PvPBattle] Loading problem:', matchData.problemId);
             const problemData = await getProblemById(matchData.problemId);
             if (problemData) {
               setProblem(problemData);
@@ -74,8 +78,12 @@ export default function PvPBattle() {
               }
             }
           }
+        } else {
+          setErrorMessage('Failed to load match data');
+          setShowErrorNotif(true);
         }
       } catch (err) {
+        console.error('Failed to load battle:', err);
         setErrorMessage('Failed to load battle');
         setShowErrorNotif(true);
       }
@@ -110,27 +118,33 @@ export default function PvPBattle() {
     pollingIntervalRef.current = setInterval(async () => {
       try {
         const updatedMatch = await getMatchById(matchId);
-        if (updatedMatch) {
-          setMatch(updatedMatch);
-
-          if (updatedMatch.status === 'completed') {
-            clearInterval(pollingIntervalRef.current);
-            const userIsWinner = updatedMatch.winnerId === userStats?.user?.userId;
-            setSuccessMessage(userIsWinner ? 'Victory!' : 'Defeated!');
+        if (updatedMatch && updatedMatch.status === 'completed') {
+          clearInterval(pollingIntervalRef.current);
+          
+          const currentUserId = userStats?.user?.userId;
+          const isPlayer1 = match?.player1Id === currentUserId;
+          const isWinner = updatedMatch.winnerId === currentUserId;
+          const xpChange = isPlayer1 ? updatedMatch.xpChangeP1 : updatedMatch.xpChangeP2;
+          
+          if (isWinner) {
+            setSuccessMessage(`Victory! +${xpChange || 20} XP`);
             setShowSuccessNotif(true);
-
-            setTimeout(() => {
-              navigate('/pvp/lobby');
-            }, 3000);
+          } else {
+            setErrorMessage(`Defeated! ${xpChange || -5} XP`);
+            setShowErrorNotif(true);
           }
+
+          setTimeout(() => {
+            navigate('/pvp/lobby');
+          }, 3000);
         }
       } catch (err) {
         console.error('Polling error:', err);
       }
-    }, 5000);
+    }, 2000); // Poll every 2 seconds for faster result detection
 
     return () => clearInterval(pollingIntervalRef.current);
-  }, [battleStarted, matchId, getMatchById, userStats, navigate]);
+  }, [battleStarted, matchId, match, getMatchById, userStats, navigate]);
 
   const handleRunCode = async () => {
     setIsRunning(true);
@@ -175,15 +189,49 @@ export default function PvPBattle() {
       return;
     }
 
+    if (!matchId) {
+      setErrorMessage('Match ID not found');
+      setShowErrorNotif(true);
+      return;
+    }
+
     try {
       setIsRunning(true);
-      const result = await submitCode(matchId, code);
-      if (result) {
+      
+      // First validate code with test cases
+      if (problem && problem.testCases) {
+        const pistonLang = convertDbToPistonLanguage(language);
+        let testCases = problem.testCases;
+
+        if (typeof testCases === 'string') {
+          testCases = JSON.parse(testCases);
+        }
+
+        const result = await executeAndValidate(code, pistonLang, testCases);
+        
+        if (!result.allPassed) {
+          setErrorMessage(`Tests not all passed! Only ${result.passedCount}/${result.totalTests} passed.`);
+          setShowErrorNotif(true);
+          setIsRunning(false);
+          return;
+        }
+      }
+
+      // If tests passed, submit code
+      console.log('[PvPBattle] Submitting code to match:', matchId);
+      const submitResult = await submitCode(matchId, code);
+      
+      if (submitResult.success) {
         setSubmitted(true);
-        setSuccessMessage('Code submitted successfully!');
+        setSuccessMessage('Code submitted! Waiting for opponent...');
         setShowSuccessNotif(true);
+        // Don't redirect yet - let polling detect winner
+      } else {
+        setErrorMessage(submitResult.message || 'Failed to submit code');
+        setShowErrorNotif(true);
       }
     } catch (err) {
+      console.error('Submit code error:', err);
       setErrorMessage(err.message || 'Failed to submit code');
       setShowErrorNotif(true);
     } finally {

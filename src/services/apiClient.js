@@ -3,19 +3,30 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5131
 
 // Lấy access token từ Supabase session
 const getAuthHeader = async () => {
-  const { supabase } = await import("./supabaseClient");
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  try {
+    const { supabase } = await import("./supabaseClient");
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-  if (!session?.access_token) {
-    throw new Error("No authentication token found");
+    console.log('[getAuthHeader] Session:', session?.user?.id);
+
+    if (!session?.access_token) {
+      console.error('[getAuthHeader] No access token found');
+      throw new Error("No authentication token found");
+    }
+
+    const header = {
+      Authorization: `Bearer ${session.access_token}`,
+      "Content-Type": "application/json",
+    };
+    
+    console.log('[getAuthHeader] Token present, length:', session.access_token.length);
+    return header;
+  } catch (err) {
+    console.error('[getAuthHeader] Error:', err);
+    throw err;
   }
-
-  return {
-    Authorization: `Bearer ${session.access_token}`,
-    "Content-Type": "application/json",
-  };
 };
 
 // Generic API call function
@@ -24,9 +35,9 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
     const headers = await getAuthHeader();
     const fullUrl = `${API_BASE_URL}/api${endpoint}`;
 
-    console.log(`API Call: ${method} ${fullUrl}`);
-    console.log(`API Base URL: ${API_BASE_URL}`);
-    console.log(`Headers:`, headers);
+    console.log(`[apiCall] ${method} ${fullUrl}`);
+    console.log(`[apiCall] API Base URL: ${API_BASE_URL}`);
+    console.log(`[apiCall] Auth header present:`, !!headers?.Authorization);
 
     const options = {
       method,
@@ -35,12 +46,12 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
 
     if (data) {
       options.body = JSON.stringify(data);
-      console.log(`Body:`, data);
+      console.log(`[apiCall] Body:`, data);
     }
 
     const response = await fetch(fullUrl, options);
 
-    console.log(`Response Status: ${response.status}`);
+    console.log(`[apiCall] Response Status: ${response.status}`);
 
     if (!response.ok) {
       try {
@@ -49,7 +60,7 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
       } catch (parseError) {
         // Response không phải JSON (có thể là HTML exception page)
         const errorText = await response.text();
-        console.error("Error Response Text:", errorText.substring(0, 200));
+        console.error("[apiCall] Error Response Text:", errorText.substring(0, 200));
         throw new Error(`API error: ${response.status} - ${errorText.substring(0, 100)}`);
       }
     }
@@ -60,7 +71,7 @@ const apiCall = async (endpoint, method = "GET", data = null) => {
 
     return await response.json();
   } catch (error) {
-    console.error(`API call error [${method} ${endpoint}]:`, error);
+    console.error(`[apiCall] error [${method} ${endpoint}]:`, error);
     throw error;
   }
 };
@@ -674,12 +685,38 @@ export const pvpProblemService = {
     }
   },
 
-  // Get PvP problem by ID
+  // Get PvP problem by ID from Supabase
   async getProblemById(problemId) {
     try {
-      const problem = await apiCall(`/pvpproblem/${problemId}`);
-      return { success: true, data: problem };
+      console.log('[pvpProblemService] Getting problem:', problemId);
+      const { supabase } = await import("./supabaseClient");
+      
+      const { data, error } = await supabase
+        .from('pvp_problems')
+        .select('*')
+        .eq('problem_id', problemId)
+        .single();
+
+      if (error) {
+        console.error('[pvpProblemService] getProblemById error:', error);
+        throw error;
+      }
+
+      console.log('[pvpProblemService] Problem data:', data);
+      
+      const mapped = {
+        problemId: data.problem_id,
+        title: data.title,
+        problemDescription: data.problem_description,
+        solutionTemplate: data.solution_template,
+        testCases: data.test_cases,
+        xpReward: data.xp_reward,
+        createdAt: data.created_at,
+      };
+      
+      return { success: true, data: mapped };
     } catch (error) {
+      console.error('[pvpProblemService] getProblemById error:', error);
       return { success: false, message: error.message };
     }
   },
@@ -739,11 +776,43 @@ export const pvpProblemService = {
 
 // ========== PvP MATCHES SERVICES ==========
 export const pvpMatchService = {
-  // Get match by ID
+  // Get match by ID from Supabase
   async getMatchById(matchId) {
     try {
-      const match = await apiCall(`/pvpmatch/${matchId}`);
-      return { success: true, data: match };
+      const { supabase } = await import("./supabaseClient");
+      
+      const { data, error } = await supabase
+        .from('pvp_matches')
+        .select('*')
+        .eq('match_id', matchId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Match was deleted
+      if (!data || data.length === 0) {
+        return { success: false, message: 'Match not found' };
+      }
+      
+      const match = data[0];
+      const mapped = {
+        matchId: match.match_id,
+        problemId: match.problem_id,
+        status: match.status,
+        player1Id: match.player1_id,
+        player2Id: match.player2_id,
+        winnerId: match.winner_id,
+        xpChangeP1: match.xp_change_p1,
+        xpChangeP2: match.xp_change_p2,
+        player1Code: match.player1_code,
+        player2Code: match.player2_code,
+        createdAt: match.created_at,
+        startedAt: match.started_at,
+        completedAt: match.completed_at,
+      };
+      
+      return { success: true, data: mapped };
     } catch (error) {
       return { success: false, message: error.message };
     }
@@ -833,6 +902,66 @@ export const pvpMatchService = {
     }
   },
 
+  // Join matchmaking queue - call Supabase find_match function
+  async joinQueue() {
+    try {
+      console.log('[pvpMatchService] Calling find_match function...');
+      const { supabase } = await import("./supabaseClient");
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        throw new Error("User not authenticated");
+      }
+
+      console.log('[pvpMatchService] Session user ID:', session.user.id);
+      
+      const { data, error } = await supabase.rpc('find_match', {
+        p_player_id: session.user.id
+      });
+
+      console.log('[pvpMatchService] RPC response - data:', data, 'error:', error);
+
+      if (error) {
+        console.error('[pvpMatchService] find_match RPC error:', error);
+        // Return a more helpful error message
+        if (error.message?.includes('ambiguous')) {
+          throw new Error("Matchmaking system temporarily unavailable. Please try again in a few seconds.");
+        }
+        throw new Error(error.message || 'find_match RPC call failed');
+      }
+
+      if (!data) {
+        throw new Error("find_match returned no data");
+      }
+
+      // RPC response can be array or object
+      const matchArray = Array.isArray(data) ? data : [data];
+      
+      if (matchArray.length === 0) {
+        throw new Error("No match data in RPC response");
+      }
+
+      const match = matchArray[0];
+      console.log('[pvpMatchService] Match from RPC:', match);
+      
+      if (!match.match_id) {
+        throw new Error("Match ID is missing from response");
+      }
+      
+      const mappedMatch = {
+        matchId: match.match_id,
+        problemId: match.problem_id || null, // problem_id can be null
+        status: match.status || 'searching',
+      };
+      
+      console.log('[pvpMatchService] Mapped match:', mappedMatch);
+      return { success: true, data: mappedMatch };
+    } catch (error) {
+      console.error('[pvpMatchService] joinQueue error:', error.message || error);
+      return { success: false, message: error.message || 'Failed to join queue' };
+    }
+  },
+
   // Create a new match (player1 joins queue)
   async createMatch() {
     try {
@@ -853,14 +982,95 @@ export const pvpMatchService = {
     }
   },
 
-  // Submit player code
+  // Submit player code - call Supabase submit_pvp_win function
   async submitCode(matchId, code) {
     try {
-      const match = await apiCall(`/pvpmatch/${matchId}/submit-code`, "POST", {
-        code
+      console.log('[pvpMatchService] Submitting PvP code...', { matchId, codeLength: code?.length });
+      const { supabase } = await import("./supabaseClient");
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        throw new Error("User not authenticated");
+      }
+
+      const { error } = await supabase.rpc('submit_pvp_win', {
+        p_match_id: matchId,
+        p_winner_id: session.user.id,
+        p_code: code
       });
-      return { success: true, data: match };
+
+      if (error) {
+        console.error('[pvpMatchService] submit_pvp_win error:', error);
+        throw error;
+      }
+
+      console.log('[pvpMatchService] PvP code submitted successfully');
+      return { success: true, message: "Code submitted, you won!" };
     } catch (error) {
+      console.error('[pvpMatchService] submitCode error:', error);
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get match result and update user XP
+  async getMatchResult(matchId, currentUserId) {
+    try {
+      console.log('[pvpMatchService] Getting match result:', matchId);
+      const { supabase } = await import("./supabaseClient");
+      
+      const { data, error } = await supabase
+        .from('pvp_matches')
+        .select('*')
+        .eq('match_id', matchId)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        return { success: false, message: 'Match not found' };
+      }
+
+      const isPlayer1 = data.player1_id === currentUserId;
+      const isWinner = data.winner_id === currentUserId;
+      const xpChange = isPlayer1 ? data.xp_change_p1 : data.xp_change_p2;
+
+      // Update user stats with XP change
+      if (data.status === 'completed' && xpChange) {
+        const { data: stats } = await supabase
+          .from('user_stats')
+          .select('xp')
+          .eq('user_id', currentUserId)
+          .single();
+
+        if (stats) {
+          const currentXP = parseInt(stats.xp || 0);
+          const newXP = (currentXP + xpChange).toString();
+
+          await supabase
+            .from('user_stats')
+            .update({ xp: newXP })
+            .eq('user_id', currentUserId);
+        }
+      }
+
+      return {
+        success: true,
+        data: {
+          matchId: data.match_id,
+          status: data.status,
+          winnerId: data.winner_id,
+          isWinner,
+          xpChange,
+          opponentId: isPlayer1 ? data.player2_id : data.player1_id,
+          player1Code: data.player1_code,
+          player2Code: data.player2_code,
+          completedAt: data.completed_at
+        }
+      };
+    } catch (error) {
+      console.error('[pvpMatchService] getMatchResult error:', error);
       return { success: false, message: error.message };
     }
   },
@@ -879,12 +1089,26 @@ export const pvpMatchService = {
     }
   },
 
-  // Cancel match
+  // Cancel match - delete from Supabase
   async cancelMatch(matchId) {
     try {
-      await apiCall(`/pvpmatch/${matchId}/cancel`, "POST");
+      console.log('[pvpMatchService] Cancelling match:', matchId);
+      const { supabase } = await import("./supabaseClient");
+      
+      const { error } = await supabase
+        .from('pvp_matches')
+        .delete()
+        .eq('match_id', matchId);
+
+      if (error) {
+        console.error('[pvpMatchService] cancelMatch error:', error);
+        throw error;
+      }
+
+      console.log('[pvpMatchService] Match cancelled successfully');
       return { success: true, message: "Match cancelled successfully" };
     } catch (error) {
+      console.error('[pvpMatchService] cancelMatch error:', error);
       return { success: false, message: error.message };
     }
   },

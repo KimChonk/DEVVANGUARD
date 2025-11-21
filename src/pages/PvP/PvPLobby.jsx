@@ -11,6 +11,7 @@ import '../../assets/CSS/mainmenu.css';
 
 const POLL_INTERVAL = 2000;
 const COUNTDOWN_TIME = 5;
+const SEARCH_TIMEOUT = 60000;
 
 export default function PvPLobby() {
   const navigate = useNavigate();
@@ -19,10 +20,9 @@ export default function PvPLobby() {
   const { courses, loading: coursesLoading } = useCourses();
   const {
     joinQueue,
-    getSearchingMatches,
+    getMatchByIdForPolling,
     getUserMatches,
     cancelMatch,
-    getMatchById,
     loading: pvpLoading
   } = usePvP();
 
@@ -48,13 +48,14 @@ export default function PvPLobby() {
 
   useEffect(() => {
     if (profile) {
+      console.log('[PvPLobby] Profile received:', profile);
       setUser((prev) => ({
         ...prev,
-        name: profile.fullName || profile.email || 'Player',
-        avatar: profile.avatarName
-          ? `/images/avatars/${profile.avatarName}`
+        name: profile.fullName || profile.full_name || profile.email || 'Player',
+        avatar: (profile.avatarName || profile.avatar_name)
+          ? `/images/avatars/${profile.avatarName || profile.avatar_name}`
           : '/images/avatars/default-avatar.jpg',
-        userId: profile.user_id || profile.id
+        userId: profile.userId || profile.user_id || profile.id
       }));
     }
   }, [profile]);
@@ -90,40 +91,36 @@ export default function PvPLobby() {
   }, [user.userId, getUserMatches]);
 
   useEffect(() => {
-    if (!isSearching) return;
+    if (!currentMatchId || !isSearching) return;
 
     const pollInterval = setInterval(async () => {
       try {
-        const searchingMatches = await getSearchingMatches();
-        if (searchingMatches && searchingMatches.length > 0) {
-          const matchToJoin = searchingMatches[0];
+        const result = await getMatchByIdForPolling(currentMatchId);
+        if (result && result.success) {
+          const match = result.data;
           
-          const result = await joinQueue(matchToJoin.matchId);
-          if (result && result.matchId) {
-            setCurrentMatchId(result.matchId);
+          if (match.status === 'in_progress' && match.player2Id) {
+            console.log('[PvPLobby] Opponent found! Match status: in_progress');
             setIsSearching(false);
             setShowMatchFound(true);
             setCountdown(COUNTDOWN_TIME);
-
-            const isPlayer1 = result.player1Id === user.userId;
-            const opponent = isPlayer1 ? result.player2Id : result.player1Id;
-            const opponentName = isPlayer1 ? 'Opponent' : 'Opponent';
+            
+            const isPlayer1 = match.player1Id === user.userId;
+            const opponent = isPlayer1 ? match.player2Id : match.player1Id;
             
             setOpponentInfo({
-              name: opponentName,
+              name: 'Opponent',
               userId: opponent
             });
-
-            setSuccessMessage('');
           }
         }
       } catch (err) {
-        console.error('Polling error:', err);
+        // Silently fail on poll errors
       }
-    }, POLL_INTERVAL);
+    }, 3000); // Poll every 3 seconds
 
     return () => clearInterval(pollInterval);
-  }, [isSearching, getSearchingMatches, joinQueue, user.userId]);
+  }, [isSearching, currentMatchId, getMatchByIdForPolling, user.userId]);
 
   useEffect(() => {
     if (!showMatchFound || !currentMatchId) return;
@@ -142,24 +139,56 @@ export default function PvPLobby() {
   }, [showMatchFound, currentMatchId, navigate]);
 
   const handleFindMatch = async () => {
-    if (!user.userId) {
-      setErrorMessage('User not loaded. Please refresh the page.');
-      setShowErrorNotif(true);
-      return;
-    }
-
     try {
-      setIsSearching(true);
-      setSuccessMessage('Searching for opponent in your XP range...');
-      setShowSuccessNotif(true);
+      console.log('[PvP] handleFindMatch started');
       
-      const result = await joinQueue();
-      if (result && result.matchId) {
-        setCurrentMatchId(result.matchId);
-        setSuccessMessage('Created match. Waiting for opponent...');
+      if (!user.userId) {
+        console.log('[PvP] User not loaded:', user);
+        setErrorMessage('User not loaded. Please refresh the page.');
+        setShowErrorNotif(true);
+        return;
       }
-    } catch (err) {
-      setErrorMessage(err.message || 'Failed to search for match');
+
+      console.log('[PvP] Setting isSearching=true');
+      setIsSearching(true);
+      setSuccessMessage('');
+      setShowSuccessNotif(false);
+      
+      console.log('[PvP] Starting matchmaking request...', { userId: user.userId, xp: user.xp });
+      
+      // Call joinQueue
+      const response = await joinQueue();
+      console.log('[PvP] Matchmaking response:', response);
+
+      // FIX: Check if has matchId instead of checking .success
+      if (response && response.matchId) {
+        // SUCCESS - Got a match!
+        console.log('[PvP] Got match with ID:', response.matchId);
+        
+        setCurrentMatchId(response.matchId);
+        
+        // If waiting for opponent
+        if (response.status === 'searching') {
+          console.log('[PvP] Status: searching, waiting for opponent...');
+          // Polling will handle finding opponent
+        } 
+        // If found opponent immediately
+        else if (response.status === 'in_progress') {
+          console.log('[PvP] Status: in_progress, opponent found!');
+          setShowMatchFound(true);
+          setCountdown(COUNTDOWN_TIME);
+          setSuccessMessage('Match found! Entering battle...');
+          setShowSuccessNotif(true);
+        }
+      } else {
+        // NO matchId - this is an error
+        throw new Error('Failed to join queue: No match ID returned');
+      }
+
+    } catch (error) {
+      console.error('[PvP] Matchmaking error caught:', error);
+      console.error('[PvP] Error message:', error?.message);
+      setErrorMessage(error?.message || 'Failed to find match');
       setShowErrorNotif(true);
       setIsSearching(false);
     }
@@ -167,16 +196,29 @@ export default function PvPLobby() {
 
   const handleCancelSearch = async () => {
     try {
-      if (currentMatchId) {
-        await cancelMatch(currentMatchId);
-      }
+      console.log('[PvP] Cancelling search...');
+      
+      const matchIdToCancel = currentMatchId;
+      
+      // Stop polling immediately by clearing state
       setIsSearching(false);
       setCurrentMatchId(null);
       setShowMatchFound(false);
+      
+      // Then delete the match from database
+      if (matchIdToCancel) {
+        console.log('[PvP] Deleting match:', matchIdToCancel);
+        await cancelMatch(matchIdToCancel);
+      }
+      
+      console.log('[PvP] Search cancelled successfully');
       setCountdown(COUNTDOWN_TIME);
       setSuccessMessage('');
+      setErrorMessage('');
+      setShowErrorNotif(false);
     } catch (err) {
-      setErrorMessage('Failed to cancel search');
+      console.error('[PvP] Cancel search error:', err);
+      setErrorMessage('Failed to cancel search: ' + (err?.message || 'Unknown error'));
       setShowErrorNotif(true);
     }
   };
@@ -354,8 +396,12 @@ export default function PvPLobby() {
             <button
               className="pvp-hero-cta"
               onClick={() => {
-                navigate("/pvp-battle");
+                console.log('[Button] ENTER BATTLE clicked!');
+                console.log('[Button] User:', user);
+                console.log('[Button] isSearching:', isSearching);
+                handleFindMatch();
               }}
+              disabled={isSearching || pvpLoading}
             >
               {isSearching ? 'Searching...' : 'Enter Battle'}
             </button>
@@ -430,23 +476,59 @@ export default function PvPLobby() {
                 </div>
               </div>
 
-              <button
-                className="pvp-find-button"
-                onClick={isSearching ? handleCancelSearch : handleFindMatch}
-                disabled={pvpLoading}
-                style={{
-                  background: isSearching ? '#ef4444' : undefined,
-                  marginTop: '20px'
-                }}
-              >
-                {isSearching ? 'Cancel Search' : 'Find Match'}
-              </button>
-              <button
-                className="view-profile-btn"
-                onClick={() => navigate('/profile')}
-              >
-                View Profile
-              </button>
+              {isSearching && (
+                <div style={{
+                  marginTop: '20px',
+                  padding: '16px',
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  border: '1px solid #3b82f6'
+                }}>
+                  <div style={{ fontSize: '14px', color: '#3b82f6', marginBottom: '8px' }}>
+                    Searching for opponent...
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#93c5fd', marginTop: '8px' }}>
+                    XP Range: {user.xp - 50} - {user.xp + 50}
+                  </div>
+                  <button
+                    onClick={handleCancelSearch}
+                    style={{
+                      marginTop: '12px',
+                      padding: '8px 16px',
+                      background: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    Cancel Search
+                  </button>
+                </div>
+              )}
+
+              {!isSearching && (
+                <>
+                  <button
+                    className="pvp-find-button"
+                    onClick={handleFindMatch}
+                    disabled={pvpLoading}
+                    style={{
+                      marginTop: '20px'
+                    }}
+                  >
+                    Find Match
+                  </button>
+                  <button
+                    className="view-profile-btn"
+                    onClick={() => navigate('/profile')}
+                  >
+                    View Profile
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
