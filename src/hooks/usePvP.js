@@ -54,6 +54,7 @@ export const usePvP = () => {
     setError(null);
     try {
       const result = await pvpProblemService.getProblemById(problemId);
+
       if (result.success) {
         return result.data;
       } else {
@@ -187,18 +188,29 @@ export const usePvP = () => {
     setError(null);
     try {
       const result = await pvpMatchService.getMatchById(matchId);
+
       if (result.success) {
         setCurrentMatch(result.data);
-        return result.data;
+        return { success: true, data: result.data };
       } else {
         setError(result.message);
-        return null;
+        return { success: false, message: result.message };
       }
     } catch (err) {
       setError(err.message);
-      return null;
+      return { success: false, message: err.message };
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  // Get match by ID (for polling - doesn't set state to avoid re-renders)
+  const getMatchByIdForPolling = useCallback(async (matchId) => {
+    try {
+      const result = await pvpMatchService.getMatchById(matchId);
+      return result;
+    } catch (err) {
+      return { success: false, message: err.message };
     }
   }, []);
 
@@ -223,15 +235,21 @@ export const usePvP = () => {
     }
   }, []);
 
-  // Join queue (create new match in queue, not join existing)
+  // Join queue (auto-match with XP range)
   const joinQueue = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await pvpMatchService.createMatch();
-      if (result.success) {
+      const result = await pvpMatchService.joinQueue();
+
+      if (result.success && result.data) {
         setCurrentMatch(result.data);
+        // Return the match data directly (not wrapped)
         return result.data;
+      } else if (result.matchId) {
+        // If service returns match directly (not wrapped in success/data)
+        setCurrentMatch(result);
+        return result;
       } else {
         setError(result.message);
         return null;
@@ -255,16 +273,16 @@ export const usePvP = () => {
     setError(null);
     try {
       const result = await pvpMatchService.submitCode(matchId, code);
+
       if (result.success) {
-        setCurrentMatch(result.data);
-        return result.data;
+        return result; // Return full result with success and message
       } else {
         setError(result.message);
-        return null;
+        return result;
       }
     } catch (err) {
       setError(err.message);
-      return null;
+      return { success: false, message: err.message };
     } finally {
       setLoading(false);
     }
@@ -297,16 +315,39 @@ export const usePvP = () => {
     setError(null);
     try {
       const result = await pvpMatchService.cancelMatch(matchId);
+
       if (result.success) {
         setCurrentMatch(null);
-        return true;
+        return result;
       } else {
         setError(result.message);
-        return false;
+        return result;
       }
     } catch (err) {
       setError(err.message);
-      return false;
+      return { success: false, message: err.message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Handle player disconnect
+  const playerDisconnect = useCallback(async (matchId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await pvpMatchService.playerDisconnect(matchId);
+
+      if (result.success) {
+        setCurrentMatch(null);
+        return result;
+      } else {
+        setError(result.message);
+        return result;
+      }
+    } catch (err) {
+      setError(err.message);
+      return { success: false, message: err.message };
     } finally {
       setLoading(false);
     }
@@ -340,12 +381,14 @@ export const usePvP = () => {
     loadSearchingMatches,
     getSearchingMatches,
     getMatchById,
+    getMatchByIdForPolling,
     createMatch,
     joinQueue,
     joinMatch,
     submitCode,
     completeMatch,
     cancelMatch,
+    playerDisconnect,
 
     // Utilities
     clearError,

@@ -37,8 +37,6 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
       };
     }
 
-    console.log('Sending to NPC AI:', { userMessage, problemDescription: problemDescription.substring(0, 100) + '...' });
-
     const response = await fetch(EDGE_FUNCTION_URL, {
       method: 'POST',
       headers: {
@@ -52,8 +50,6 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
         userCode: userCode || '# No code provided yet',
       }),
     });
-
-    console.log('Response status:', response.status, response.statusText);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -69,10 +65,7 @@ export async function getNPCResponse(userMessage, problemDescription = '', userC
 
     const data = await response.json();
 
-    console.log('Response data:', data);
-
     if (data.reply) {
-      console.log(' NPC Reply:', data.reply);
       return {
         success: true,
         reply: data.reply

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../assets/CSS/successnotification.css';
 
-const SuccessNotification = ({ isVisible, message, xpReward, onClose }) => {
+const SuccessNotification = ({ isVisible, message, xpReward, onClose, duration = 3000 }) => {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
@@ -12,10 +12,10 @@ const SuccessNotification = ({ isVisible, message, xpReward, onClose }) => {
         setTimeout(() => {
           onClose();
         }, 600);
-      }, 3000);
+      }, duration);
       return () => clearTimeout(timer);
     }
-  }, [isVisible, onClose]);
+  }, [isVisible, onClose, duration]);
 
   if (!isVisible && !isClosing) return null;
 

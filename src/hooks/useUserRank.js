@@ -25,7 +25,6 @@ export const useUserRank = (userId) => {
           console.error('Error fetching rank data:', error);
           setError(error.message);
         } else {
-          console.log('Rank data fetched:', data);
           setRankData(data);
         }
       } catch (err) {
