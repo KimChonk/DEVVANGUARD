@@ -16,18 +16,14 @@ export const useLessonById = (lessonId) => {
       try {
         setLoading(true);
         setError(null);
-        console.log(`🔄 Fetching lesson ${lessonId}...`);
         const result = await lessonService.getLessonById(lessonId);
-        
+
         if (result.success) {
-          console.log("✅ Lesson fetched:", result.data);
           setLesson(result.data);
         } else {
-          console.error("❌ Fetch failed:", result.message);
           setError(result.message);
         }
       } catch (err) {
-        console.error("❌ Error fetching lesson:", err);
         setError(err.message || "Failed to fetch lesson");
       } finally {
         setLoading(false);
@@ -55,19 +51,15 @@ export const useLessonsByCourse = (courseId) => {
       try {
         setLoading(true);
         setError(null);
-        console.log(`🔄 Fetching lessons for course ${courseId}...`);
         const result = await lessonService.getLessonsByCourseId(courseId);
-        
+
         if (result.success) {
-          console.log("✅ Lessons fetched:", result.data);
           setLessons(Array.isArray(result.data) ? result.data : []);
         } else {
-          console.error("❌ Fetch failed:", result.message);
           setError(result.message);
           setLessons([]);
         }
       } catch (err) {
-        console.error("❌ Error fetching lessons:", err);
         setError(err.message || "Failed to fetch lessons");
         setLessons([]);
       } finally {

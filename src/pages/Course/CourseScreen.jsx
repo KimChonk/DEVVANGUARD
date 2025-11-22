@@ -122,7 +122,6 @@ export default function CourseScreen() {
                 completed[lesson.lessonId] = progressResult.data.status === 'completed';
               }
             } catch (err) {
-              console.log(`Cannot fetch progress for lesson ${lesson.lessonId}`);
             }
           }
           setCompletedLessons(completed);

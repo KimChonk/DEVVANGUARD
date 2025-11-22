@@ -116,10 +116,6 @@ export async function executePvPCode(language, code, input = "") {
     const pistonLang = LANGUAGE_MAP[language] || language;
     const version = LANGUAGE_VERSIONS[language] || "*";
 
-    console.log(`[PvP Compiler] Executing ${language} (${pistonLang} v${version})...`);
-    console.log(`[PvP Compiler] Code length: ${code.length} chars`);
-    console.log(`[PvP Compiler] Input: ${input || "(empty)"}`);
-
     // Prepare payload - IMPORTANT: Keep structure simple
     const payload = {
       language: pistonLang,
@@ -133,8 +129,6 @@ export async function executePvPCode(language, code, input = "") {
       run_timeout: 10000,
     };
 
-    console.log(`[PvP Compiler] Sending payload:`, JSON.stringify(payload).substring(0, 200) + "...");
-
     const response = await fetch(PISTON_API_URL, {
       method: "POST",
       headers: {
@@ -142,8 +136,6 @@ export async function executePvPCode(language, code, input = "") {
       },
       body: JSON.stringify(payload),
     });
-
-    console.log(`[PvP Compiler] Response status: ${response.status}`);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -164,7 +156,6 @@ export async function executePvPCode(language, code, input = "") {
     }
 
     const result = await response.json();
-    console.log(`[PvP Compiler] API Response:`, result);
 
     // Extract output - Piston uses result.run.stdout/stderr
     const stdout = result.run?.stdout || "";
@@ -181,8 +172,6 @@ export async function executePvPCode(language, code, input = "") {
         exitCode: exitCode,
       };
     }
-
-    console.log(`[PvP Compiler] Execution successful. Output: ${stdout.substring(0, 100)}...`);
 
     return {
       success: true,
@@ -238,8 +227,6 @@ function validateTestOutput(actualOutput, expectedOutput) {
  * @returns {Promise} Validation result
  */
 export async function executePvPAndValidate(language, code, testCases = []) {
-  console.log(`[PvP Compiler] Starting execution with ${testCases.length} test cases...`);
-
   if (!testCases || testCases.length === 0) {
     return {
       allPassed: false,
@@ -261,8 +248,6 @@ export async function executePvPAndValidate(language, code, testCases = []) {
     const expectedOutput = testCase.expected_output || testCase.expected || "";
     const testName = testCase.name || `Test ${i + 1}`;
 
-    console.log(`[PvP Compiler] Running ${testName}...`);
-
     const execution = await executePvPCode(language, code, input);
 
     if (!execution.success) {
@@ -281,8 +266,6 @@ export async function executePvPAndValidate(language, code, testCases = []) {
 
     const passed = validateTestOutput(execution.stdout, expectedOutput);
     if (passed) passedCount++;
-
-    console.log(`[PvP Compiler] ${testName}: ${passed ? "PASS" : "FAIL"}`);
 
     results.push({
       testNumber: i + 1,
