@@ -26,69 +26,49 @@ const LANGUAGE_MAP = {
 export const CODE_TEMPLATES = {
   python: `# Python Template
 def solve():
-    # Read input
-    n = int(input())
-    
-    # Your code here
-    result = n
-    
-    # Print output
-    print(result)
+    #Enter your code here
 
 if __name__ == "__main__":
     solve()
 `,
-  java: `// Java Template
+  java: `
 import java.util.Scanner;
 
 public class Solution {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        
-        // Read input
-        int n = sc.nextInt();
-        
         // Your code here
-        int result = n;
-        
-        // Print output
-        System.out.println(result);
-        
-        sc.close();
+
+
+
+
     }
 }
 `,
-  c: `// C Template
+  c: `
 #include <stdio.h>
 
-int main() {
-    // Read input
-    int n;
-    scanf("%d", &n);
-    
+int main() {   
     // Your code here
-    int result = n;
-    
-    // Print output
-    printf("%d\\n", result);
-    
+
+
+
+
+
+
+
     return 0;
 }
 `,
-  cpp: `// C++ Template
+  cpp: `
 #include <iostream>
 using namespace std;
 
 int main() {
-    // Read input
-    int n;
-    cin >> n;
-    
     // Your code here
-    int result = n;
-    
-    // Print output
-    cout << result << endl;
+
+
+
+
     
     return 0;
 }
