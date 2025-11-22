@@ -15,6 +15,8 @@ import DashboardScreen from "./pages/Dashboard/DashboardScreen";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PvPLobby from "./pages/PvP/PvPLobby";
 import PvPBattle from "./pages/PvP/PvPBattle";
+import Practice from "./pages/Practice/Practice";
+import PracticeGame from "./pages/Practice/PracticeGame";
 
 function App() {
   return (
@@ -100,6 +102,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <PvPBattle />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Practice Route */}
+          <Route 
+            path="/practice" 
+            element={
+              <ProtectedRoute>
+                <Practice />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/practice/:problemId" 
+            element={
+              <ProtectedRoute>
+                <PracticeGame />
               </ProtectedRoute>
             } 
           />
