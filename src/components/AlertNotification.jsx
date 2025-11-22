@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../assets/CSS/alertnotification.css';
 
-const AlertNotification = ({ isVisible, message, onClose, onClosedComplete }) => {
+const AlertNotification = ({ isVisible, message, onClose, onClosedComplete, duration = 3000 }) => {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
@@ -16,10 +16,10 @@ const AlertNotification = ({ isVisible, message, onClose, onClosedComplete }) =>
             onClosedComplete();
           }
         }, 600);
-      }, 3000);
+      }, duration);
       return () => clearTimeout(timer);
     }
-  }, [isVisible, onClose, onClosedComplete]);
+  }, [isVisible, onClose, onClosedComplete, duration]);
 
   if (!isVisible && !isClosing) return null;
 

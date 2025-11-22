@@ -423,28 +423,31 @@ export default function PvPLobby() {
               ) : (
                 <div className="pvp-history-list-container-new">
                   <div className="pvp-history-list">
-                    {matchHistory.map((match) => (
-                    <div key={match.matchId} className="pvp-match-card">
-                      <div className="pvp-match-header">
-                        <span className="pvp-match-date">
-                          {formatMatchTime(match.completedAt)}
-                        </span>
-                        <span className={`pvp-match-status ${getStatusClass(match)}`}>
-                          {getMatchResult(match)}
-                        </span>
-                      </div>
-                      <div className="pvp-match-result">
-                        <div className="pvp-result-item">
-                          <div className="pvp-result-label">XP Change</div>
-                          <div className={`pvp-result-value ${match.winnerId === user.userId ? 'positive' : 'negative'}`}>
-                            {match.winnerId === user.userId
-                              ? `+${match.xpChangeP1 || match.xpChangeP2 || 0}`
-                              : `${match.xpChangeP1 || match.xpChangeP2 || 0}`}
+                    {matchHistory.map((match) => {
+                      const isPlayer1 = match.player1Id === user.userId;
+                      const xpChange = isPlayer1 ? match.xpChangeP1 : match.xpChangeP2;
+                      const isWin = match.winnerId === user.userId;
+                      return (
+                        <div key={match.matchId} className="pvp-match-card">
+                          <div className="pvp-match-header">
+                            <span className="pvp-match-date">
+                              {formatMatchTime(match.completedAt)}
+                            </span>
+                            <span className={`pvp-match-status ${getStatusClass(match)}`}>
+                              {getMatchResult(match)}
+                            </span>
+                          </div>
+                          <div className="pvp-match-result">
+                            <div className="pvp-result-item">
+                              <div className="pvp-result-label">XP Change</div>
+                              <div className={`pvp-result-value ${isWin ? 'positive' : 'negative'}`}>
+                                {xpChange || 0}
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
