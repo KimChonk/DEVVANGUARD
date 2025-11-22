@@ -567,6 +567,30 @@ export const userStatsService = {
     }
   },
 
+  // Update XP with change value (POST method)
+  async updateXp(xpChange) {
+    try {
+      const stats = await apiCall("/userstats/me/update-xp", "POST", {
+        xpChange,
+      });
+      return { success: true, data: stats };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Update XP with change value (PUT method)
+  async updateXpPut(xpChange) {
+    try {
+      const stats = await apiCall("/userstats/me/xp", "PUT", {
+        xpChange,
+      });
+      return { success: true, data: stats };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
   // Lấy stats theo ID
   async getStatsById(statId) {
     try {
@@ -1012,7 +1036,7 @@ export const pvpMatchService = {
     }
   },
 
-  // Get match result and update user XP
+  // Get match result and update user XP via API
   async getMatchResult(matchId, currentUserId) {
     try {
       console.log('[pvpMatchService] Getting match result:', matchId);
@@ -1036,23 +1060,10 @@ export const pvpMatchService = {
       const isWinner = data.winner_id === currentUserId;
       const xpChange = isPlayer1 ? data.xp_change_p1 : data.xp_change_p2;
 
-      // Update user stats with XP change
+      // Update user stats with XP change via API
       if (data.status === 'completed' && xpChange) {
-        const { data: stats } = await supabase
-          .from('user_stats')
-          .select('xp')
-          .eq('user_id', currentUserId)
-          .single();
-
-        if (stats) {
-          const currentXP = parseInt(stats.xp || 0);
-          const newXP = (currentXP + xpChange).toString();
-
-          await supabase
-            .from('user_stats')
-            .update({ xp: newXP })
-            .eq('user_id', currentUserId);
-        }
+        console.log('[pvpMatchService] Updating XP via API. XP change:', xpChange);
+        await userStatsService.updateXpPut(xpChange);
       }
 
       return {
@@ -1119,6 +1130,19 @@ export const pvpMatchService = {
       await apiCall(`/pvpmatch/${matchId}`, "DELETE");
       return { success: true, message: "Match deleted successfully" };
     } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Handle player disconnect - opponent wins and gets XP
+  async playerDisconnect(matchId) {
+    try {
+      console.log('[pvpMatchService] Player disconnecting from match:', matchId);
+      const result = await apiCall(`/pvpmatch/${matchId}/disconnect`, "POST");
+      console.log('[pvpMatchService] Disconnect result:', result);
+      return { success: true, data: result };
+    } catch (error) {
+      console.error('[pvpMatchService] playerDisconnect error:', error);
       return { success: false, message: error.message };
     }
   }

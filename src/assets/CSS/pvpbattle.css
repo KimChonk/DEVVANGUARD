@@ -797,6 +797,114 @@ body {
   }
 }
 
+
+
+/* ===== PVP TEST CASES STYLING ===== */
+.pvp-test-cases-section {
+  border-top: 2px solid var(--border-color);
+  padding-top: 16px;
+}
+
+.pvp-test-cases-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-color);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.test-cases-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.test-cases-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.test-cases-container::-webkit-scrollbar-track {
+  background: var(--tertiary-color);
+  border-radius: 3px;
+}
+
+.test-cases-container::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+.test-cases-container::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+.test-case-item {
+  background-color: var(--tertiary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.test-case-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-color);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.test-case-body {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.test-case-body strong {
+  color: var(--text-primary);
+  display: block;
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+.test-case-body strong:first-child {
+  margin-top: 0;
+}
+
+.test-case-input,
+.test-case-expected {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin: 4px 0 8px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: var(--text-primary);
+  max-height: 80px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.test-cases-code {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  max-height: 150px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Courier New', monospace;
+}
+
 @media (max-width: 768px) {
   .pvp-header {
     padding: 10px 12px;
@@ -891,5 +999,33 @@ body {
 
   .pvp-timer {
     font-size: 16px;
+  }
+}
+
+/* ===== SIMPLE ERROR NOTIFICATION ===== */
+.simple-error-notif {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(220, 53, 69, 0.9);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  max-width: 300px;
+  animation: slideInRight 0.3s ease-out;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  z-index: 5000;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }

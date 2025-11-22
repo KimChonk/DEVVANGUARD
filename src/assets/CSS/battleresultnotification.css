@@ -1,0 +1,233 @@
+.battle-result-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.battle-result-overlay.closing {
+  animation: fadeOut 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.battle-result-card {
+  position: relative;
+  width: 90%;
+  max-width: 400px;
+  padding: 40px 30px;
+  border-radius: 16px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  border: 2px solid;
+  animation: slideUp 0.5s ease-out;
+  overflow: hidden;
+}
+
+.battle-result-card.victory {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(56, 142, 60, 0.2));
+  border-color: rgba(76, 175, 80, 0.6);
+  box-shadow: 0 0 30px rgba(76, 175, 80, 0.3), inset 0 0 20px rgba(76, 175, 80, 0.1);
+}
+
+.battle-result-card.defeat {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(211, 47, 47, 0.2));
+  border-color: rgba(244, 67, 54, 0.6);
+  box-shadow: 0 0 30px rgba(244, 67, 54, 0.3), inset 0 0 20px rgba(244, 67, 54, 0.1);
+}
+
+.battle-result-card.closing {
+  animation: slideDown 0.6s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+}
+
+.battle-result-content {
+  position: relative;
+  z-index: 2;
+}
+
+.battle-result-icon {
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  animation: bounce 0.6s ease-out;
+}
+
+.battle-result-icon.victory {
+  animation: bounce 0.6s ease-out, glow-green 1.5s ease-in-out infinite;
+}
+
+.battle-result-icon.defeat {
+  animation: bounce 0.6s ease-out, glow-red 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(0) rotateZ(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotateZ(-5deg);
+  }
+  100% {
+    transform: scale(1) rotateZ(0deg);
+  }
+}
+
+@keyframes glow-green {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+  }
+}
+
+@keyframes glow-red {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(244, 67, 54, 0.8);
+  }
+}
+
+.battle-result-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 10px 0;
+  letter-spacing: 2px;
+}
+
+.battle-result-card.victory .battle-result-title {
+  color: #4caf50;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.battle-result-card.defeat .battle-result-title {
+  color: #f44336;
+  text-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+}
+
+.battle-result-message {
+  font-size: 1rem;
+  color: #e0e0e0;
+  margin: 15px 0 20px 0;
+  line-height: 1.5;
+}
+
+.battle-result-xp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.battle-result-xp.positive {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.battle-result-xp.negative {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.5);
+}
+
+.xp-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.xp-value {
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+}
+
+.battle-result-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.battle-result-card.victory .battle-result-glow {
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+  animation: pulse-glow-green 2s ease-in-out infinite;
+}
+
+.battle-result-card.defeat .battle-result-glow {
+  background: radial-gradient(circle, rgba(244, 67, 54, 0.1) 0%, transparent 70%);
+  animation: pulse-glow-red 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-green {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(76, 175, 80, 0.5);
+  }
+}
+
+@keyframes pulse-glow-red {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(244, 67, 54, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(244, 67, 54, 0.5);
+  }
+}
