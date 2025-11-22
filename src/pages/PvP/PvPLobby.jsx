@@ -48,7 +48,6 @@ export default function PvPLobby() {
 
   useEffect(() => {
     if (profile) {
-      console.log('[PvPLobby] Profile received:', profile);
       setUser((prev) => ({
         ...prev,
         name: profile.fullName || profile.full_name || profile.email || 'Player',
@@ -98,9 +97,8 @@ export default function PvPLobby() {
         const result = await getMatchByIdForPolling(currentMatchId);
         if (result && result.success) {
           const match = result.data;
-          
+
           if (match.status === 'in_progress' && match.player2Id) {
-            console.log('[PvPLobby] Opponent found! Match status: in_progress');
             setIsSearching(false);
             setShowMatchFound(true);
             setCountdown(COUNTDOWN_TIME);
@@ -140,41 +138,30 @@ export default function PvPLobby() {
 
   const handleFindMatch = async () => {
     try {
-      console.log('[PvP] handleFindMatch started');
-      
       if (!user.userId) {
-        console.log('[PvP] User not loaded:', user);
         setErrorMessage('User not loaded. Please refresh the page.');
         setShowErrorNotif(true);
         return;
       }
 
-      console.log('[PvP] Setting isSearching=true');
       setIsSearching(true);
       setSuccessMessage('');
       setShowSuccessNotif(false);
-      
-      console.log('[PvP] Starting matchmaking request...', { userId: user.userId, xp: user.xp });
-      
+
       // Call joinQueue
       const response = await joinQueue();
-      console.log('[PvP] Matchmaking response:', response);
 
       // FIX: Check if has matchId instead of checking .success
       if (response && response.matchId) {
         // SUCCESS - Got a match!
-        console.log('[PvP] Got match with ID:', response.matchId);
-        
         setCurrentMatchId(response.matchId);
-        
+
         // If waiting for opponent
         if (response.status === 'searching') {
-          console.log('[PvP] Status: searching, waiting for opponent...');
           // Polling will handle finding opponent
-        } 
+        }
         // If found opponent immediately
         else if (response.status === 'in_progress') {
-          console.log('[PvP] Status: in_progress, opponent found!');
           setShowMatchFound(true);
           setCountdown(COUNTDOWN_TIME);
           setSuccessMessage('Match found! Entering battle...');
@@ -196,22 +183,18 @@ export default function PvPLobby() {
 
   const handleCancelSearch = async () => {
     try {
-      console.log('[PvP] Cancelling search...');
-      
       const matchIdToCancel = currentMatchId;
-      
+
       // Stop polling immediately by clearing state
       setIsSearching(false);
       setCurrentMatchId(null);
       setShowMatchFound(false);
-      
+
       // Then delete the match from database
       if (matchIdToCancel) {
-        console.log('[PvP] Deleting match:', matchIdToCancel);
         await cancelMatch(matchIdToCancel);
       }
-      
-      console.log('[PvP] Search cancelled successfully');
+
       setCountdown(COUNTDOWN_TIME);
       setSuccessMessage('');
       setErrorMessage('');
@@ -396,9 +379,6 @@ export default function PvPLobby() {
             <button
               className="pvp-hero-cta"
               onClick={() => {
-                console.log('[Button] ENTER BATTLE clicked!');
-                console.log('[Button] User:', user);
-                console.log('[Button] isSearching:', isSearching);
                 handleFindMatch();
               }}
               disabled={isSearching || pvpLoading}

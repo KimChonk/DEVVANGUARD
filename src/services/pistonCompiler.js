@@ -37,14 +37,11 @@ export async function executeCode(language, code, input = "") {
     if (!language) {
       throw new Error("Language parameter is required for code execution");
     }
-    
-    console.log(` Executing ${language} code via Piston API...`);
+
     const startTime = performance.now();
 
     const pistonLang = LANGUAGE_MAP[language] || language;
     const version = LANGUAGE_VERSIONS[language] || "*";
-    
-    console.log(`   Language Mapping: ${language} → ${pistonLang} v${version}`);
 
     const payload = {
       language: pistonLang,
@@ -73,8 +70,6 @@ export async function executeCode(language, code, input = "") {
     const result = await response.json();
     const endTime = performance.now();
     const executionTime = Math.round(endTime - startTime);
-
-    console.log("Piston API Response:", result);
 
     // Extract output from result
     const stdout = result.run?.stdout || "";

@@ -72,17 +72,13 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log('📨 Asking NPC:', messageToSend);
       const result = await getNPCResponse(
         messageToSend,
         problemDescription,
         userCode
       );
 
-      console.log('📩 NPC Response:', result);
-
       if (result.success && result.reply) {
-        console.log('✅ Setting AI reply:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
@@ -108,13 +104,9 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log('💡 Asking for hint...');
       const result = await getNPCHint(problemDescription, userCode);
       
-      console.log('💡 Hint Response:', result);
-      
       if (result.success && result.reply) {
-        console.log('✅ Setting hint:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {
@@ -140,13 +132,9 @@ export default function NPCChat({
     setIsVisible(true);
 
     try {
-      console.log('📝 Asking for code feedback...');
       const result = await getNPCCodeFeedback(problemDescription, userCode);
       
-      console.log('📝 Feedback Response:', result);
-      
       if (result.success && result.reply) {
-        console.log('✅ Setting feedback:', result.reply);
         setDisplayedText('');
         setCurrentMessage(result.reply);
       } else {

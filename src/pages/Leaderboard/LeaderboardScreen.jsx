@@ -19,7 +19,6 @@ export default function LeaderboardScreen() {
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching leaderboard data...');
         
         // Create a new method in userService or use direct apiCall
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5131'}/api/user/leaderboard/top?limit=10`, {
@@ -37,7 +36,6 @@ export default function LeaderboardScreen() {
         const result = await response.json();
         
         if (result.success && result.data) {
-          console.log(' Leaderboard fetched:', result.data);
           // Ensure we have exactly 10 slots, fill empty ones with "Anonymous"
           const leaderboardArray = Array.isArray(result.data) ? result.data : [];
           while (leaderboardArray.length < 10) {
@@ -45,11 +43,9 @@ export default function LeaderboardScreen() {
           }
           setLeaderboardData(leaderboardArray);
         } else {
-          console.error(' Failed to fetch leaderboard:', result.message);
           setError(result.message || 'Failed to load leaderboard');
         }
       } catch (err) {
-        console.error(' Error fetching leaderboard:', err);
         setError(err.message);
       } finally {
         setLoading(false);

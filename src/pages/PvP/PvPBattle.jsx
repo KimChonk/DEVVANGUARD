@@ -63,8 +63,7 @@ export default function PvPBattle() {
       if (match && match.status === 'in_progress' && !submitted) {
         e.preventDefault();
         e.returnValue = '';
-        
-        console.log('[PvPBattle] Player disconnecting, calling playerDisconnect API...');
+
         try {
           await playerDisconnect(match.matchId);
         } catch (err) {
@@ -84,7 +83,6 @@ export default function PvPBattle() {
       setCode(template);
       setAllTestsPassed(false); // Reset test status when language changes
       setOutput(''); // Clear output when language changes
-      console.log(`[PvPBattle] Language: ${language}`);
     }
   }, [language, submitted, problem]);
 
@@ -92,12 +90,10 @@ export default function PvPBattle() {
   useEffect(() => {
     const loadBattle = async () => {
       try {
-        console.log('[PvPBattle] Component mounted, matchId:', matchId);
         setIsLoading(true);
-        
+
         // If no matchId, skip loading from API (demo/design mode)
         if (!matchId) {
-          console.log('[PvPBattle] No matchId, using demo problem');
           setProblem({
             problemId: 'demo-1',
             title: 'Demo Problem',
@@ -110,10 +106,8 @@ export default function PvPBattle() {
           return;
         }
 
-        console.log('[PvPBattle] Loading match:', matchId);
         const matchResult = await getMatchById(matchId);
-        console.log('[PvPBattle] Match result:', matchResult);
-        
+
         // Handle both wrapped {success, data} and direct object formats
         let matchData = null;
         if (matchResult && matchResult.success && matchResult.data) {
@@ -123,7 +117,6 @@ export default function PvPBattle() {
         }
         
         if (matchData) {
-          console.log('[PvPBattle] Match data loaded:', matchData);
           setMatch(matchData);
           
           // Set battle end time (server time based)
@@ -147,7 +140,6 @@ export default function PvPBattle() {
               const result = await userService.getUserProfile(opponentId);
               if (result.success && result.data) {
                 setOpponentName(result.data.fullName || result.data.full_name || result.data.email || 'Opponent');
-                console.log('[PvPBattle] Opponent name fetched:', result.data.fullName);
               } else {
                 setOpponentName('Opponent');
               }
@@ -160,9 +152,7 @@ export default function PvPBattle() {
           }
 
           if (matchData.problemId) {
-            console.log('[PvPBattle] Loading problem:', matchData.problemId);
             const problemData = await getProblemById(matchData.problemId);
-            console.log('[PvPBattle] Problem data loaded:', problemData);
             if (problemData) {
               setProblem(problemData);
               if (problemData.solutionTemplate) {
@@ -236,8 +226,6 @@ export default function PvPBattle() {
     // Start polling either when battle starts OR when code is submitted
     if (!battleStarted && !submitted) return;
 
-    console.log('[PvPBattle] Starting polling for winner detection...');
-    
     pollingIntervalRef.current = setInterval(async () => {
       try {
         const result = await getMatchById(matchId);
@@ -251,25 +239,18 @@ export default function PvPBattle() {
         }
         
         if (!updatedMatch) {
-          console.log('[PvPBattle] No match data returned');
           return;
         }
-
-        console.log('[PvPBattle] Poll result - status:', updatedMatch.status, 'winnerId:', updatedMatch.winnerId);
 
         // Check if match is completed
         if (updatedMatch.status === 'completed' && updatedMatch.winnerId) {
           clearInterval(pollingIntervalRef.current);
-          console.log('[PvPBattle] Match completed! Winner:', updatedMatch.winnerId);
-          
+
           const currentUserId = userStats?.user?.userId;
           const isPlayer1 = match?.player1Id === currentUserId;
           const isWinner = updatedMatch.winnerId === currentUserId;
           const xpChange = isPlayer1 ? updatedMatch.xpChangeP1 : updatedMatch.xpChangeP2;
-          
-          console.log('[PvPBattle] Current user:', currentUserId, 'Is winner:', isWinner, 'XP change:', xpChange);
-          console.log('[PvPBattle] XP already updated by backend API');
-          
+
           setBattleResult({
             isVictory: isWinner,
             xpChange: xpChange || (isWinner ? 20 : -5),
@@ -279,7 +260,6 @@ export default function PvPBattle() {
 
           // 5 second delay before redirect
           setTimeout(() => {
-            console.log('[PvPBattle] Redirecting to lobby...');
             navigate('/pvp/lobby');
           }, 5000);
         }
@@ -312,12 +292,7 @@ export default function PvPBattle() {
         testCases = JSON.parse(testCases);
       }
 
-      console.log('[PvPBattle] Running code with language:', language);
-      console.log('[PvPBattle] Test cases:', testCases);
-
       const result = await executePvPAndValidate(language, code, testCases);
-
-      console.log('[PvPBattle] Test result:', result);
 
       // Track if all tests passed
       setTestResults(result);
@@ -360,7 +335,6 @@ export default function PvPBattle() {
           testCases = JSON.parse(testCases);
         }
 
-        console.log('[PvPBattle] Validating before submit:', language);
         const result = await executePvPAndValidate(language, code, testCases);
         
         if (!result.allPassed) {
@@ -372,7 +346,6 @@ export default function PvPBattle() {
       }
 
       // If tests passed, submit code
-      console.log('[PvPBattle] Submitting code to match:', matchId);
       const submitResult = await submitCode(matchId, code);
       
       if (submitResult.success) {
@@ -398,7 +371,6 @@ export default function PvPBattle() {
     if (confirmed) {
       if (match && match.status === 'in_progress') {
         try {
-          console.log('[PvPBattle] Player quitting, calling playerDisconnect...');
           await playerDisconnect(match.matchId);
         } catch (err) {
           console.error('[PvPBattle] Error calling playerDisconnect:', err);

@@ -62,7 +62,6 @@ export default function EditProfile() {
   // === SỬA 2: LƯU DỮ LIỆU VÀO LOCALSTORAGE KHI SUBMIT ===
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Đã lưu dữ liệu:', formData);
 
     // 1. Lấy user data cũ (nếu có)
     const storedUser = JSON.parse(localStorage.getItem('devVanguardUser')) || {};
