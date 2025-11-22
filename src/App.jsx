@@ -6,6 +6,7 @@ import Intro from "./pages/intro";
 import Login from "./pages/Account/Login";
 import Register from "./pages/Account/Register";
 import ForgotPassword from "./pages/Account/ForgotPassword";
+import AuthCallback from "./pages/Account/AuthCallback";
 import MainMenu from "./pages/Menu/MainMenu";
 import CourseScreen from "./pages/Course/CourseScreen";
 import LessonScreen from "./pages/Lesson/LessonScreen";
@@ -27,6 +28,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ForgotPassword />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           
           {/* Protected Routes - User */}
           <Route 

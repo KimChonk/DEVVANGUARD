@@ -19,6 +19,7 @@ dist-ssr
 .env.development
 .env.production
 .env.test
+.env.production
 
 # Supabase (contains database credentials and API keys)
 supabase/
