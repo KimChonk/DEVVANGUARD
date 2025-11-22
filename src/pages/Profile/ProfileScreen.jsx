@@ -454,24 +454,6 @@ export default function ProfileScreen() {
               </div>
             </div>
 
-            <div className="info-card">
-              <h3>Rank Progress</h3>
-              <div className="rank-info">
-                <div className="rank-current">
-                  <strong>{rankData?.rank_title || "Newbie"}</strong>
-                </div>
-                <div className="xp-progress">
-                  <div className="xp-bar">
-                    <div
-                      className="xp-fill"
-                      style={{ width: `${Math.min((rankData?.xp || 0) / 100, 100)}%` }}
-                    ></div>
-                  </div>
-                  <div className="xp-text">{rankData?.xp || 0} XP</div>
-                </div>
-              </div>
-            </div>
-
             {/* Bạn có thể thêm card "Languages" hoặc "Skills" ở đây */}
             
           </div>

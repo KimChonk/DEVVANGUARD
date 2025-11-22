@@ -354,10 +354,6 @@ export default function PvPLobby() {
             </ul>
           </div>
           <div className="main-nav-right">
-            <button className="nav-icon-btn notification-btn" onClick={() => alert("No new notifications")}>
-              <i className="fas fa-bell"></i>
-              <span className="notification-badge">3</span>
-            </button>
           </div>
         </div>
       </nav>

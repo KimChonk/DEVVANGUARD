@@ -11,11 +11,7 @@ import "../../assets/CSS/mainmenu.css";
 const courseImageMap = {
   python: "python_background.gif",  
   java: "Java_background.gif",
-  javascript: "html_course.jpg",
   "c++": "Cpp_background.gif",
-  "c#": "c_background.gif",
-  css: "C_background.gif",
-  html: "html_course.jpg",
   c: "C_background.gif",
 };
 
@@ -286,7 +282,7 @@ export default function MainMenu() {
                 </a>
               </li>
               <li>
-                <a onClick={() => alert("Practice mode coming soon!")}>
+                <a onClick={() => navigate("/practice")}>
                   Practice
                 </a>
               </li>
@@ -298,13 +294,6 @@ export default function MainMenu() {
             </ul>
           </div>
           <div className="main-nav-right">
-            {/* <button className="nav-icon-btn search-btn" onClick={() => alert("Search coming soon!")}>
-              <i className="fas fa-search"></i>
-            </button> */}
-            <button className="nav-icon-btn notification-btn" onClick={() => alert("No new notifications")}>
-              <i className="fas fa-bell"></i>
-              <span className="notification-badge">3</span>
-            </button>
           </div>
         </div>
       </nav>
