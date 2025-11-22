@@ -102,12 +102,12 @@ export default function ProfileScreen() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editFormData, setEditFormData] = useState({
     fullName: "",
-    avatarName: "default-avatar.jpg",
+    avatarName: "default-avatar.png",
   });
 
   // Available avatars
   const availableAvatars = [
-    "default-avatar.jpg",
+    "default-avatar.png",
     "avatar1.png",
     "avatar2.png",
     "avatar3.png",
@@ -119,7 +119,7 @@ export default function ProfileScreen() {
     if (profile) {
       setEditFormData({
         fullName: profile.fullName || "",
-        avatarName: profile.avatarName || "default-avatar.jpg",
+        avatarName: profile.avatarName || "default-avatar.png",
       });
     }
   }, [profile]);
@@ -133,7 +133,7 @@ export default function ProfileScreen() {
     if (profile) {
       setEditFormData({
         fullName: profile.fullName || "",
-        avatarName: profile.avatarName || "default-avatar.jpg",
+        avatarName: profile.avatarName || "default-avatar.png",
       });
     }
   };
@@ -223,7 +223,7 @@ export default function ProfileScreen() {
   const totalLessonsCount = totalLessons > 0 ? totalLessons : 1; // Tránh chia cho 0
   const completedLessons = rankData?.total_lessons_completed || 0;
   const percentage = (completedLessons / totalLessonsCount) * 100;
-  const currentAvatar = editFormData.avatarName || "default-avatar.jpg";
+  const currentAvatar = editFormData.avatarName || "default-avatar.png";
   const displayName = editFormData.fullName || "Knight Coder";
 
   return (
@@ -336,9 +336,9 @@ export default function ProfileScreen() {
               </button>
               
               {/* === NÚT LOGOUT TỪ PROFILE HEADER CŨ === */}
-              {/* <button className="logout-btn" onClick={handleLogout}>
+              <button className="logout-btn" onClick={handleLogout}>
                 <i className="fas fa-sign-out-alt"></i>
-              </button> */}
+              </button>
               
             </div>
           </div>
@@ -372,61 +372,11 @@ export default function ProfileScreen() {
 
               {/* Edit/Save Buttons */}
               <div className="profile-actions">
-                {!isEditMode ? (
-                  <button className="btn-edit" onClick={handleEditClick}>
-                    Edit Profile
-                  </button>
-                ) : (
-                  <div className="action-buttons">
-                    <button className="btn-save" onClick={handleSaveProfile}>
-                      Save Changes
-                    </button>
-                    <button className="btn-cancel" onClick={handleCancelEdit}>
-                      Cancel
-                    </button>
-                  </div>
-                )}
+                <button className="btn-edit" onClick={handleEditClick}>Edit Profile</button>
               </div>
 
               {/* Edit Mode */}
-              {isEditMode && (
-                <div className="edit-form">
-                  {/* Full Name Input */}
-                  <div className="form-group">
-                    <label>Full Name</label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={editFormData.fullName}
-                      onChange={handleInputChange}
-                      placeholder="Enter your full name"
-                      className="form-input"
-                    />
-                  </div>
-
-                  {/* Avatar Selector */}
-                  <div className="form-group">
-                    <label>Select Avatar</label>
-                    <div className="avatar-selector">
-                      {availableAvatars.map((avatar) => (
-                        <div
-                          key={avatar}
-                          className={`avatar-option ${
-                            editFormData.avatarName === avatar ? "selected" : ""
-                          }`}
-                          onClick={() => handleAvatarSelect(avatar)}
-                        >
-                          <img
-                            src={`/images/avatars/${avatar}`}
-                            alt={avatar}
-                            className="avatar-thumbnail"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+              
             </div>
             
             {/* Card thông tin Account */}
@@ -454,7 +404,7 @@ export default function ProfileScreen() {
               </div>
             </div>
 
-            {/* Bạn có thể thêm card "Languages" hoặc "Skills" ở đây */}
+
             
           </div>
 
@@ -464,6 +414,7 @@ export default function ProfileScreen() {
             {/* Card Stats Grid */}
             <div className="info-card">
               {/* <h3>Statistics</h3> (Tùy chọn: thêm tiêu đề) */}
+              <h3>Stats</h3>
               <div className="stats-grid">
                 <div className="stat-box stat-box-icon-layout">
                     <img src="/icons/xp.png" alt="XP" className="stat-main-icon" />
@@ -556,6 +507,56 @@ export default function ProfileScreen() {
           </div>
 
         </div>
+        {isEditMode && (
+          <div className="modal-overlay" onClick={handleCancelEdit}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Edit Profile</h2>
+                <button className="close-modal-btn" onClick={handleCancelEdit}>&times;</button>
+              </div>
+              
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={editFormData.fullName}
+                    onChange={handleInputChange}
+                    placeholder="Enter your full name"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Select Avatar</label>
+                  <div className="avatar-selector">
+                    {availableAvatars.map((avatar) => (
+                      <div
+                        key={avatar}
+                        className={`avatar-option ${
+                          editFormData.avatarName === avatar ? "selected" : ""
+                        }`}
+                        onClick={() => handleAvatarSelect(avatar)}
+                      >
+                        <img
+                          src={`/images/avatars/${avatar}`}
+                          alt={avatar}
+                          className="avatar-thumbnail"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCancelEdit}>Cancel</button>
+                <button className="btn-save" onClick={handleSaveProfile}>Save Changes</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
