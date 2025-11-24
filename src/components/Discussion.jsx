@@ -48,6 +48,17 @@ export default function Discussion({ lessonId }) {
       alert('Please enter title and content');
       return;
     }
+    
+    // Validation matching backend requirements
+    if (postTitle.trim().length < 6) {
+      alert('Title must be at least 6 characters long');
+      return;
+    }
+    
+    if (postContent.trim().length < 11) {
+      alert('Content must be at least 11 characters long');
+      return;
+    }
 
     try {
       setCreatePostLoading(true);
@@ -66,6 +77,17 @@ export default function Discussion({ lessonId }) {
   const handleUpdatePost = async (postId) => {
     if (!editPostTitle.trim() || !editPostContent.trim()) {
       alert('Please enter title and content');
+      return;
+    }
+    
+    // Validation matching backend requirements
+    if (editPostTitle.trim().length < 6) {
+      alert('Title must be at least 6 characters long');
+      return;
+    }
+    
+    if (editPostContent.trim().length < 11) {
+      alert('Content must be at least 11 characters long');
       return;
     }
 
