@@ -222,7 +222,7 @@ export default function NPCChat({
         <div className="npc-header-info">
           <h3 className="npc-title">Mystery Wizard</h3>
           <p className="npc-status">
-            {isLoading ? 'Thinking...' : (conversationMode ? 'AI Mode' : 'Ready')}
+            {isLoading ? 'Thinking...' : (conversationMode ? 'Ready to help' : 'Ready')}
           </p>
         </div>
       </div>
@@ -257,9 +257,17 @@ export default function NPCChat({
               className="npc-btn-hint"
               onClick={handleGetHint}
               disabled={isLoading}
-              title="Get a hint from NPC"
+              title="Get a hint about the current problem"
             >
               Hint
+            </button>
+            <button
+              className="npc-btn-feedback"
+              onClick={handleGetFeedback}
+              disabled={isLoading}
+              title="Get feedback on your code"
+            >
+              Code Review
             </button>
           </div>
 
@@ -268,7 +276,7 @@ export default function NPCChat({
             <input
               type="text"
               className="npc-input"
-              placeholder="Ask NPC a question..."
+              placeholder="Ask NPC anything about coding..."
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               onKeyPress={(e) => {
@@ -277,15 +285,21 @@ export default function NPCChat({
                 }
               }}
               disabled={isLoading}
+              maxLength="500"
             />
             <button
               className="npc-send-btn"
               onClick={() => handleAskNPC()}
               disabled={isLoading || !userInput.trim()}
-              title="Send message to NPC"
+              title="Send question to NPC (or press Enter)"
             >
-              {isLoading ? 'Loading' : 'Send'}
+              {isLoading ? 'Sending' : 'Send'}
             </button>
+          </div>
+          
+          {/* Character counter */}
+          <div className="npc-char-counter">
+            {userInput.length}/500
           </div>
         </div>
       )}
@@ -294,7 +308,13 @@ export default function NPCChat({
       {!conversationMode && isVisible && (
         <button
           className="npc-toggle-chat"
-          onClick={() => setConversationMode(true)}
+          onClick={() => {
+            setConversationMode(true);
+            // Set focus to input when opening chat
+            setTimeout(() => {
+              document.querySelector('.npc-input')?.focus();
+            }, 100);
+          }}
           title="Start talking to NPC"
         >
           Ask NPC
