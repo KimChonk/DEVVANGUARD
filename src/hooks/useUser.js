@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { userService, userStatsService, userProgressService } from "../services/apiClient";
+import { badgeService } from "../services/apiClient";
 import { supabase } from "../services/supabaseClient";
 
 export const useUserProfile = () => {
@@ -84,6 +85,14 @@ export const useUserStats = () => {
       );
       if (result.success) {
         setStats(result.data);
+        
+        // Check and grant badges after stats update
+        try {
+          await badgeService.checkAndGrantBadges();
+        } catch (badgeErr) {
+          console.warn("Badge check failed (non-blocking):", badgeErr.message);
+        }
+        
         return { success: true };
       } else {
         setError(result.message);
@@ -95,7 +104,32 @@ export const useUserStats = () => {
     }
   };
 
-  return { stats, loading, error, updateStats };
+  const updateXp = async (xpChange) => {
+    try {
+      setError(null);
+      const result = await userStatsService.updateXpPut(xpChange);
+      if (result.success) {
+        setStats(result.data);
+        
+        // Check and grant badges after XP update
+        try {
+          await badgeService.checkAndGrantBadges();
+        } catch (badgeErr) {
+          console.warn("Badge check failed (non-blocking):", badgeErr.message);
+        }
+        
+        return { success: true };
+      } else {
+        setError(result.message);
+        return { success: false, message: result.message };
+      }
+    } catch (err) {
+      setError(err.message);
+      return { success: false, message: err.message };
+    }
+  };
+
+  return { stats, loading, error, updateStats, updateXp };
 };
 
 export const useUserProgress = () => {
@@ -137,6 +171,15 @@ export const useUserProgress = () => {
         setProgress(
           progress.map((p) => (p.progressId === progressId ? result.data : p))
         );
+        
+        // Check and grant badges after progress update
+        // (especially for LESSON_COUNT badge type)
+        try {
+          await badgeService.checkAndGrantBadges();
+        } catch (badgeErr) {
+          console.warn("Badge check failed (non-blocking):", badgeErr.message);
+        }
+        
         return { success: true };
       } else {
         setError(result.message);

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { pvpProblemService, pvpMatchService } from "../services/apiClient";
+import { pvpProblemService, pvpMatchService, badgeService } from "../services/apiClient";
 
 export const usePvP = () => {
   const [problems, setProblems] = useState([]);
@@ -296,6 +296,14 @@ export const usePvP = () => {
       const result = await pvpMatchService.completeMatch(matchId, winnerId, xpChangeP1, xpChangeP2);
       if (result.success) {
         setCurrentMatch(result.data);
+        
+        // Check and grant badges after match completion
+        try {
+          await badgeService.checkAndGrantBadges();
+        } catch (badgeErr) {
+          console.warn("Badge check failed (non-blocking):", badgeErr.message);
+        }
+        
         return result.data;
       } else {
         setError(result.message);

@@ -1103,3 +1103,113 @@ export const pvpMatchService = {
     }
   }
 };
+
+// ========== BADGE SERVICES ==========
+export const badgeService = {
+  // Get all badges
+  async getAllBadges() {
+    try {
+      const badges = await apiCall("/badge");
+      return { success: true, data: badges.data || badges };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get badge by ID
+  async getBadgeById(badgeId) {
+    try {
+      const badge = await apiCall(`/badge/${badgeId}`);
+      return { success: true, data: badge.data || badge };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Get all badges earned by a user
+  async getUserBadges(userId) {
+    try {
+      const badges = await apiCall(`/badge/user/${userId}`);
+      return { success: true, data: Array.isArray(badges.data) ? badges.data : badges };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Check if user has earned a specific badge
+  async hasUserEarnedBadge(userId, badgeId) {
+    try {
+      const result = await apiCall(`/badge/check/${userId}/${badgeId}`);
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Award badge to user (Admin)
+  async awardBadge(userId, badgeId) {
+    try {
+      const result = await apiCall("/badge/award", "POST", {
+        userId,
+        badgeId
+      });
+      return { success: true, data: result.data, message: result.message };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Remove badge from user (Admin)
+  async removeBadge(userId, badgeId) {
+    try {
+      const result = await apiCall("/badge/remove", "DELETE", null, {
+        userId,
+        badgeId
+      });
+      return { success: true, message: result.message };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Check and grant badges - triggers Supabase function
+  async checkAndGrantBadges() {
+    try {
+      const result = await apiCall("/badge/check-and-grant", "POST");
+      return { success: true, message: result.message };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Create badge (Admin)
+  async createBadge(badgeData) {
+    try {
+      const badge = await apiCall("/badge", "POST", badgeData);
+      return { success: true, data: badge.data || badge };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Update badge (Admin)
+  async updateBadge(badgeId, badgeData) {
+    try {
+      const badge = await apiCall(`/badge/${badgeId}`, "PUT", badgeData);
+      return { success: true, data: badge.data || badge };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Delete badge (Admin)
+  async deleteBadge(badgeId) {
+    try {
+      await apiCall(`/badge/${badgeId}`, "DELETE");
+      return { success: true, message: "Badge deleted successfully" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+};
+
