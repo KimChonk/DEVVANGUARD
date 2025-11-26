@@ -23,14 +23,14 @@ const Practice = () => {
 
   // Sample lesson data
   const allLessons = [
-    { id: 1, title: 'Introduction to Arrays', difficulty: 'Easy', acceptance: '45.2%', solved: true, xpBonus: 10 },
-    { id: 2, title: 'Binary Search', difficulty: 'Medium', acceptance: '32.1%', solved: true, xpBonus: 20 },
-    { id: 3, title: 'Dynamic Programming', difficulty: 'Hard', acceptance: '18.5%', solved: false, xpBonus: 30 },
-    { id: 4, title: 'Recursion Basics', difficulty: 'Easy', acceptance: '52.3%', solved: true, xpBonus: 10 },
-    { id: 5, title: 'Graph Algorithms', difficulty: 'Hard', acceptance: '22.1%', solved: false, xpBonus: 30 },
-    { id: 6, title: 'String Manipulation', difficulty: 'Medium', acceptance: '38.7%', solved: false, xpBonus: 20 },
-    { id: 7, title: 'Hash Tables', difficulty: 'Medium', acceptance: '41.2%', solved: true, xpBonus: 20 },
-    { id: 8, title: 'Trees and BST', difficulty: 'Hard', acceptance: '25.6%', solved: false, xpBonus: 30 },
+    { id: 1, title: 'Introduction to Arrays', solved: true },
+    { id: 2, title: 'Binary Search', solved: true },
+    { id: 3, title: 'Dynamic Programming', solved: false },
+    { id: 4, title: 'Recursion Basics', solved: true },
+    { id: 5, title: 'Graph Algorithms', solved: false },
+    { id: 6, title: 'String Manipulation', solved: false },
+    { id: 7, title: 'Hash Tables', solved: true },
+    { id: 8, title: 'Trees and BST', solved: false },
   ];
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const Practice = () => {
 
   const filteredLessons = selectedFilter === 'all' 
     ? allLessons 
-    : allLessons.filter(lesson => lesson.difficulty.toLowerCase() === selectedFilter);
+    : allLessons;
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty.toLowerCase()) {
@@ -102,41 +102,13 @@ const Practice = () => {
             <p className="practice-subtitle">Improve your coding skills</p>
           </div>
 
-          {/* Filters */}
-          <div className="practice-filters">
-            <button
-              className={`filter-btn ${selectedFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('all')}
-            >
-              All ({allLessons.length})
-            </button>
-            <button
-              className={`filter-btn ${selectedFilter === 'easy' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('easy')}
-            >
-              Easy
-            </button>
-            <button
-              className={`filter-btn ${selectedFilter === 'medium' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('medium')}
-            >
-              Medium
-            </button>
-            <button
-              className={`filter-btn ${selectedFilter === 'hard' ? 'active' : ''}`}
-              onClick={() => setSelectedFilter('hard')}
-            >
-              Hard
-            </button>
-          </div>
+
 
           {/* Lesson Table */}
           <div className="practice-lesson-list">
             <div className="lesson-table-header">
               <div className="column status-col">Status</div>
               <div className="column title-col">Title</div>
-              <div className="column difficulty-col">Difficulty</div>
-              <div className="column acceptance-col">Acceptance</div>
               <div className="column xp-col">XP Bonus</div>
             </div>
 
@@ -157,20 +129,9 @@ const Practice = () => {
                   <span className="lesson-num">#{lesson.id}</span>
                   <span className="lesson-title-text">{lesson.title}</span>
                 </div>
-                <div className="column difficulty-col">
-                  <span 
-                    className="difficulty-badge"
-                    style={{ color: getDifficultyColor(lesson.difficulty) }}
-                  >
-                    {lesson.difficulty}
-                  </span>
-                </div>
-                <div className="column acceptance-col">
-                  {lesson.acceptance}
-                </div>
                 <div className="column xp-col">
                   <span className={lesson.solved ? 'xp-earned' : 'xp-locked'}>
-                    {lesson.solved ? `+${lesson.xpBonus} XP` : `+${lesson.xpBonus} XP`}
+                    +20 XP
                   </span>
                 </div>
               </div>
