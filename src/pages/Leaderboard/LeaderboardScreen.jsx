@@ -74,7 +74,7 @@ export default function LeaderboardScreen() {
             <i className="fas fa-arrow-left"></i>
           </button>
           <div className="header-title">
-            <h1>🏆 Leaderboard</h1>
+            <h1>Leaderboard</h1>
             <p>Top 10 Knights by Experience</p>
           </div>
         </div>

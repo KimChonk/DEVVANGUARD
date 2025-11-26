@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
-import { userService, lessonService, userProgressService } from "../../services/apiClient";
+import { userService, lessonService, userProgressService, userProgressPracticeService, pvpProblemService } from "../../services/apiClient";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useCourses } from "../../hooks/useCourses";
 import "../../assets/CSS/profilescreen.css";
@@ -46,13 +46,17 @@ export default function ProfileScreen() {
       try {
         setDataLoading(true);
 
-        // Gọi 2 API cùng lúc
-        const [lessonResponse, progressResponse] = await Promise.all([
+        // Gọi 4 API cùng lúc: lessons, lesson progress, practice progress, problems
+        const [lessonResponse, progressResponse, practiceProgressResponse, problemsResponse] = await Promise.all([
           lessonService.getAllLessons(),
-          userProgressService.getMyProgress() // API mới
+          userProgressService.getMyProgress(),
+          userProgressPracticeService.getMyPracticeProgress(),
+          pvpProblemService.getAllProblems()
         ]);
         
         let lessons = [];
+        let problems = [];
+        
         // Xử lý Lesson Response (cho Donut chart VÀ map tên)
         if (lessonResponse.success && Array.isArray(lessonResponse.data)) {
           setTotalLessons(lessonResponse.data.length);
@@ -61,31 +65,59 @@ export default function ProfileScreen() {
           setTotalLessons(0);
         }
 
-        // Xử lý Progress Response (cho Recent Activity)
+        // Xử lý Problems Response
+        if (problemsResponse.success && Array.isArray(problemsResponse.data)) {
+          problems = problemsResponse.data;
+        }
+
+        // Combine Lesson Activities + Practice Activities
+        let allActivities = [];
+
+        // Lesson Activities
         if (progressResponse.success && Array.isArray(progressResponse.data)) {
           const allProgress = progressResponse.data;
-
-          // 1. Lọc
           const completed = allProgress.filter(p => p.status === 'completed');
-          // 2. Sắp xếp
-          completed.sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed));
-          // 3. Lấy 3 bài
-          const recent = completed.slice(0, 3);
-          // 4. Map
-          const activityList = recent.map(progress => {
+          
+          const lessonActivities = completed.map(progress => {
             const lesson = lessons.find(l => l.lessonId === progress.lessonId);
             return {
-              id: progress.progressId,
+              id: `lesson-${progress.progressId}`,
               title: lesson ? lesson.lessonTitle : 'Unknown Lesson',
-              courseName: 'Lesson Completion', // Placeholder
+              type: 'Lesson Completion',
               xp: lesson ? lesson.xpReward : 0,
+              date: new Date(progress.lastAccessed),
+              timestamp: new Date(progress.lastAccessed).getTime(),
             };
           });
           
-          setRecentActivity(activityList);
-        } else {
-          setRecentActivity([]);
+          allActivities.push(...lessonActivities);
         }
+
+        // Practice Activities
+        if (practiceProgressResponse.success && Array.isArray(practiceProgressResponse.data)) {
+          const allPractice = practiceProgressResponse.data;
+          const completed = allPractice.filter(p => p.status === 'completed');
+          
+          const practiceActivities = completed.map(progress => {
+            const problem = problems.find(p => p.problemId === progress.problemId);
+            return {
+              id: `practice-${progress.progressId}`,
+              title: problem ? problem.title : 'Unknown Problem',
+              type: 'Practice Completion',
+              xp: 20, // Practice always gives 20 XP
+              date: new Date(progress.lastAccessed),
+              timestamp: new Date(progress.lastAccessed).getTime(),
+            };
+          });
+          
+          allActivities.push(...practiceActivities);
+        }
+
+        // Sort by timestamp (newest first) and take top 3
+        allActivities.sort((a, b) => b.timestamp - a.timestamp);
+        const recentTop3 = allActivities.slice(0, 3);
+        
+        setRecentActivity(recentTop3);
 
       } catch (error) {
         console.error("Failed to fetch profile data:", error);
@@ -483,7 +515,7 @@ export default function ProfileScreen() {
                     <li key={activity.id} className="activity-item">
                       <div className="activity-info">
                         <span className="activity-title">{activity.title}</span>
-                        <span className="activity-course">{"   "+activity.courseName}</span>
+                        <span className="activity-course">{"   "+activity.type}</span>
                       </div>
                       <span className="activity-xp">+{activity.xp || 0} XP</span>
                     </li>
