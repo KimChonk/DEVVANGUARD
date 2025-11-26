@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { userService, courseService, lessonService, userProgressService, lessonHintService, pvpProblemService } from "../../services/apiClient";
+import { userService, courseService, lessonService, userProgressService, lessonHintService, pvpProblemService, badgeService  } from "../../services/apiClient";
 import { authService } from "../../services/supabaseClient";
 import LoadingScreen from "../../components/LoadingScreen";
 import TestCaseBuilder from "../../components/TestCaseBuilder";
@@ -38,6 +38,11 @@ export default function AdminDashboard() {
   const [showMessage, setShowMessage] = useState(false);
   const [showPvpProblemForm, setShowPvpProblemForm] = useState(false);
 
+  //Badges
+  const [badges, setBadges] = useState([]);
+  const [showBadgeForm, setShowBadgeForm] = useState(false);
+  const [editingBadgeId, setEditingBadgeId] = useState(null);
+
   // Form states
   const [courseForm, setCourseForm] = useState({
     name: "",
@@ -67,6 +72,14 @@ export default function AdminDashboard() {
     solutionTemplate: "",
     testCases: "",
     xpReward: "",
+  });
+
+  const [badgeForm, setBadgeForm] = useState({
+    name: "",
+    description: "",
+    xpReward: "",       
+    conditionType: "XP_MILESTONE",
+    conditionValue: "" 
   });
 
   const [editingHintId, setEditingHintId] = useState(null);
@@ -128,6 +141,15 @@ export default function AdminDashboard() {
       if (problemsResult.success && Array.isArray(problemsResult.data)) {
         setPvpProblems(problemsResult.data);
       }
+
+      // Fetch Badges 
+      if (badgeService) { 
+          const badgesResult = await badgeService.getAllBadges();
+          if (badgesResult.success && Array.isArray(badgesResult.data)) {
+            setBadges(badgesResult.data);
+          }
+      }
+
     } catch (error) {
       console.error("Error fetching data:", error);
       setMessage("Error fetching data: " + error.message);
@@ -474,12 +496,96 @@ export default function AdminDashboard() {
     setShowHintForm(true);
   };
 
+  const handleCreateBadge = async (e) => {
+    e.preventDefault();
+    if (!badgeForm.name || !badgeForm.description || !badgeForm.xpReward || !badgeForm.conditionValue) {
+      setMessage("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      let result;
+      const finalConditionType = badgeForm.conditionType || "XP_MILESTONE";
+      const badgeData = {
+        badgeName: badgeForm.name,           
+        badgeImg: "/Badges/default-badge.png", 
+        description: badgeForm.description,
+        xpReward: parseInt(badgeForm.xpReward), 
+        conditionType: finalConditionType,
+        conditionValue: parseInt(badgeForm.conditionValue)
+      };
+      
+      if (editingBadgeId) {
+        result = await badgeService.updateBadge(editingBadgeId, badgeData);
+      } else {
+        result = await badgeService.createBadge(badgeData);
+      }
+
+      if (result.success) {
+        setMessage(editingBadgeId ? "✅ Badge updated successfully!" : "✅ Badge created successfully!");
+        // Reset form về mặc định
+        setBadgeForm({ 
+          name: "", 
+          description: "", 
+          xpReward: "", 
+          conditionType: "XP_MILESTONE", 
+          conditionValue: "" 
+        });
+        setEditingBadgeId(null);
+        setShowBadgeForm(false);
+        fetchAllData(); 
+      } else {
+        setMessage("Error: " + (result.message || "Unable to save badge"));
+      }
+    } catch (err) {
+      setMessage("Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Badge Edit
+  const handleEditBadge = (badge) => {
+    setEditingBadgeId(badge.id || badge.badgeId); 
+    setBadgeForm({
+      name: badge.badgeName || badge.name, 
+      description: badge.description,
+      xpReward: badge.xpReward || 0,
+      conditionType: badge.conditionType || "XP_MILESTONE",
+      conditionValue: badge.conditionValue || 0
+    });
+    setShowBadgeForm(true);
+  };
+
+  // Handle Badge Delete
+  const handleDeleteBadge = async (badgeId) => {
+    if (window.confirm("Are you sure you want to delete this badge?")) {
+      try {
+        setLoading(true);
+        const result = await badgeService.deleteBadge(badgeId);
+
+        if (result.success) {
+          setMessage("✅ Badge deleted successfully!");
+          fetchAllData();
+        } else {
+          setMessage("Error: " + (result.message || "Unable to delete badge"));
+        }
+      } catch (err) {
+        setMessage("Error: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   // Handle cancel edit
   const handleCancelEdit = () => {
     setEditingHintId(null);
     setEditingLessonId(null);
     setEditingCourseId(null);
     setEditingPvpProblemId(null);
+    setEditingBadgeId(null);
     setHintForm({ lessonId: "", hintTitle: "", hintContent: "" });
     setCourseForm({ name: "", language: "", description: "" });
     setLessonForm({ courseId: "", lessonTitle: "", lessonOrder: "", problemDescription: "", solutionTemplate: "", testCases: "" });
@@ -490,11 +596,14 @@ export default function AdminDashboard() {
       testCases: "",
       xpReward: "",
     });
+    setBadgeForm({ name: "", description: "", iconUrl: "" });
     setShowHintForm(false);
     setShowCourseForm(false);
     setShowLessonForm(false);
     setShowPvpProblemForm(false);
+    setShowBadgeForm(false);
   };
+
 
   // Handle logout
   const handleLogout = async () => {
@@ -779,6 +888,13 @@ export default function AdminDashboard() {
             >
               <i className="fas fa-th"></i>
               <span>PvP Problems</span>
+            </div>
+            <div 
+              className={`sidebar-item ${activeTab === "badges" ? "active" : ""}`}
+              onClick={() => setActiveTab("badges")}
+            >
+              <i className="fas fa-certificate"></i>
+              <span>Badges</span>
             </div>
             <div 
               className={`sidebar-item ${activeTab === "users" ? "active" : ""}`}
@@ -1288,7 +1404,7 @@ export default function AdminDashboard() {
           <div className="admin-tab-content">
             <div className="section-header">
               <h2 className="section-title">
-                <i className="fas fa-lightbulb"></i>
+                <i className="fas fa-lightbulb"> </i>
                 Manage Hints
               </h2>
               <button
@@ -1630,6 +1746,284 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        
+        {/* Badges Tab */}
+        {activeTab === "badges" && (
+          <div className="admin-tab-content">
+            <div className="section-header">
+              <h2 className="section-title">
+                <i className="fas fa-certificate"></i>
+                 Manage Badges
+              </h2>
+              <button
+                type="button"
+                className="add-btn"
+                onClick={() => {
+                  setEditingBadgeId(null);
+                  setBadgeForm({ name: "", description: "", iconUrl: "" });
+                  setShowBadgeForm(!showBadgeForm);
+                }}
+              >
+                <i className="fas fa-plus"></i>
+                {showBadgeForm ? "Cancel" : "Add Badge"}
+              </button>
+            </div>
+
+            {/* Badge Form */}
+            {showBadgeForm && (
+              <div className="admin-form-container">
+                <form className="admin-form-grid" onSubmit={handleCreateBadge}>
+                  
+                  {/* Hàng 1: Tên Badge */}
+                  <div className="admin-form-group form-full-width">
+                    <label className="admin-label">Badge Name *</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      placeholder="E.g.: Bug Hunter"
+                      value={badgeForm.name}
+                      onChange={(e) =>
+                        setBadgeForm({ ...badgeForm, name: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  {/* Hàng 2: Mô tả */}
+                  <div className="admin-form-group form-full-width">
+                    <label className="admin-label">Description *</label>
+                    <textarea
+                      className="admin-input textarea"
+                      placeholder="Describe how to earn this badge..."
+                      value={badgeForm.description}
+                      onChange={(e) =>
+                        setBadgeForm({
+                          ...badgeForm,
+                          description: e.target.value,
+                        })
+                      }
+                      rows="2"
+                      required
+                    ></textarea>
+                  </div> 
+
+                  {/* Hàng 3: XP Reward & Condition Type (2 cột) */}
+                  <div className="form-row-2col">
+                    <div className="admin-form-group">
+                      <label className="admin-label">XP Reward *</label>
+                      <input
+                        type="number"
+                        className="admin-input"
+                        placeholder="E.g.: 100"
+                        value={badgeForm.xpReward}
+                        onChange={(e) =>
+                          setBadgeForm({ ...badgeForm, xpReward: e.target.value })
+                        }
+                        min="0"
+                        required
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-label">Condition Type *</label>
+                      <select
+                        className="admin-input"
+                        value={badgeForm.conditionType}
+                        onChange={(e) =>
+                          setBadgeForm({ ...badgeForm, conditionType: e.target.value })
+                        }
+                        required
+                      >
+                        <option value="XP_MILESTONE">XP Milestone (Đạt mốc XP)</option>
+                        <option value="LESSON_COUNT">Lesson Count (Số bài học)</option>
+                        <option value="COURSE_COMPLETION">Course Completion (Hoàn thành khóa)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Hàng 4: Condition Value */}
+                  <div className="admin-form-group form-full-width">
+                    <label className="admin-label">
+                      Condition Value * <span style={{fontWeight: 'normal', fontSize: '12px', color: '#888', marginLeft: '5px'}}>
+                        (Amount needed to earn badge)
+                      </span>
+                    </label>
+                    <input
+                      type="number"
+                      className="admin-input"
+                      placeholder={
+                        badgeForm.conditionType === 'XP_MILESTONE' ? "E.g.: 1000 XP" :
+                        badgeForm.conditionType === 'LESSON_COUNT' ? "E.g.: 10 Lessons" : 
+                        "E.g.: 1 (Course ID)"
+                      }
+                      value={badgeForm.conditionValue}
+                      onChange={(e) =>
+                        setBadgeForm({ ...badgeForm, conditionValue: e.target.value })
+                      }
+                      min="1"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-actions">
+                    <button type="submit" className="admin-submit" disabled={loading}>
+                      {loading ? (editingBadgeId ? "Updating..." : "Creating...") : (editingBadgeId ? "Update Badge" : "Create Badge")}
+                    </button>
+                    <button type="button" className="admin-submit-cancel" onClick={() => setShowBadgeForm(false)}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Badges List */}
+            {/* Badges List - ĐÃ SỬA LỖI HIỂN THỊ */}
+            <div style={{ marginTop: "20px", width: "100%" }}> {/* Container bao ngoài full width */}
+              {loading && badges.length === 0 ? (
+                <div className="loading-state">
+                  <div className="spinner"></div>
+                  <p>Loading badges...</p>
+                </div>
+              ) : badges.length === 0 ? (
+                <div className="empty-state">
+                  <i className="fas fa-inbox"></i>
+                  <p>No badges available</p>
+                </div>
+              ) : (
+                <div 
+                  style={{ 
+                    display: "grid", 
+                    // Ép cứng 3 cột, mỗi cột chiếm 1 phần bằng nhau
+                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))", 
+                    gap: "24px", 
+                    width: "100%" 
+                  }}
+                >
+                  {badges.map((badge) => (
+                    <div 
+                      key={badge.id || badge.badgeId} 
+                      style={{
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        width: '100%',
+                        minHeight: '300px', // Tăng chiều cao xíu để chứa thêm thông tin
+                        background: 'var(--secondary-color, #222)',
+                        border: '1px solid var(--border-color, #444)',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        position: 'relative'
+                      }}
+                    >
+                      <div style={{
+                        flex: 1, 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        textAlign: 'center', 
+                        padding: '20px',
+                        gap: '12px'
+                      }}>
+                        {/* Icon */}
+                        <div style={{
+                          width: '70px', 
+                          height: '70px', 
+                          background: 'rgba(255,255,255,0.05)', 
+                          borderRadius: '50%', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                        }}>
+                          <img 
+                            src={badge.badgeImg || badge.iconUrl || "/Badges/default-badge.png"} 
+                            alt={badge.badgeName || badge.name} 
+                            style={{width: '40px', height: '40px', objectFit: 'contain'}}
+                            onError={(e) => e.target.src = "/Badges/default-badge.png"}
+                          />
+                        </div>
+                        
+                        {/* Name & Desc */}
+                        <div>
+                          <h3 style={{fontSize: '18px', fontWeight: 'bold', margin: '0 0 5px 0', color: '#fff'}}>
+                            {badge.badgeName || badge.name}
+                          </h3>
+                          <p style={{fontSize: '13px', color: '#b0b0b0', margin: 0, lineHeight: '1.4', minHeight: '36px'}}>
+                            {badge.description}
+                          </p>
+                        </div>
+
+                        {/* INFO TAGS (MỚI) */}
+                        <div style={{
+                          display: 'flex', 
+                          flexWrap: 'wrap', 
+                          gap: '8px', 
+                          justifyContent: 'center', 
+                          marginTop: '8px',
+                          width: '100%'
+                        }}>
+                           {/* XP Tag */}
+                           <span style={{
+                             background: 'rgba(255, 193, 7, 0.15)', 
+                             color: '#ffc107', 
+                             padding: '4px 8px', 
+                             borderRadius: '4px', 
+                             fontSize: '11px', 
+                             fontWeight: '600',
+                             border: '1px solid rgba(255, 193, 7, 0.3)'
+                           }}>
+                             +{badge.xpReward || 0} XP
+                           </span>
+                           
+                           {/* Condition Tag */}
+                           <span style={{
+                             background: 'rgba(64, 196, 255, 0.15)', 
+                             color: '#40c4ff', 
+                             padding: '4px 8px', 
+                             borderRadius: '4px', 
+                             fontSize: '11px', 
+                             fontWeight: '600',
+                             border: '1px solid rgba(64, 196, 255, 0.3)'
+                           }}>
+                             {badge.conditionType === 'XP_MILESTONE' ? 'XP Milestone' : 
+                              badge.conditionType === 'LESSON_COUNT' ? 'Lessons' : 'Course'} 
+                             : {badge.conditionValue || 0}
+                           </span>
+                        </div>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div style={{
+                        padding: '12px', 
+                        display: 'flex', 
+                        gap: '10px',
+                        background: 'rgba(0,0,0,0.2)',
+                        borderTop: '1px solid rgba(255,255,255,0.05)'
+                      }}>
+                        <button
+                          type="button"
+                          className="action-btn edit"
+                          style={{flex: 1, justifyContent: 'center', height: '32px'}}
+                          onClick={() => handleEditBadge(badge)}
+                        >
+                          <i className="fas fa-edit"></i> Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="action-btn delete"
+                          style={{flex: 1, justifyContent: 'center', height: '32px'}}
+                          onClick={() => handleDeleteBadge(badge.id || badge.badgeId)}
+                        >
+                          <i className="fas fa-trash"></i> Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Users Tab */}
         {activeTab === "users" && (
