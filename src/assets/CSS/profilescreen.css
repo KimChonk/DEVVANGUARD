@@ -193,7 +193,8 @@
 .profile-actions {
   margin-bottom: 30px;
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .btn-edit,
@@ -209,8 +210,8 @@
 }
 
 .btn-edit {
-  background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
-  color: var(--dark-blue);
+  background: linear-gradient(135deg, #d4af37, #00d4ff);
+  color: var(--darker-blue);
   flex: 1;
 }
 

@@ -112,6 +112,8 @@ export default function ProfileScreen() {
     "avatar2.png",
     "avatar3.png",
     "avatar4.png",
+    "avatar5.png",
+    "avatar6.png",
   ];
 
   // Initialize form data from profile
@@ -316,7 +318,7 @@ export default function ProfileScreen() {
                   </a>
                 </li>
                 <li>
-                  <a onClick={() => alert("Practice mode coming soon!")}>
+                  <a onClick={() => navigate("/practice")}>
                     Practice
                   </a>
                 </li>
@@ -328,17 +330,8 @@ export default function ProfileScreen() {
               </ul>
             </div>
             <div className="main-nav-right">
-              {/* <button className="nav-icon-btn search-btn" onClick={() => alert("Search coming soon!")}>
-                <i className="fas fa-search"></i>
-              </button> */}
-              <button className="nav-icon-btn notification-btn" onClick={() => alert("No new notifications")}>
-                <i className="fas fa-bell"></i>
-              </button>
-              
               {/* === NÚT LOGOUT TỪ PROFILE HEADER CŨ === */}
-              <button className="logout-btn" onClick={handleLogout}>
-                <i className="fas fa-sign-out-alt"></i>
-              </button>
+              
               
             </div>
           </div>
@@ -373,8 +366,9 @@ export default function ProfileScreen() {
               {/* Edit/Save Buttons */}
               <div className="profile-actions">
                 <button className="btn-edit" onClick={handleEditClick}>Edit Profile</button>
+                <button className="btn-edit" onClick={handleLogout}>Log out</button>
               </div>
-
+              
               {/* Edit Mode */}
               
             </div>

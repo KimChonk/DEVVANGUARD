@@ -620,7 +620,7 @@ body {
 }
 
 /* Action Buttons */
-.action-buttons {
+.practice-action-buttons {
   display: flex;
   gap: 10px;
   padding: 12px;

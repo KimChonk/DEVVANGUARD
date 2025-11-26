@@ -196,6 +196,74 @@ export default function PracticeGame() {
     }
   };
 
+  // Handle horizontal resize (left/right panels)
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizingHorizontal) return;
+      
+      const main = document.querySelector('.leetcode-main');
+      const problemPanel = document.querySelector('.problem-panel');
+      if (!main || !problemPanel) return;
+
+      const mainRect = main.getBoundingClientRect();
+      const newWidth = e.clientX - mainRect.left;
+      const percentage = (newWidth / mainRect.width) * 100;
+
+      // Constrain between 25% and 70%
+      if (percentage >= 25 && percentage <= 70) {
+        problemPanel.style.flex = `0 0 ${percentage}%`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingHorizontal(false);
+    };
+
+    if (isResizingHorizontal) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingHorizontal]);
+
+  // Handle vertical resize (code editor/output)
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizingVertical) return;
+      
+      const editorPanel = document.querySelector('.editor-panel');
+      const outputPanel = document.querySelector('.output-panel');
+      if (!editorPanel || !outputPanel) return;
+
+      const editorRect = editorPanel.getBoundingClientRect();
+      const newHeight = editorRect.bottom - e.clientY;
+      const percentage = (newHeight / editorRect.height) * 100;
+
+      // Constrain between 15% and 60%
+      if (percentage >= 15 && percentage <= 60) {
+        outputPanel.style.flex = `0 0 ${percentage}%`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingVertical(false);
+    };
+
+    if (isResizingVertical) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingVertical]);
+
   if (loading) {
     return <LoadingScreen isVisible={true} message={pageLoadingMessage} />;
   }
@@ -376,6 +444,12 @@ export default function PracticeGame() {
             )}
           </div>
         </div>
+        
+        <div 
+          className="resize-divider-horizontal"
+          onMouseDown={() => setIsResizingHorizontal(true)}
+          style={{ display: isFullscreenEditor ? 'none' : 'block' }}
+        ></div>
 
         {/* Right: Code Editor + Output */}
         <div className={`editor-panel ${isFullscreenEditor ? 'fullscreen' : ''}`}>
@@ -397,7 +471,7 @@ export default function PracticeGame() {
           </div>
 
           {/* Action Buttons */}
-          <div className="action-buttons">
+          <div className="practice-action-buttons">
             <button
               className="btn btn-run"
               onClick={handleRunCode}
