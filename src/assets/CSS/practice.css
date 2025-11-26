@@ -93,7 +93,7 @@
 
 .lesson-table-header {
   display: grid;
-  grid-template-columns: 60px 1fr auto;
+  grid-template-columns: 1fr auto;
   gap: 20px;
   padding: 16px 20px;
   background: #0f172a;
@@ -109,7 +109,7 @@
 
 .lesson-table-row {
   display: grid;
-  grid-template-columns: 60px 1fr auto;
+  grid-template-columns: 1fr auto;
   gap: 20px;
   padding: 16px 20px;
   border-bottom: 1px solid #334155;
@@ -129,10 +129,6 @@
 .column {
   display: flex;
   align-items: center;
-}
-
-.status-col {
-  justify-content: center;
 }
 
 .title-col {
@@ -394,7 +390,7 @@
 
   .lesson-table-header,
   .lesson-table-row {
-    grid-template-columns: 50px 1fr auto;
+    grid-template-columns: 1fr auto;
     gap: 12px;
   }
 }
@@ -425,7 +421,7 @@
 
   .lesson-table-header,
   .lesson-table-row {
-    grid-template-columns: 40px 1fr auto;
+    grid-template-columns: 1fr auto;
     gap: 8px;
   }
 

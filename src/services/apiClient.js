@@ -596,6 +596,96 @@ export const userStatsService = {
   },
 };
 
+// ========== USER PROGRESS PRACTICE SERVICES ==========
+export const userProgressPracticeService = {
+  // Lấy practice progress của user hiện tại
+  async getMyPracticeProgress() {
+    try {
+      const progress = await apiCall("/userprogresspractice/me");
+      return { success: true, data: progress };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Tạo practice progress mới
+  async createPracticeProgress(problemId, status = "not_started") {
+    try {
+      const progress = await apiCall("/userprogresspractice/me", "POST", {
+        problemId,
+        status,
+      });
+      return { success: true, data: progress };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Cập nhật practice progress
+  async updatePracticeProgress(progressId, status) {
+    try {
+      const progress = await apiCall(`/userprogresspractice/${progressId}`, "PUT", {
+        status,
+      });
+      return { success: true, data: progress };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Lấy practice progress theo ID
+  async getPracticeProgressById(progressId) {
+    try {
+      const progress = await apiCall(`/userprogresspractice/${progressId}`);
+      return { success: true, data: progress };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Xóa practice progress
+  async deletePracticeProgress(progressId) {
+    try {
+      await apiCall(`/userprogresspractice/${progressId}`, "DELETE");
+      return { success: true, message: "Practice progress deleted successfully" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Submit practice (hoàn thành bài practice và nhận 20 XP reward)
+  async submitPractice(problemId) {
+    try {
+      const result = await apiCall("/userprogresspractice/submit", "POST", {
+        problemId,
+      });
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  // Lấy practice progress của user cho một bài practice cụ thể
+  async getUserPracticeProgressByProblemId(problemId) {
+    try {
+      const progress = await apiCall(`/userprogresspractice/problem/${problemId}`);
+      return { success: true, data: progress };
+    } catch (error) {
+      return { success: false, data: null, message: error.message };
+    }
+  },
+
+  // Lấy tất cả practice progress records của một user
+  async getUserPracticeProgressByUserId(userId) {
+    try {
+      const progressList = await apiCall(`/userprogresspractice/user/${userId}`);
+      return { success: true, data: progressList };
+    } catch (error) {
+      return { success: false, data: [], message: error.message };
+    }
+  },
+};
+
 // ========== LESSON HINT SERVICES ==========
 export const lessonHintService = {
   // Lấy tất cả hints
