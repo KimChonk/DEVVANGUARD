@@ -418,44 +418,7 @@ export default function MainMenu() {
           </div>
         </div>
 
-        {/* Invite Friend Section */}
-        <div className="invite-friend-section">
-          <div className="invite-content">
-            <div className="invite-left">
-              <h3 className="invite-title">Invite Friends</h3>
-              <p className="invite-description">
-                Share your coding journey! Invite your friends to join Dev Vanguard and learn together.
-              </p>
-            </div>
-            <div className="invite-right">
-              <div className="invite-form">
-                <input 
-                  type="email" 
-                  placeholder="Enter friend's email"
-                  className="invite-email-input"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleInviteFriend();
-                    }
-                  }}
-                />
-                <button 
-                  className="invite-send-btn"
-                  onClick={handleInviteFriend}
-                >
-                  <i className="fas fa-paper-plane"></i> Invite
-                </button>
-              </div>
-            </div>
-          </div>
-          {inviteMessage && (
-            <div className={`invite-message ${inviteStatus}`}>
-              {inviteMessage}
-            </div>
-          )}
-        </div>
+        {/* ...existing code... */}
       </div>
 
       {/* Footer */}
