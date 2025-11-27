@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
-<<<<<<< HEAD
-import { userService, lessonService, userProgressService, badgeService } from "../../services/apiClient";
-=======
-import { userService, lessonService, userProgressService, userProgressPracticeService, pvpProblemService } from "../../services/apiClient";
->>>>>>> 5a5b7ec9d115f9196ed19cdf63740d50fd68791c
+import { userService, lessonService, userProgressService, userProgressPracticeService, pvpProblemService, badgeService } from "../../services/apiClient";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useCourses } from "../../hooks/useCourses";
 import "../../assets/CSS/profilescreen.css";
