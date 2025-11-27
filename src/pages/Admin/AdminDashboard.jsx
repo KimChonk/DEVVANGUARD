@@ -78,7 +78,7 @@ export default function AdminDashboard() {
     name: "",
     description: "",
     xpReward: "",       
-    conditionType: "XP_MILESTONE",
+    conditionType: "XP_LEVEL",
     conditionValue: "" 
   });
 
@@ -506,10 +506,10 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       let result;
-      const finalConditionType = badgeForm.conditionType || "XP_MILESTONE";
+      const finalConditionType = badgeForm.conditionType || "XP_LEVEL";
       const badgeData = {
         badgeName: badgeForm.name,           
-        badgeImg: "/Badges/default-badge.png", 
+        badgeImg: "default-badge.png", 
         description: badgeForm.description,
         xpReward: parseInt(badgeForm.xpReward), 
         conditionType: finalConditionType,
@@ -529,7 +529,7 @@ export default function AdminDashboard() {
           name: "", 
           description: "", 
           xpReward: "", 
-          conditionType: "XP_MILESTONE", 
+          conditionType: "XP_LEVEL", 
           conditionValue: "" 
         });
         setEditingBadgeId(null);
@@ -552,7 +552,7 @@ export default function AdminDashboard() {
       name: badge.badgeName || badge.name, 
       description: badge.description,
       xpReward: badge.xpReward || 0,
-      conditionType: badge.conditionType || "XP_MILESTONE",
+      conditionType: badge.conditionType || "XP_LEVEL",
       conditionValue: badge.conditionValue || 0
     });
     setShowBadgeForm(true);
@@ -1834,7 +1834,7 @@ export default function AdminDashboard() {
                         }
                         required
                       >
-                        <option value="XP_MILESTONE">XP Milestone (Đạt mốc XP)</option>
+                        <option value="XP_LEVEL">XP Milestone (Đạt mốc XP)</option>
                         <option value="LESSON_COUNT">Lesson Count (Số bài học)</option>
                         <option value="COURSE_COMPLETION">Course Completion (Hoàn thành khóa)</option>
                       </select>
@@ -1852,7 +1852,7 @@ export default function AdminDashboard() {
                       type="number"
                       className="admin-input"
                       placeholder={
-                        badgeForm.conditionType === 'XP_MILESTONE' ? "E.g.: 1000 XP" :
+                        badgeForm.conditionType === 'XP_LEVEL' ? "E.g.: 1000 XP" :
                         badgeForm.conditionType === 'LESSON_COUNT' ? "E.g.: 10 Lessons" : 
                         "E.g.: 1 (Course ID)"
                       }
@@ -1936,7 +1936,13 @@ export default function AdminDashboard() {
                           boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
                         }}>
                           <img 
-                            src={badge.badgeImg || badge.iconUrl || "/Badges/default-badge.png"} 
+                            src={
+                              badge.badgeImg 
+                                ? (badge.badgeImg.startsWith('/') || badge.badgeImg.startsWith('http') 
+                                    ? badge.badgeImg 
+                                    : `/Badges/${badge.badgeImg}`)
+                                : "/Badges/default-badge.png"
+                            } 
                             alt={badge.badgeName || badge.name} 
                             style={{width: '40px', height: '40px', objectFit: 'contain'}}
                             onError={(e) => e.target.src = "/Badges/default-badge.png"}
@@ -1985,7 +1991,7 @@ export default function AdminDashboard() {
                              fontWeight: '600',
                              border: '1px solid rgba(64, 196, 255, 0.3)'
                            }}>
-                             {badge.conditionType === 'XP_MILESTONE' ? 'XP Milestone' : 
+                             {badge.conditionType === 'XP_LEVEL' ? 'XP Milestone' : 
                               badge.conditionType === 'LESSON_COUNT' ? 'Lessons' : 'Course'} 
                              : {badge.conditionValue || 0}
                            </span>

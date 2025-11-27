@@ -108,7 +108,7 @@
   margin: 40px auto;
   padding: 0 20px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 3.5fr 6.5fr;
   gap: 30px;
 }
 
@@ -218,6 +218,29 @@
 .btn-edit:hover {
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
   transform: translateY(-2px);
+}
+
+.btn-logout {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%; /* Chiếm hết chiều ngang sidebar */
+  
+  /* Gradient màu đỏ đậm */
+  background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(203, 45, 62, 0.3);
+  margin-top: 10px; /* Cách nút trên một chút */
+}
+
+.btn-logout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(203, 45, 62, 0.5);
+  background: linear-gradient(135deg, #ef473a 0%, #cb2d3e 100%);
 }
 
 .btn-save {
@@ -375,12 +398,9 @@
 }
 
 .stat-box-icon-layout {
-  flex-direction: row;   
-  justify-content: flex-start; 
-  align-items: center;     
-  gap: 30px;              
-  padding: 15px 20px;      
-  text-align: center;       
+  display: flex;
+  align-items: center; 
+  padding: 15px 20px;  
 }
 
 .stat-main-icon {
@@ -390,6 +410,14 @@
   flex-shrink: 0; 
 }
 
+.stat-text-content {
+  flex: 1; 
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
 
 
 
@@ -796,7 +824,7 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
