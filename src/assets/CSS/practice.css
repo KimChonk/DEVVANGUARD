@@ -93,7 +93,7 @@
 
 .lesson-table-header {
   display: grid;
-  grid-template-columns: 60px 1fr 100px 120px 80px;
+  grid-template-columns: 1fr auto;
   gap: 20px;
   padding: 16px 20px;
   background: #0f172a;
@@ -109,7 +109,7 @@
 
 .lesson-table-row {
   display: grid;
-  grid-template-columns: 60px 1fr 100px 120px 80px;
+  grid-template-columns: 1fr auto;
   gap: 20px;
   padding: 16px 20px;
   border-bottom: 1px solid #334155;
@@ -129,10 +129,6 @@
 .column {
   display: flex;
   align-items: center;
-}
-
-.status-col {
-  justify-content: center;
 }
 
 .title-col {
@@ -190,6 +186,8 @@
 .xp-col {
   text-align: right;
   font-size: 13px;
+  justify-self: flex-end;
+  min-width: 80px;
 }
 
 .xp-earned {
@@ -392,7 +390,7 @@
 
   .lesson-table-header,
   .lesson-table-row {
-    grid-template-columns: 50px 1fr 90px 100px 70px;
+    grid-template-columns: 1fr auto;
     gap: 12px;
   }
 }
@@ -423,7 +421,7 @@
 
   .lesson-table-header,
   .lesson-table-row {
-    grid-template-columns: 40px 1fr 60px;
+    grid-template-columns: 1fr auto;
     gap: 8px;
   }
 
