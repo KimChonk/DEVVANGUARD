@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile, useUserStats, useUserRank } from "../../hooks/useUser";
-import { userService, lessonService, userProgressService } from "../../services/apiClient";
+import { userService, lessonService, userProgressService, badgeService } from "../../services/apiClient";
 import LoadingScreen from "../../components/LoadingScreen";
 import { useCourses } from "../../hooks/useCourses";
 import "../../assets/CSS/profilescreen.css";
@@ -104,6 +104,35 @@ export default function ProfileScreen() {
     fullName: "",
     avatarName: "default-avatar.png",
   });
+
+  const [userBadges, setUserBadges] = useState([]);
+  const [badgesLoading, setBadgesLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchBadges = async () => {
+      if (profile?.userId) {
+        try {
+          setBadgesLoading(true);
+          const response = await badgeService.getUserBadges(profile.userId);
+          if (response.success) {
+            setUserBadges(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching badges:", error);
+        } finally {
+          setBadgesLoading(false);
+        }
+      }
+    };
+
+    fetchBadges();
+  }, [profile]); 
+
+  const getBadgeImageUrl = (imgName) => {
+    if (!imgName) return "/Badges/default-badge.png";
+    if (imgName.startsWith("/") || imgName.startsWith("http")) return imgName;
+    return `/Badges/${imgName}`;
+  };
 
   // Available avatars
   const availableAvatars = [
@@ -366,7 +395,7 @@ export default function ProfileScreen() {
               {/* Edit/Save Buttons */}
               <div className="profile-actions">
                 <button className="btn-edit" onClick={handleEditClick}>Edit Profile</button>
-                <button className="btn-edit" onClick={handleLogout}>Log out</button>
+                <button className="btn-logout" onClick={handleLogout}>Log out</button>
               </div>
               
               {/* Edit Mode */}
@@ -432,6 +461,13 @@ export default function ProfileScreen() {
                       <div className="stat-label">Current Rank Knight</div>
                    </div>
                 </div>
+                <div className="stat-box stat-box-icon-layout">
+                   <img src="/icons/badge.png" alt="Badge" className="stat-main-icon" />
+                   <div className="stat-text-content">
+                      <div className="stat-value">{userBadges ? userBadges.length : 0}</div>
+                      <div className="stat-label">Badges</div>
+                   </div>
+                </div>
               </div>
             </div>
             
@@ -459,16 +495,78 @@ export default function ProfileScreen() {
 
                 {/* Cột 2: Stats Grid (cũ) và Badges (mới) */}
                 <div className="detailed-stats-breakdown">
-                  {/* Phần Badges (MỚI - mô phỏng theo LeetCode) */}
+                  {/* Phần Badges */}
                   <div className="badges-section">
                     <h3>Badges</h3>
-                    <div className="badge-item">
-                      <span>0</span>
-                      <div className="badge-label">Total Badges</div>
+                    
+                    <div className="badge-item" style={{ marginBottom: '15px', cursor: 'default', border: 'none', background: 'transparent' }}>
+                      <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#FFD700' }}>
+                        {userBadges ? userBadges.length : 0}
+                      </span>
+                      <div className="badge-label">Unlocked</div>
                     </div>
-                    <div className="badge-locked">
-                      <span>Locked Badge</span>
-                      <div className="badge-label">Fantasy Coder Challenge</div>
+
+                    <div className="badges-grid" style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+                      gap: '15px',
+                      marginTop: '10px'
+                    }}>
+                      {badgesLoading ? (
+                        <p style={{ fontSize: '12px', color: '#666', gridColumn: '1/-1' }}>Loading...</p>
+                      ) : userBadges && userBadges.length > 0 ? (
+                        userBadges.map((badge) => (
+                          <div 
+                            key={badge.id || badge.badgeId} 
+                            className="badge-item-unlocked"
+                            title={badge.description}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              textAlign: 'center',
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              padding: '10px',
+                              borderRadius: '8px',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                          >
+                            <img 
+                              src={getBadgeImageUrl(badge.badgeImg || badge.iconUrl)} 
+                              alt={badge.badgeName || badge.name}
+                              style={{
+                                width: '45px', 
+                                height: '45px', 
+                                objectFit: 'contain', 
+                                marginBottom: '8px',
+                                filter: 'drop-shadow(0 0 5px rgba(255,215,0,0.3))'
+                              }}
+                              onError={(e) => e.target.src = "/Badges/default-badge.png"}
+                            />
+                            <span style={{ 
+                              fontSize: '11px', 
+                              color: '#e8e8e8', 
+                              lineHeight: '1.2',
+                              width: '100%',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {badge.badgeName || badge.name}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="badge-locked" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '15px', opacity: 0.7 }}>
+                          <span style={{ fontSize: '20px', display: 'block', marginBottom: '5px' }}>🔒</span>
+                          <div className="badge-label" style={{ fontSize: '12px' }}>
+                            No badges yet.
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
