@@ -596,7 +596,13 @@ export default function AdminDashboard() {
       testCases: "",
       xpReward: "",
     });
-    setBadgeForm({ name: "", description: "", iconUrl: "" });
+    setBadgeForm({ 
+      name: "", 
+      description: "", 
+      xpReward: "", 
+      conditionType: "XP_LEVEL", 
+      conditionValue: "" 
+    });
     setShowHintForm(false);
     setShowCourseForm(false);
     setShowLessonForm(false);
@@ -1760,7 +1766,13 @@ export default function AdminDashboard() {
                 className="add-btn"
                 onClick={() => {
                   setEditingBadgeId(null);
-                  setBadgeForm({ name: "", description: "", iconUrl: "" });
+                  setBadgeForm({ 
+                    name: "", 
+                    description: "", 
+                    xpReward: "", 
+                    conditionType: "XP_LEVEL",
+                    conditionValue: "" 
+                  });
                   setShowBadgeForm(!showBadgeForm);
                 }}
               >
@@ -1834,9 +1846,8 @@ export default function AdminDashboard() {
                         }
                         required
                       >
-                        <option value="XP_LEVEL">XP Milestone (Đạt mốc XP)</option>
+                        <option value="XP_LEVEL">XP Level (Đạt mốc XP)</option>
                         <option value="LESSON_COUNT">Lesson Count (Số bài học)</option>
-                        <option value="COURSE_COMPLETION">Course Completion (Hoàn thành khóa)</option>
                       </select>
                     </div>
                   </div>
@@ -1854,7 +1865,7 @@ export default function AdminDashboard() {
                       placeholder={
                         badgeForm.conditionType === 'XP_LEVEL' ? "E.g.: 1000 XP" :
                         badgeForm.conditionType === 'LESSON_COUNT' ? "E.g.: 10 Lessons" : 
-                        "E.g.: 1 (Course ID)"
+                        "Enter condition value"
                       }
                       value={badgeForm.conditionValue}
                       onChange={(e) =>

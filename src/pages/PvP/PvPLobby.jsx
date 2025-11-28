@@ -342,7 +342,7 @@ export default function PvPLobby() {
                 </a>
               </li>
               <li>
-                <a onClick={() => navigate("/practice")}> 
+                <a onClick={() => navigate("/practice")}>
                   Practice
                 </a>
               </li>
