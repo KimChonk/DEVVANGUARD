@@ -89,6 +89,22 @@ const Practice = () => {
       {/* Navbar */}
       <SharedNavbar />
 
+      {/* Hero Section */}
+      <div className="practice-hero-section" style={{
+        backgroundImage: `url('/images/practive_background.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}>
+        <div className="practice-hero-overlay"></div>
+        <div className="practice-hero-content">
+          <h1 className="practice-hero-title">Master Your Skills</h1>
+          <p className="practice-hero-description">
+            Solve practice problems and sharpen your coding abilities to become a legendary developer!
+          </p>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="practice-content-wrapper">
         {/* Left Section - Lesson List */}
