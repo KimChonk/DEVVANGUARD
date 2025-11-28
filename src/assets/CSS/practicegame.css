@@ -1,0 +1,396 @@
+/* ===== PRACTICE GAME CSS (Based on lessongame.css) ===== */
+
+/* 1. VARIABLES (Giữ nguyên từ lessongame.css) */
+:root {
+  --primary-color: #1a1a1a;
+  --secondary-color: #222;
+  --tertiary-color: #2d2d2d;
+  --accent-color: #007bff;
+  --accent-hover: #0056b3;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --warning-color: #ffc107;
+  --text-primary: #e8e8e8;
+  --text-secondary: #b0b0b0;
+  --border-color: #404040;
+  --code-bg: #1e1e1e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background-color: var(--primary-color);
+  color: var(--text-primary);
+  overflow: hidden; /* Quan trọng để không bị scroll trang chính */
+}
+
+/* ===== MAIN LAYOUT ===== */
+.lesson-screen-leetcode {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--primary-color);
+  overflow: hidden;
+}
+
+/* ===== HEADER (Giống hệt lessongame.css) ===== */
+.leetcode-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+  height: 60px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+/* Nút Back màu vàng đặc trưng */
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Nhỏ lại chút cho gọn */
+  height: 40px;
+  background: linear-gradient(135deg, #d4af37, #b8941f);
+  border: none;
+  color: #1a1a2e;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+.lesson-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== MAIN CONTENT AREA ===== */
+.leetcode-main {
+  display: flex;
+  flex: 1; /* Chiếm hết chiều cao còn lại */
+  overflow: hidden;
+  position: relative;
+  height: calc(100vh - 60px);
+}
+
+/* ===== LEFT PANEL: PROBLEM DESCRIPTION ===== */
+.problem-panel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--primary-color);
+  overflow-y: auto; /* Scroll nội dung */
+  flex: 0 0 40%; /* Mặc định 40% */
+  min-width: 250px;
+}
+
+.problem-section {
+  padding: 20px;
+}
+
+.problem-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+/* Style cho nội dung bài tập (quan trọng để đẹp như cũ) */
+.description-content {
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.description-content p {
+  margin-bottom: 12px;
+}
+
+.description-content code, .test-io code {
+  background-color: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #81c784; /* Màu xanh lá nhạt cho code */
+  font-family: 'Monaco', monospace;
+  font-size: 13px;
+  border: 1px solid #333;
+}
+
+.description-content pre {
+  background-color: var(--code-bg);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 10px 0;
+  border: 1px solid var(--border-color);
+}
+
+/* Test Cases Section bên trái */
+.test-cases-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+}
+
+.test-case-item {
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.test-label {
+  color: var(--warning-color);
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* ===== RESIZERS (THANH KÉO) ===== */
+.resize-divider-horizontal {
+  width: 8px;
+  background-color: var(--secondary-color);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  cursor: col-resize;
+  flex-shrink: 0;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.resize-divider-horizontal:hover {
+  background-color: var(--accent-color);
+}
+
+.resize-divider-vertical {
+  height: 8px;
+  background-color: var(--secondary-color);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  cursor: row-resize;
+  flex-shrink: 0;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.resize-divider-vertical:hover {
+  background-color: var(--accent-color);
+}
+
+/* ===== RIGHT PANEL: EDITOR & OUTPUT ===== */
+/* Đây là phần quan trọng nhất để fix lỗi resize dọc */
+.editor-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column; /* Bắt buộc xếp dọc */
+  background-color: var(--primary-color);
+  min-width: 300px;
+  height: 100%; /* Full chiều cao cha */
+  overflow: hidden; /* Ẩn scroll thừa */
+  position: relative;
+}
+
+/* 1. Header Editor */
+.editor-header {
+  height: 50px;
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  flex-shrink: 0; /* Không bị co lại khi kéo */
+}
+
+.editor-header h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-right: 15px;
+}
+
+.lang-selector {
+  background-color: var(--tertiary-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 5px 10px;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Buttons (Run/Reset/Submit) - Màu sắc theo ảnh Screenshot */
+.editor-header-right {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.btn:hover { opacity: 0.9; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Nút Run: Màu trắng xám */
+.btn-run {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* Nút Reset: Màu vàng warning */
+.btn-reset {
+  background-color: var(--warning-color);
+  color: #1a1a1a;
+}
+
+/* Nút Submit: Màu xanh lá success */
+.btn-submit {
+  background-color: var(--success-color); /* #28a745 */
+  color: white;
+}
+
+/* 2. Code Editor Container */
+.code-editor-container {
+  /* Layout logic */
+  flex: 1; /* Mặc định chiếm phần lớn */
+  position: relative;
+  overflow: hidden;
+  min-height: 200px; /* Không cho kéo nhỏ hơn mức này */
+  background-color: var(--code-bg);
+}
+
+/* Override style của thư viện Editor bên trong (nếu có) */
+.code-editor-container .cm-editor {
+  height: 100%;
+}
+
+/* 3. Output Panel */
+.output-panel {
+  height: 180px; 
+  flex: 0 0 auto; /* Không tự co giãn, giữ đúng chiều cao này khi mới vào */
+  
+  display: flex;
+  flex-direction: column;
+  background-color: var(--secondary-color);
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+}
+
+.output-header {
+  padding: 8px 15px;
+  background-color: var(--tertiary-color);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.output-content {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto; /* Scroll nội dung output */
+  font-family: 'Monaco', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  background-color: var(--primary-color);
+}
+
+.output-text {
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+/* ===== TEST RESULTS (Bảng kết quả) ===== */
+.test-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.test-result-item {
+  border-radius: 4px;
+  background-color: var(--tertiary-color);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.test-result-item.passed {
+  border-left: 4px solid var(--success-color);
+}
+
+.test-result-item.failed {
+  border-left: 4px solid var(--error-color);
+}
+
+.test-result-header {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.test-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.test-badge.pass { background-color: var(--success-color); color: white; }
+.test-badge.fail { background-color: var(--error-color); color: white; }
+
+.test-result-details {
+  padding: 10px 12px;
+  background-color: rgba(0,0,0,0.2);
+  border-top: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.test-error {
+  color: var(--error-color);
+  margin-top: 5px;
+}

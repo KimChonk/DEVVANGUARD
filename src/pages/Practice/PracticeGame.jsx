@@ -7,7 +7,7 @@ import ProblemDescription from "../../components/ProblemDescription";
 import SuccessNotification from "../../components/SuccessNotification";
 import AlertNotification from "../../components/AlertNotification";
 import LoadingScreen from "../../components/LoadingScreen";
-import "../../assets/CSS/lessongame.css";
+import "../../assets/CSS/practicegame.css";
 
 const LANGUAGE_OPTIONS = ['python', 'java', 'c', 'cpp'];
 
@@ -151,33 +151,55 @@ export default function PracticeGame() {
 
   useEffect(() => {
     const handleMouseMove = (e) => {
+      // 1. Kéo Ngang (Giữ nguyên logic cũ nếu đã ổn, hoặc dùng logic Pixel tương tự bên dưới)
       if (isResizingHorizontal) {
         const main = document.querySelector('.leetcode-main');
         const problemPanel = document.querySelector('.problem-panel');
         if (main && problemPanel) {
-          const newWidth = e.clientX - main.offsetLeft;
-          const percentage = (newWidth / main.offsetWidth) * 100;
-          if (percentage > 20 && percentage < 80) {
-            problemPanel.style.flex = `0 0 ${percentage}%`;
+          const mainRect = main.getBoundingClientRect();
+          const newWidth = e.clientX - mainRect.left;
+          // Giới hạn min/max width (ví dụ: min 200px)
+          if (newWidth > 200 && newWidth < mainRect.width - 200) {
+             // Dùng pixel thay vì % để mượt hơn
+            problemPanel.style.flex = `0 0 ${newWidth}px`;
+            problemPanel.style.width = `${newWidth}px`; // Backup width
           }
         }
       }
+
+      // 2. Kéo Dọc (Phần đang bị lỗi)
       if (isResizingVertical) {
+        const container = document.querySelector('.editor-panel');
+        const header = document.querySelector('.editor-header');
         const codeEditor = document.querySelector('.code-editor-container');
         const outputPanel = document.querySelector('.output-panel');
-        if (codeEditor && outputPanel) {
-          const parentPanel = document.querySelector('.editor-panel');
-          if (parentPanel) {
-            const dividerPos = e.clientY - parentPanel.offsetTop;
-            const editorHeight = dividerPos - 48; // 48px for editor-header
-            const parentHeight = parentPanel.offsetHeight;
-            const codePercentage = (editorHeight / (parentHeight - 48)) * 100;
-            
-            if (codePercentage > 20 && codePercentage < 80) {
-              codeEditor.style.flex = `0 0 ${codePercentage}%`;
-              outputPanel.style.flex = `0 0 ${100 - codePercentage}%`;
-            }
-          }
+
+        if (container && header && codeEditor && outputPanel) {
+          // Lấy tọa độ và kích thước thực tế
+          const containerRect = container.getBoundingClientRect();
+          const headerHeight = header.offsetHeight;
+          
+          // Tính toán chiều cao mới cho Code Editor
+          // Logic: Vị trí chuột hiện tại (Y) - Đỉnh của Container - Chiều cao Header = Chiều cao Editor
+          let newEditorHeight = e.clientY - containerRect.top - headerHeight;
+          
+          // Tính chiều cao khả dụng còn lại
+          const totalAvailableHeight = containerRect.height - headerHeight;
+          
+          // Giới hạn không cho kéo quá nhỏ hoặc quá lớn (min 100px)
+          const minHeight = 100;
+          const maxHeight = totalAvailableHeight - 100; // Chừa chỗ cho Output
+
+          if (newEditorHeight < minHeight) newEditorHeight = minHeight;
+          if (newEditorHeight > maxHeight) newEditorHeight = maxHeight;
+
+          // Áp dụng Style (Dùng Pixel trực tiếp)
+          codeEditor.style.flex = `0 0 ${newEditorHeight}px`;
+          codeEditor.style.height = `${newEditorHeight}px`;
+          
+          // Output panel tự động lấp đầy phần còn lại
+          outputPanel.style.flex = '1 1 auto';
+          outputPanel.style.height = 'auto';
         }
       }
     };
@@ -185,14 +207,46 @@ export default function PracticeGame() {
     const handleMouseUp = () => {
       setIsResizingHorizontal(false);
       setIsResizingVertical(false);
+      
+      // Quan trọng: Bật lại khả năng bôi đen text và tương tác chuột
+      document.body.style.cursor = 'default';
+      document.body.style.userSelect = '';
+      
+      // Xóa overlay nếu có (xem Bước 2 CSS)
+      const overlay = document.getElementById('resize-overlay');
+      if (overlay) overlay.remove();
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    if (isResizingHorizontal || isResizingVertical) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      // Tối ưu UX: Khi đang kéo, tắt bôi đen toàn trang
+      document.body.style.userSelect = 'none';
+      
+      // Set con trỏ chuột cưỡng ép
+      document.body.style.cursor = isResizingHorizontal ? 'col-resize' : 'row-resize';
+      
+      // Mẹo: Tạo một div overlay vô hình để chuột không bị miss khi kéo nhanh qua các iframe/editor
+      const overlay = document.createElement('div');
+      overlay.id = 'resize-resize-overlay';
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100vw';
+      overlay.style.height = '100vh';
+      overlay.style.zIndex = '9999';
+      overlay.style.cursor = isResizingHorizontal ? 'col-resize' : 'row-resize';
+      document.body.appendChild(overlay);
+    }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = 'default';
+      const overlay = document.getElementById('resize-resize-overlay');
+      if (overlay) overlay.remove();
     };
   }, [isResizingHorizontal, isResizingVertical]);
 
