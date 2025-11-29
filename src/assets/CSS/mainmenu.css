@@ -446,23 +446,30 @@
 }
 
 .stat-icon-img {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
+  width: 22px; 
+  height: 22px;
+  min-width: 22px;
   object-fit: contain;
-  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.3));
+  filter: brightness(1.5) drop-shadow(0 0 8px rgba(212, 175, 55, 0.8));
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover .stat-icon-img {
+  filter: brightness(1.8) drop-shadow(0 0 12px var(--primary-gold));
+  transform: scale(1.1);
+}
+
+.stat-value {
+  font-size: 0.9rem;
+  color: var(--primary-gold);
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(212, 175, 55, 0.4); 
 }
 
 .stat-content {
   display: flex;
   flex-direction: column;
   gap: 0.05rem;
-}
-
-.stat-value {
-  font-size: 0.8rem;
-  color: var(--primary-gold);
-  font-weight: 600;
 }
 
 .stat-label {

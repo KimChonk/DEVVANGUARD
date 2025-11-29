@@ -175,8 +175,13 @@ export default function Intro() {
               Welcome to Dev Vanguard, lets Conquer algorithms, scale mountains of data, and unlock the treasures of programming. Join the quest to become a coding master.
             </p>
 
-            <div style={{ textAlign: "center" }}>
-              <a href="/login" className="btn">Start Your Adventure</a>
+            <div style={{ textAlign: "center", marginTop: "40px" }}>
+              <a href="/login" className="btn-legendary">
+                <span className="btn-content">
+                    <i className="fas fa-dungeon"></i> Start Your Adventure
+                </span>
+                <div className="btn-glow"></div>
+              </a>
             </div>
 
             <div className="scroll-indicator">

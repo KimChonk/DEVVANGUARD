@@ -184,6 +184,146 @@ body {
     width: 100%;
 }
 
+/* =========================================
+   NÚT "LEGENDARY" - START YOUR ADVENTURE
+   ========================================= */
+
+.btn-legendary {
+    position: relative;
+    display: inline-block;
+    padding: 4px; /* Khoảng cách để hiện viền màu chạy */
+    border-radius: 50px;
+    background: linear-gradient(90deg, #FFD700, #4CAF50, #00d2ff, #FFD700); /* Dải màu cầu vồng phép thuật */
+    background-size: 300% 100%;
+    animation: magicFlow 3s linear infinite; /* Màu viền tự chạy */
+    text-decoration: none;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.5); /* Hào quang xanh nhẹ ban đầu */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 10;
+}
+
+/* Hiệu ứng dòng chảy ma thuật */
+@keyframes magicFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Lớp lõi bên trong nút (Màu đen/xanh đậm) */
+.btn-legendary .btn-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Khoảng cách giữa icon và chữ */
+    
+    background-color: #0d1117; /* Màu nền lõi nút */
+    padding: 18px 50px;
+    border-radius: 46px; /* Nhỏ hơn border cha một chút */
+    
+    font-family: 'MedievalSharp', cursive; /* Font hiệp sĩ */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+}
+
+/* Icon cái cổng/hầm ngục */
+.btn-legendary .fas {
+    color: #FFD700; /* Icon màu vàng kim */
+    font-size: 1.4rem;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    transition: transform 0.5s ease;
+}
+
+/* === HIỆU ỨNG HOVER (LÀM CHO NÓ BÙNG NỔ) === */
+
+.btn-legendary:hover {
+    transform: scale(1.05) translateY(-5px); /* Phóng to và bay lên */
+    box-shadow: 
+        0 0 30px rgba(76, 175, 80, 0.8),    /* Hào quang xanh */
+        0 0 60px rgba(255, 215, 0, 0.4),    /* Hào quang vàng lan rộng */
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+    filter: brightness(1.2); /* Sáng rực lên */
+}
+
+/* Khi hover, nền bên trong đổi màu nhẹ */
+.btn-legendary:hover .btn-content {
+    background: linear-gradient(to bottom, #1a251b, #0d1117);
+    color: #FFD700; /* Chữ chuyển sang vàng kim */
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+/* Khi hover, icon xoay nhẹ hoặc phóng to */
+.btn-legendary:hover .fas {
+    transform: rotate(-10deg) scale(1.2);
+    color: #fff; /* Icon sáng trắng */
+}
+
+/* === LỚP SƯƠNG MÙ PHÁT SÁNG (GLOW BLUR) === */
+/* Tạo một lớp mờ nằm dưới nút để làm nó trông như đang tỏa khí */
+.btn-legendary::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: inherit; /* Kế thừa màu gradient của viền */
+    filter: blur(20px); /* Làm nhòe đi */
+    opacity: 0.7;
+    z-index: -1;
+    border-radius: 50px;
+    transition: opacity 0.3s;
+}
+
+.btn-legendary:hover::before {
+    opacity: 1; /* Khi hover thì sáng rực hơn */
+    filter: blur(25px);
+}
+
+/* === HIỆU ỨNG QUÉT SÁNG (SHINE SWEEP) === */
+/* Một vệt sáng chạy xẹt qua nút */
+.btn-content::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent
+    );
+    transform: skewX(-20deg);
+    transition: none;
+}
+
+/* Kích hoạt vệt sáng chạy tự động mỗi 4 giây */
+.btn-legendary .btn-content::after {
+    animation: shineSweep 4s infinite;
+}
+
+@keyframes shineSweep {
+    0% { left: -150%; }
+    20% { left: 150%; } /* Chạy nhanh qua trong 20% thời gian */
+    100% { left: 150%; } /* Thời gian còn lại nghỉ */
+}
+
+/* === MOBILE RESPONSIVE CHO NÚT === */
+@media (max-width: 768px) {
+    .btn-legendary .btn-content {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        gap: 10px;
+    }
+    .btn-legendary .fas {
+        font-size: 1rem;
+    }
+}
 /* ===== HERO CONTENT ===== */
 .hero-content {
     max-width: 800px;
@@ -290,7 +430,6 @@ body {
     
     /* Giữ nguyên các thuộc tính còn lại */
     text-align: center;
-    animation: bounce 2s infinite;
 }
 
 .scroll-indicator p {
@@ -304,11 +443,6 @@ body {
     color: var(--primary-color);
 }
 
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-20px); }
-    60% { transform: translateY(-10px); }
-}
 
 /* ===== GLOW EFFECT (Thanh kiáº¿m lÃ³a sÃ¡ng) ===== */
 @keyframes glow-pulse {
