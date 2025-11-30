@@ -28,7 +28,7 @@ export default function PvPLobby() {
 
   const [user, setUser] = useState({
     name: 'Player',
-    avatar: '/images/avatars/default-avatar.jpg',
+    avatar: '/images/avatars/default-avatar.png',
     xp: 0,
     userId: null
   });
@@ -53,7 +53,7 @@ export default function PvPLobby() {
         name: profile.fullName || profile.full_name || profile.email || 'Player',
         avatar: (profile.avatarName || profile.avatar_name)
           ? `/images/avatars/${profile.avatarName || profile.avatar_name}`
-          : '/images/avatars/default-avatar.jpg',
+          : '/images/avatars/default-avatar.png',
         userId: profile.userId || profile.user_id || profile.id
       }));
     }
@@ -438,7 +438,7 @@ export default function PvPLobby() {
                 alt={user.name}
                 className="pvp-profile-avatar"
                 onError={(e) => {
-                  e.target.src = '/images/avatars/default-avatar.jpg';
+                  e.target.src = '/images/avatars/default-avatar.png';
                 }}
               />
               <h2 className="pvp-profile-name">{user.name}</h2>
