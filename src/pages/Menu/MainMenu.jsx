@@ -462,8 +462,8 @@ export default function MainMenu() {
             <ul className="footer-links">
               <li><a onClick={() => alert("Coming soon!")}>Help Center</a></li>
               <li><a onClick={() => alert("Coming soon!")}>FAQ</a></li>
-              <li><a onClick={() => alert("Coming soon!")}>Privacy Policy</a></li>
-              <li><a onClick={() => alert("Coming soon!")}>Terms of Service</a></li>
+              <li><a onClick={() => navigate("/privacy-policy")}>Privacy Policy</a></li>
+              <li><a onClick={() => navigate("/terms-of-service")}>Terms of Service</a></li>
             </ul>
           </div>
         </div>
@@ -471,9 +471,9 @@ export default function MainMenu() {
         <div className="footer-bottom">
           <p>&copy; 2025 Dev Vanguard. All rights reserved.</p>
           <div className="footer-legal">
-            <a onClick={() => alert("Coming soon!")}>Privacy</a>
+            <a onClick={() => navigate("/privacy-policy")}>Privacy</a>
             <span className="separator">•</span>
-            <a onClick={() => alert("Coming soon!")}>Terms</a>
+            <a onClick={() => navigate("/terms-of-service")}>Terms</a>
             <span className="separator">•</span>
             <a onClick={() => alert("Coming soon!")}>Cookies</a>
           </div>

@@ -604,48 +604,43 @@ export default function LessonScreen() {
             onMouseDown={() => setIsResizingVertical(true)}
           ></div>
 
-          {/* Output Console */}
-          <div className="output-panel">
+          {/* Output Panel */}
+          <div className="practice-output-panel">
             <div className="output-header">
-              <span className="output-label">Output</span>
-              <span className={`output-status ${isRunning ? 'running' : ''}`}>
-                {isRunning ? "Running..." : "Ready"}
-              </span>
-              {executionTime > 0 && <span className="exec-time">{executionTime}ms</span>}
+              <span>Output & Test Results</span>
             </div>
-            <pre className="output-content">{output}</pre>
-          </div>
-
-          {/* Test Results */}
-          {testResults && (
-            <div className={`test-results ${testResults.success ? 'success' : 'failure'}`}>
-              <div className="results-header">
-                {testResults.success ? (
-                  <>
-                    <span className="result-icon success-icon">✓</span>
-                    <span className="result-text">ALL TESTS PASSED</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="result-icon fail-icon">✗</span>
-                    <span className="result-text">{testResults.passed}/{testResults.total} Tests Passed</span>
-                  </>
-                )}
-              </div>
-              {testResults.results && testResults.results.length > 0 && (
-                <div className="results-body">
-                  {testResults.results.map((result, idx) => (
-                    <div key={idx} className={`result-item ${result.passed ? 'pass' : 'fail'}`}>
-                      <span className={`result-badge ${result.passed ? 'pass' : 'fail'}`}>
-                        {result.passed ? '✓' : '✗'}
-                      </span>
-                      <span className="result-name">Test {idx + 1}</span>
+            <div className="practice-output-content">
+              {testResults ? (
+                <div className="practice-test-results">
+                  {testResults.results && testResults.results.length > 0 ? (
+                    testResults.results.map((result, idx) => (
+                      <div key={idx} className={`test-result-item ${result.passed ? 'passed' : 'failed'}`}>
+                        <div className="test-result-header">
+                          <span className={`test-badge ${result.passed ? 'pass' : 'fail'}`}>
+                            {result.passed ? '✓' : '✗'}
+                          </span>
+                          <span className="test-name">Test {idx + 1}: {result.passed ? 'PASSED' : 'FAILED'}</span>
+                        </div>
+                        {!result.passed && (
+                          <div className="test-result-details">
+                            {result.expectedOutput && <div className="test-expected">Expected: <code>{result.expectedOutput}</code></div>}
+                            {result.actualOutput && <div className="test-actual">Got: <code>{result.actualOutput}</code></div>}
+                            {result.error && <div className="test-error">Error: {result.error}</div>}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ padding: '10px', color: 'var(--text-secondary)' }}>
+                      {testResults.success ? "✓ ALL TESTS PASSED" : `✗ ${testResults.passed}/${testResults.total} Tests Passed`}
                     </div>
-                  ))}
+                  )}
                 </div>
+              ) : (
+                <pre className="output-text">{output}</pre>
               )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 

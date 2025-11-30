@@ -6,6 +6,8 @@ import Intro from "./pages/intro";
 import Login from "./pages/Account/Login";
 import Register from "./pages/Account/Register";
 import ForgotPassword from "./pages/Account/ForgotPassword";
+import TermsOfService from "./pages/Policy/TermsOfService";
+import PrivacyPolicy from "./pages/Policy/PrivacyPolicy";
 import MainMenu from "./pages/Menu/MainMenu";
 import CourseScreen from "./pages/Course/CourseScreen";
 import LessonScreen from "./pages/Lesson/LessonScreen";
@@ -29,6 +31,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ForgotPassword />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           
           {/* Protected Routes - User */}
           <Route 

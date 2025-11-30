@@ -767,42 +767,99 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 6px;
-  border-radius: 3px;
-  font-size: 11px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  border-left: 3px solid;
 }
 
 .result-item.pass {
   color: #10b981;
+  border-left-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.05);
 }
 
 .result-item.fail {
   color: #ef4444;
+  border-left-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .result-badge {
-  min-width: 16px;
+  min-width: 20px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .result-name {
   flex: 1;
+  font-weight: 600;
 }
 
 .result-details {
-  gap: 2px;
-  margin-left: auto;
-  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 28px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 11px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
-.result-details code {
-  background-color: var(--code-bg);
-  padding: 2px 4px;
-  border-radius: 2px;
-  color: #81c784;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+.detail-label {
+  display: inline-block;
+  font-weight: 600;
+  min-width: 70px;
+  color: #a0a0a0;
+}
+
+.detail-expected,
+.detail-actual,
+.detail-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.detail-expected code {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  padding: 4px 8px;
+  border-radius: 3px;
+  overflow-x: auto;
+  max-width: 300px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.detail-actual code {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 4px 8px;
+  border-radius: 3px;
+  overflow-x: auto;
+  max-width: 300px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.detail-error code {
+  background-color: rgba(248, 113, 113, 0.15);
+  color: #fca5a5;
+  padding: 4px 8px;
+  border-radius: 3px;
+  overflow-x: auto;
+  max-width: 400px;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 /* Loading State */
@@ -1234,4 +1291,118 @@ body {
   display: block;
   min-height: 0;
 }
+
+/* ===== PRACTICE OUTPUT PANEL (From PracticeGame) ===== */
+.practice-output-panel {
+  height: auto;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--secondary-color);
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+  min-height: 100px !important;
+}
+
+.practice-output-content {
+  flex: 1;
+  padding: 10px;
+  overflow: hidden;
+  font-family: 'Monaco', monospace;
+  font-size: 13px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ===== TEST RESULTS (RESULTS TABLE) ===== */
+.practice-test-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.test-result-item {
+  background-color: var(--tertiary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.test-result-item.passed {
+  border-left: 4px solid var(--success-color);
+}
+
+.test-result-item.failed {
+  border-left: 4px solid var(--error-color);
+}
+
+.test-result-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.test-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+}
+
+.test-badge.pass {
+  background-color: var(--success-color);
+}
+
+.test-badge.fail {
+  background-color: var(--error-color);
+}
+
+.test-name {
+  color: var(--text-primary);
+}
+
+.test-result-details {
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.test-expected,
+.test-actual {
+  margin-bottom: 8px;
+}
+
+.test-expected code,
+.test-actual code {
+  background-color: var(--code-bg);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  display: inline-block;
+  max-width: 100%;
+  word-break: break-all;
+  margin-left: 5px;
+}
+
+.test-error {
+  color: var(--error-color);
+  margin-top: 8px;
+}
+
 
