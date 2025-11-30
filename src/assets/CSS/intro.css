@@ -184,9 +184,6 @@ body {
     width: 100%;
 }
 
-/* =========================================
-   NÚT "LEGENDARY" - START YOUR ADVENTURE
-   ========================================= */
 
 .btn-legendary {
     position: relative;
@@ -232,46 +229,42 @@ body {
     overflow: hidden;
 }
 
-/* Icon cái cổng/hầm ngục */
 .btn-legendary .fas {
-    color: #FFD700; /* Icon màu vàng kim */
+    color: #FFD700; 
     font-size: 1.4rem;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
     transition: transform 0.5s ease;
 }
 
-/* === HIỆU ỨNG HOVER (LÀM CHO NÓ BÙNG NỔ) === */
 
 .btn-legendary:hover {
-    transform: scale(1.05) translateY(-5px); /* Phóng to và bay lên */
+    transform: scale(1.05) translateY(-5px); 
     box-shadow: 
-        0 0 30px rgba(76, 175, 80, 0.8),    /* Hào quang xanh */
-        0 0 60px rgba(255, 215, 0, 0.4),    /* Hào quang vàng lan rộng */
+        0 0 30px rgba(76, 175, 80, 0.8),   
+        0 0 60px rgba(255, 215, 0, 0.4),    
         inset 0 0 20px rgba(255, 255, 255, 0.2);
-    filter: brightness(1.2); /* Sáng rực lên */
+    filter: brightness(1.2); 
 }
 
-/* Khi hover, nền bên trong đổi màu nhẹ */
+
 .btn-legendary:hover .btn-content {
     background: linear-gradient(to bottom, #1a251b, #0d1117);
-    color: #FFD700; /* Chữ chuyển sang vàng kim */
+    color: #FFD700; 
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
 }
 
-/* Khi hover, icon xoay nhẹ hoặc phóng to */
+
 .btn-legendary:hover .fas {
     transform: rotate(-10deg) scale(1.2);
-    color: #fff; /* Icon sáng trắng */
+    color: #fff; 
 }
 
-/* === LỚP SƯƠNG MÙ PHÁT SÁNG (GLOW BLUR) === */
-/* Tạo một lớp mờ nằm dưới nút để làm nó trông như đang tỏa khí */
 .btn-legendary::before {
     content: '';
     position: absolute;
     top: -2px; left: -2px; right: -2px; bottom: -2px;
-    background: inherit; /* Kế thừa màu gradient của viền */
-    filter: blur(20px); /* Làm nhòe đi */
+    background: inherit; 
+    filter: blur(20px);
     opacity: 0.7;
     z-index: -1;
     border-radius: 50px;
@@ -283,8 +276,6 @@ body {
     filter: blur(25px);
 }
 
-/* === HIỆU ỨNG QUÉT SÁNG (SHINE SWEEP) === */
-/* Một vệt sáng chạy xẹt qua nút */
 .btn-content::after {
     content: '';
     position: absolute;
@@ -302,7 +293,6 @@ body {
     transition: none;
 }
 
-/* Kích hoạt vệt sáng chạy tự động mỗi 4 giây */
 .btn-legendary .btn-content::after {
     animation: shineSweep 4s infinite;
 }
@@ -369,43 +359,32 @@ body {
     color: #cccccc;
 }
 
-.btn {
-    display: inline-block;
-    padding: 15px 30px;
-    background-color: var(--primary-color);
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease, box-shadow 0.3s ease, text-shadow 0.3s ease;
-    box-shadow: 0 0 15px 5px rgba(76, 175, 80, 0.4);
+.btn-courses {
     position: relative;
-    overflow: hidden;
+    display: inherit;
+    padding: 4px; 
+    border-radius: 50px;
+    background: linear-gradient(90deg, #FFD700, #4CAF50, #00d2ff, #FFD700); 
+    background-size: 300% 100%;
+    animation: magicFlow 3s linear infinite;
+    text-decoration: none;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.5); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 10;
 }
 
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: 0.5s;
+.btn-courses:hover {
+    transform: scale(1.05) translateY(-5px); 
+    box-shadow: 
+        0 0 30px rgba(76, 175, 80, 0.8),    
+        0 0 60px rgba(255, 215, 0, 0.4),    
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+    filter: brightness(1.2); 
 }
 
-.btn:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(-3px);
-    box-shadow: 0 0 30px 10px rgba(76, 175, 80, 0.7);
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-}
-
-.btn:hover::before {
-    left: 100%;
+.btn-courses:hover::before {
+    opacity: 1;
+    filter: blur(25px);
 }
 
 .btn-secondary {

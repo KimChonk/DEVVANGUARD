@@ -180,7 +180,6 @@ export default function Intro() {
                 <span className="btn-content">
                     <i className="fas fa-dungeon"></i> Start Your Adventure
                 </span>
-                <div className="btn-glow"></div>
               </a>
             </div>
 
@@ -384,10 +383,11 @@ export default function Intro() {
           )}
           </div>
           <div className="explore-courses-btn">
-            <a href="/login" className="btn">
+            <a href="/login" className="btn-courses">
               Explore All Courses <i className="fas fa-arrow-right"></i>
             </a>
           </div>
+          
         </div>
       </section>
 
@@ -661,7 +661,10 @@ export default function Intro() {
       <section className="cta-section">
         <div className="section-container">
           <h2 className="cta-title">Ready to level up your coding skills?</h2>
-          <a href="/login" className="btn btn-large">Start Learning for Free</a>
+            <a href="/login" className="btn-legendary">
+                <span className="btn-content"> Start Learning for Free
+                </span>
+              </a>
         </div>
       </section>
 

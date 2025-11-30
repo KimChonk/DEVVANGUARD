@@ -678,23 +678,53 @@ body {
   cursor: not-allowed;
 }
 
-.btn-run {
-  background-color: var(--accent-color);
-  color: white;
+.lesson-btn-run {
+  background-color: #00c853; 
+  color: #ffffff;
+  border: 1px solid #00e676; 
+  border-radius: 6px;
+  padding: 8px 24px;        
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 700;           
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
-.btn-run:hover:not(:disabled) {
-  background-color: var(--accent-hover);
-  transform: translateY(-1px);
+.lesson-btn-run:hover:not(:disabled) {
+  background-color: #00e676;
+  border-color: #69f0ae;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4); 
+}
+
+.lesson-btn-run:active {
+  background-color: #00c853;
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.lesson-btn-run:disabled {
+  background-color: #333333;
+  border-color: #444444;
+  color: #888888;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-submit {
-  background-color: var(--success-color);
+  background-color: #2979FF;
   color: white;
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: #218838;
+  background-color: #2979FF;
   transform: translateY(-1px);
 }
 
@@ -1076,39 +1106,6 @@ body {
 }
 
 /* ===== PRACTICE MODE BUTTONS ===== */
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: var(--secondary-color);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.btn:hover:not(:disabled) {
-  background-color: var(--tertiary-color);
-  border-color: var(--accent-color);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-run {
-  background-color: var(--success-color);
-  color: white;
-  border: none;
-}
-
-.btn-run:hover:not(:disabled) {
-  background-color: #1e8449;
-  transform: translateY(-2px);
-}
 
 .btn-reset {
   background-color: var(--warning-color);
@@ -1120,18 +1117,6 @@ body {
   background-color: #e0a800;
   transform: translateY(-2px);
 }
-
-.btn-submit {
-  background-color: var(--accent-color);
-  color: white;
-  border: none;
-}
-
-.btn-submit:hover:not(:disabled) {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
-
 .lang-selector {
   background-color: var(--tertiary-color);
   color: var(--text-primary);
