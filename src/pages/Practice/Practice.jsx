@@ -91,7 +91,7 @@ const Practice = () => {
 
       {/* Hero Section */}
       <div className="practice-hero-section" style={{
-        backgroundImage: `url('/images/practive_background.png')`,
+        backgroundImage: `url('/images/practice_background.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
