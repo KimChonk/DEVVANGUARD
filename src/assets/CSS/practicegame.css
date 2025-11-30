@@ -268,22 +268,43 @@
 
 /* 2. Code Editor Container */
 .code-editor-container {
-  flex: 1; /* Tự động chiếm hết không gian còn lại */
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
-  min-height: 150px;
+  min-height: 0; /* THÊM DÒNG NÀY: Cho phép flex item thu nhỏ dưới mức nội dung tối thiểu */
   background-color: var(--code-bg);
 }
 
 /* 3. Output Panel */
-.output-panel {
-  height: 180px; /* Chiều cao mặc định */
-  flex: 0 0 auto; /* Cố định chiều cao ban đầu */
+.practice-output-panel {
+  /* Mặc định auto để vừa khít nội dung khi mới vào */
+  height: auto;
+  
+  /* Flex 0 0 auto: Không co, không giãn, giữ nguyên height được set bởi JS */
+  flex: 0 0 auto; 
+  
   display: flex;
   flex-direction: column;
   background-color: var(--secondary-color);
   overflow: hidden;
   border-top: 1px solid var(--border-color);
+  
+  min-height: 100px !important;
+}
+
+.practice-output-content {
+  flex: 1; 
+  padding: 10px;
+  overflow: hidden;
+  font-family: 'Monaco', monospace;
+  font-size: 13px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .output-header {
@@ -296,15 +317,6 @@
   flex-shrink: 0;
 }
 
-.output-content {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-  font-family: 'Monaco', monospace;
-  font-size: 13px;
-  color: var(--text-primary);
-  background-color: var(--primary-color);
-}
 
 .output-text {
   white-space: pre-wrap;
@@ -312,10 +324,13 @@
 }
 
 /* ===== TEST RESULTS (RESULTS TABLE) ===== */
-.test-results {
+.practice-test-results {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;           
+  overflow-y: auto;  
+  min-height: 0;
 }
 
 .test-result-item {

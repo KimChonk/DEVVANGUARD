@@ -41,6 +41,11 @@ export default function ProfileScreen() {
   const [recentActivity, setRecentActivity] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
+  const [selectedBadge, setSelectedBadge] = useState(null);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+
+  const [badgeDisplayData, setBadgeDisplayData] = useState({ desc: "", criteria: "" });
+
   useEffect(() => {
     async function fetchProfileData() { // Đổi tên hàm
       try {
@@ -278,6 +283,32 @@ export default function ProfileScreen() {
       setIsLoading(false);
     }, 1000);
   }, [navigate]);
+
+  const handleBadgeClick = (badge) => {
+    const fullDesc = badge.description || "";
+    const separator = "How to earn:";
+    
+    let displayDesc = fullDesc;
+    let displayCriteria = "Hoàn thành các thử thách đặc biệt để nhận huy hiệu này.";
+
+    // Logic tách chuỗi
+    if (fullDesc.includes(separator)) {
+      const parts = fullDesc.split(separator);
+      displayDesc = parts[0].trim(); // Phần trước "How to earn:" là mô tả
+      if (parts.length > 1 && parts[1].trim() !== "") {
+        displayCriteria = parts[1].trim(); // Phần sau là criteria
+      }
+    }
+
+    setBadgeDisplayData({ desc: displayDesc, criteria: displayCriteria });
+    setSelectedBadge(badge);
+    setShowBadgeModal(true);
+  };
+
+  const closeBadgeModal = () => {
+    setShowBadgeModal(false);
+    setSelectedBadge(null);
+  };
 
   if (profileLoading || dataLoading || coursesLoading) {
     return <LoadingScreen isVisible={true} message="Loading profile..." />;
@@ -551,7 +582,7 @@ export default function ProfileScreen() {
                           <div 
                             key={badge.id || badge.badgeId} 
                             className="badge-item-unlocked"
-                            title={badge.description}
+                            onClick={() => handleBadgeClick(badge)}
                             style={{
                               display: 'flex',
                               flexDirection: 'column',
@@ -677,6 +708,76 @@ export default function ProfileScreen() {
               <div className="modal-footer">
                 <button className="btn-cancel" onClick={handleCancelEdit}>Cancel</button>
                 <button className="btn-save" onClick={handleSaveProfile}>Save Changes</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showBadgeModal && selectedBadge && (
+          <div className="modal-overlay" onClick={closeBadgeModal}>
+            <div className="modal-content badge-detail-modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center', maxWidth: '400px' }}>
+              <div className="modal-header" style={{ borderBottom: 'none', paddingBottom: '0' }}>
+                <button className="close-modal-btn" onClick={closeBadgeModal}>&times;</button>
+              </div>
+              
+              <div className="modal-body" style={{ alignItems: 'center', gap: '15px' }}>
+                {/* Ảnh Badge Lớn */}
+                <img 
+                  src={getBadgeImageUrl(selectedBadge.badgeImg || selectedBadge.iconUrl)} 
+                  alt={selectedBadge.badgeName || selectedBadge.name}
+                  style={{ 
+                    width: '120px', 
+                    height: '120px', 
+                    objectFit: 'contain', 
+                    filter: 'drop-shadow(0 0 15px rgba(255, 215, 0, 0.6))',
+                    marginBottom: '10px'
+                  }}
+                  onError={(e) => e.target.src = "/Badges/default-badge.png"}
+                />
+                
+                {/* Tên Badge */}
+                <h2 style={{ 
+                  fontFamily: '"MedievalSharp", cursive', 
+                  color: '#FFD700', 
+                  fontSize: '2rem', 
+                  margin: '0',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                }}>
+                  {selectedBadge.badgeName || selectedBadge.name}
+                </h2>
+
+                {/* Trạng thái */}
+                <div style={{
+                  background: 'rgba(76, 175, 80, 0.2)',
+                  color: '#4caf50',
+                  padding: '5px 15px',
+                  borderRadius: '20px',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem',
+                  border: '1px solid #4caf50',
+                  marginTop: '5px'
+                }}>
+                  UNLOCKED
+                </div>
+
+                {/* Mô tả */}
+                <p style={{ color: '#e8e8e8', fontSize: '1rem', lineHeight: '1.5', margin: '10px 0' }}>
+                  {badgeDisplayData.desc || "No description available for this badge."}
+                </p>
+
+                {/* Cách nhận (Criteria) */}
+                <div style={{ width: '100%', background: 'rgba(255, 255, 255, 0.05)', padding: '15px', borderRadius: '10px', marginTop: '10px', textAlign: 'left' }}>
+                  <h4 style={{ color: '#d4af37', margin: '0 0 5px 0', fontSize: '0.9rem', textTransform: 'uppercase' }}>How to earn:</h4>
+                  <p style={{ color: '#ccc', fontSize: '0.9rem', margin: '0' }}>
+                    {badgeDisplayData.criteria || "Complete special challenges to earn this badge."}
+                  </p>
+                </div>
+
+                {/* Ngày nhận */}
+                {(selectedBadge.earnedAt || selectedBadge.createdAt) && (
+                  <p style={{ color: '#888', fontSize: '0.85rem', marginTop: '10px' }}>
+                    Earned on: {new Date(selectedBadge.earnedAt || selectedBadge.createdAt).toLocaleDateString('vi-VN')}
+                  </p>
+                )}
               </div>
             </div>
           </div>

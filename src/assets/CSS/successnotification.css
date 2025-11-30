@@ -208,17 +208,8 @@
   height: auto;
   border-radius: 20px;
   box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
-  animation: bounce 2s ease-in-out infinite;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
 
 /* Success Content */
 .success-content {

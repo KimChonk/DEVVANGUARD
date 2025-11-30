@@ -254,8 +254,8 @@ export default function CourseScreen() {
                       </div>
 
                       {/* Expandable Description */}
-                      {isExpanded && !isLocked && (
-                        <div className="lesson-card-expanded">
+                      {!isLocked && (
+                        <div className={`lesson-card-expanded ${isExpanded ? 'open' : ''}`}>
                           <div className="expanded-content">
                             {lesson.problemDescription ? (
                               <div className="description-section-new">
