@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { lessonService, userProgressService, lessonHintService } from "../../services/apiClient";
+import { lessonService, userProgressService, lessonHintService, badgeService, userService } from "../../services/apiClient";
 import { executeAndValidate, formatTestResults } from "../../services/pistonCompiler";
 import { convertDbToEditorLanguage, convertDbToPistonLanguage, getLanguageDisplayName } from "../../utils/languageMapping";
 import NPCChat from "../../components/NPCChat";
@@ -10,6 +10,7 @@ import Discussion from "../../components/Discussion";
 import SuccessNotification from "../../components/SuccessNotification";
 import AlertNotification from "../../components/AlertNotification";
 import LoadingScreen from "../../components/LoadingScreen";
+import BadgeNotification from "../../components/BadgeNotification";
 import "../../assets/CSS/lessongame.css";
 
 // NPC feedback for different lesson types
@@ -84,6 +85,9 @@ export default function LessonScreen() {
   // Fullscreen state
   const [isFullscreenEditor, setIsFullscreenEditor] = useState(false);
 
+  const [showBadgeNotification, setShowBadgeNotification] = useState(false);
+  const [newBadge, setNewBadge] = useState(null);
+
   // Fetch lesson data
   useEffect(() => {
     const fetchLesson = async () => {
@@ -106,6 +110,16 @@ export default function LessonScreen() {
             setUserProgress(progressResult.data);
           }
           
+          const userRes = await userService.getMyProfile();
+          if (userRes.success) {
+            const badgesRes = await badgeService.getUserBadges(userRes.data.userId);
+            if (badgesRes.success) {
+              // Lưu danh sách ID badge đang sở hữu vào LocalStorage
+              const currentBadgeIds = badgesRes.data.map(b => b.badgeId);
+              localStorage.setItem('PRE_LESSON_BADGES', JSON.stringify(currentBadgeIds));
+            }
+          }
+
           // Show welcome message
           setNpcStatus("welcome");
           setShowNpc(true);
@@ -201,7 +215,7 @@ export default function LessonScreen() {
       if (!isResizingVertical) return;
       
       const editorPanel = document.querySelector('.editor-panel');
-      const outputPanel = document.querySelector('.output-panel');
+      const outputPanel = document.querySelector('.practice-output-panel');
       if (!editorPanel || !outputPanel) return;
 
       const editorRect = editorPanel.getBoundingClientRect();
@@ -533,7 +547,7 @@ export default function LessonScreen() {
               </button>
 
               <button
-                className="btn btn-run"
+                className="btn lesson-btn-run"
                 onClick={handleRunCode}
                 disabled={isRunning}
                 title="Run test cases"
@@ -565,6 +579,8 @@ export default function LessonScreen() {
                     setSuccessMessage(`You completed this lesson!\nTotal XP: ${totalXp}`);
                     setShowSuccessNotification(true);
                     
+                    localStorage.setItem('SHOULD_CHECK_BADGE', 'true');
+
                     // Navigate after success animation completes
                     setTimeout(() => {
                       navigate(-1);
@@ -650,6 +666,12 @@ export default function LessonScreen() {
         message={successMessage}
         xpReward={successXpReward}
         onClose={() => setShowSuccessNotification(false)}
+      />
+      {/* Badge Notification */}
+      <BadgeNotification 
+        isVisible={showBadgeNotification}
+        badge={newBadge}
+        onClose={() => setShowBadgeNotification(false)}
       />
 
       {/* Alert Notification - Already Completed */}

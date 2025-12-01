@@ -610,22 +610,22 @@ body {
 }
 
 .btn-run {
-  background-color: #007bff;
+  background-color: #4CAF50;
   color: white;
 }
 
 .btn-run:hover:not(:disabled) {
-  background-color: #0056b3;
+  background-color: #4CAF50;
   transform: translateY(-1px);
 }
 
 .btn-submit {
-  background-color: var(--success-color);
+  background-color: #2979FF;
   color: white;
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: #218838;
+  background-color: #2979FF;
   transform: translateY(-1px);
 }
 

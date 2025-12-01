@@ -19,11 +19,13 @@ import PvPLobby from "./pages/PvP/PvPLobby";
 import PvPBattle from "./pages/PvP/PvPBattle";
 import Practice from "./pages/Practice/Practice";
 import PracticeGame from "./pages/Practice/PracticeGame";
+import GlobalBadgeListener from "./components/GlobalBadgeListener";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <GlobalBadgeListener />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Intro />} />
