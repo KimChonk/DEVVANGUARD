@@ -159,14 +159,6 @@ export default function CourseScreen() {
             <p className="course-hero-description">
               {course.description || "Learn programming fundamentals with this comprehensive course"}
             </p>
-            <button className="course-hero-cta" onClick={() => {
-              if (lessons.length > 0) {
-                setExpandedLessonId(lessons[0].lessonId);
-              }
-            }}>
-              Start Learning
-              <i className="fas fa-arrow-right"></i>
-            </button>
           </div>
         </div>
       </div>
@@ -184,9 +176,6 @@ export default function CourseScreen() {
           >
             <i className="fas fa-arrow-left"></i>
           </button>
-        </div>
-        <div className="navbar-center">
-          <h1 className="course-title">{course.name}</h1>
         </div>
       </nav>
       
