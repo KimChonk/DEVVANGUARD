@@ -773,9 +773,9 @@ export default function ProfileScreen() {
                 </div>
 
                 {/* Ngày nhận */}
-                {(selectedBadge.earnedAt || selectedBadge.createdAt) && (
+                {(selectedBadge.earnedAt || selectedBadge.EarnedAt) && (
                   <p style={{ color: '#888', fontSize: '0.85rem', marginTop: '10px' }}>
-                    Earned on: {new Date(selectedBadge.earnedAt || selectedBadge.createdAt).toLocaleDateString('vi-VN')}
+                    Earned on: {new Date(selectedBadge.earnedAt || selectedBadge.EarnedAt).toLocaleDateString('vi-VN')}
                   </p>
                 )}
               </div>
