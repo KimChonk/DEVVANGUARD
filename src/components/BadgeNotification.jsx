@@ -35,7 +35,7 @@ const BadgeNotification = ({ isVisible, badge, onClose }) => {
       <div className="badge-notification-card">
         <div className="badge-shine"></div>
         <div className="badge-header">
-          <span>Huy hiệu mới đã được mở khóa!</span>
+          <span>You just unlocked new Badges!</span>
           <button onClick={onClose} className="badge-close-btn">×</button>
         </div>
         
