@@ -157,29 +157,42 @@
 .admin-content {
   display: flex;
   gap: 0;
-  min-height: calc(100vh - 80px);
-  position: relative;
+  /* Thay vì min-height, ta chốt cứng chiều cao để tạo vùng cuộn riêng */
+  height: calc(100vh - 80px); 
+  position: fixed; /* Cố định vị trí ngay dưới navbar */
+  top: 80px; /* Bằng chiều cao Navbar */
+  width: 100%;
+  overflow: hidden; /* Không cho body cuộn, chỉ cho con cuộn */
   z-index: 1;
-  flex: 1;
 }
 
 .admin-sidebar {
   width: 250px;
-  background: rgba(15, 23, 42, 0.9);
+  height: 100%; /* Chiếm hết chiều cao của admin-content */
+  background: rgba(15, 23, 42, 0.95); /* Tăng độ đậm màu nền chút để rõ ràng hơn */
   border-right: 1px solid rgba(59, 130, 246, 0.2);
   padding: 2rem 0;
-  position: sticky;
-  top: 80px;
-  max-height: calc(100vh - 80px);
+  
+  /* Reset lại các thuộc tính sticky cũ gây lỗi */
+  position: relative; 
+  top: 0;
+  max-height: none;
+  
+  /* Nếu menu quá dài thì sidebar tự có thanh cuộn riêng */
   overflow-y: auto;
 }
 
 .admin-main-content {
   flex: 1;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  height: 100%; /* Full chiều cao */
   width: 100%;
+  
+  /* QUAN TRỌNG: Thanh cuộn chính sẽ nằm ở đây */
+  overflow-y: auto; 
+  padding: 2rem;
+  
+  /* Giúp cuộn mượt hơn */
+  scroll-behavior: smooth;
 }
 
 .sidebar-menu {
