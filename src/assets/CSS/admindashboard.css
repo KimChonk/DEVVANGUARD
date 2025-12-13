@@ -743,14 +743,28 @@
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%);
   border: 2px solid rgba(59, 130, 246, 0.25);
   border-radius: 16px;
-  padding: 2.5rem;
-  margin-bottom: 2rem;
-  margin-top: 1.5rem;
   backdrop-filter: blur(10px);
-  animation: slideDown 0.3s ease-in-out;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  max-width: 100%;
-  overflow-x: hidden;
+  width: 100%;
+  overflow: hidden;
+  
+  max-height: 0;
+  opacity: 0;
+  padding: 0 2.5rem; 
+  margin-top: 0;
+  margin-bottom: 0;
+  border-width: 0;
+  
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-form-container.active {
+  max-height: 2000px;
+  opacity: 1;
+  padding: 2.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  border-width: 2px;
 }
 
 @keyframes slideDown {
