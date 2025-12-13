@@ -1075,8 +1075,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Course Form */}
-            {showCourseForm && (
-              <div className="admin-form-container">
+            
+              <div className={`admin-form-container ${showCourseForm ? 'active' : ''}`}>
                 <form className="admin-form-grid" onSubmit={handleCreateCourse}>
                   <div className="admin-form-group">
                     <label className="admin-label">Course Name</label>
@@ -1134,7 +1134,7 @@ export default function AdminDashboard() {
                   </button>
                 </form>
               </div>
-            )}
+            
 
             {/* Courses List */}
             <div className="courses-list">
@@ -1203,8 +1203,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Lesson Form */}
-            {showLessonForm && (
-              <div className="admin-form-container">
+            
+              <div className={`admin-form-container ${showLessonForm ? 'active' : ''}`}>
                 <form className="lesson-form" onSubmit={handleCreateLesson}>
                   {/* Top Row: Course, Lesson Name */}
                   <div className="form-row-2col">
@@ -1357,7 +1357,7 @@ export default function AdminDashboard() {
                   </div>
                 </form>
               </div>
-            )}
+            
 
             {/* Lessons List */}
             <div className="lessons-list">
@@ -1428,8 +1428,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Hint Form */}
-            {showHintForm && (
-              <div className="admin-form-container">
+            
+              <div className={`admin-form-container ${showHintForm ? 'active' : ''}`}>
                 <form className="admin-form-grid" onSubmit={handleCreateHint}>
                   <div className="admin-form-group">
                     <label className="admin-label">Select Lesson</label>
@@ -1495,7 +1495,7 @@ export default function AdminDashboard() {
                   </button>
                 </form>
               </div>
-            )}
+            
 
             {/* Hints List */}
             <div className="hints-list">
@@ -1575,8 +1575,8 @@ export default function AdminDashboard() {
               </div>
 
               {/* PvP Problem Form */}
-              {showPvpProblemForm && (
-                <div className="admin-form-container">
+              
+                <div className={`admin-form-container ${showPvpProblemForm ? 'active' : ''}`}>
                   <form
                     className="lesson-form"
                     onSubmit={handleCreatePvpProblem}
@@ -1698,7 +1698,7 @@ export default function AdminDashboard() {
                     </div>
                   </form>
                 </div>
-              )}
+              
 
               {/* PvP Problems List (sử dụng style của .lessons-list) */}
               <div className="lessons-list">
@@ -1782,8 +1782,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Badge Form */}
-            {showBadgeForm && (
-              <div className="admin-form-container">
+            
+              <div className={`admin-form-container ${showBadgeForm ? 'active' : ''}`}>
                 <form className="admin-form-grid" onSubmit={handleCreateBadge}>
                   
                   {/* Hàng 1: Tên Badge */}
@@ -1886,7 +1886,7 @@ export default function AdminDashboard() {
                   </div>
                 </form>
               </div>
-            )}
+            
 
             {/* Badges List */}
             {/* Badges List - ĐÃ SỬA LỖI HIỂN THỊ */}
