@@ -1125,13 +1125,15 @@ export default function AdminDashboard() {
                     ></textarea>
                   </div>
 
-                  <button
-                    type="submit"
-                    className="admin-submit"
-                    disabled={loading}
-                  >
-                    {loading ? (editingCourseId ? "Updating..." : "Creating...") : (editingCourseId ? "Update Course" : "Create Course")}
-                  </button>
+                  <div className="form-actions form-full-width" style={{ gridColumn: "1 / 4" }}>
+                    <button
+                      type="submit"
+                      className="admin-submit"
+                      disabled={loading}
+                    >
+                      {loading ? (editingCourseId ? "Updating..." : "Creating...") : (editingCourseId ? "Update Course" : "Create Course")}
+                    </button>
+                  </div>
                 </form>
               </div>
             
@@ -1486,13 +1488,15 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    className="admin-submit"
-                    disabled={loading}
-                  >
-                    {loading ? (editingHintId ? "Updating..." : "Creating...") : (editingHintId ? "Update Hint" : "Create Hint")}
-                  </button>
+                  <div className="form-actions form-full-width" style={{ gridColumn: "1 / 4" }}>
+                    <button
+                      type="submit"
+                      className="admin-submit"
+                      disabled={loading}
+                    >
+                      {loading ? (editingHintId ? "Updating..." : "Creating...") : (editingHintId ? "Update Hint" : "Create Hint")}
+                    </button>
+                  </div>
                 </form>
               </div>
             
@@ -1876,11 +1880,20 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  <div className="form-actions">
-                    <button type="submit" className="admin-submit" disabled={loading}>
+                  <div className="form-actions form-full-width" style={{ gridColumn: "1 / -1" }}>
+                    <button 
+                      type="submit" 
+                      className="admin-submit" 
+                      disabled={loading}
+                    >
                       {loading ? (editingBadgeId ? "Updating..." : "Creating...") : (editingBadgeId ? "Update Badge" : "Create Badge")}
                     </button>
-                    <button type="button" className="admin-submit-cancel" onClick={() => setShowBadgeForm(false)}>
+                    
+                    <button 
+                      type="button" 
+                      className="admin-submit-cancel" 
+                      onClick={() => setShowBadgeForm(false)}
+                    >
                       Cancel
                     </button>
                   </div>
