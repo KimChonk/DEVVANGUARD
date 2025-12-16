@@ -83,7 +83,7 @@ export default function PvPLobby() {
           );
         }
       } catch (err) {
-        console.error('Failed to load match history:', err);
+        //
       }
     };
     loadHistory();
@@ -173,8 +173,7 @@ export default function PvPLobby() {
       }
 
     } catch (error) {
-      console.error('[PvP] Matchmaking error caught:', error);
-      console.error('[PvP] Error message:', error?.message);
+      //
       setErrorMessage(error?.message || 'Failed to find match');
       setShowErrorNotif(true);
       setIsSearching(false);
@@ -200,7 +199,7 @@ export default function PvPLobby() {
       setErrorMessage('');
       setShowErrorNotif(false);
     } catch (err) {
-      console.error('[PvP] Cancel search error:', err);
+      //
       setErrorMessage('Failed to cancel search: ' + (err?.message || 'Unknown error'));
       setShowErrorNotif(true);
     }
