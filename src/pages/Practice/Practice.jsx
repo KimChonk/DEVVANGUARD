@@ -35,7 +35,7 @@ const Practice = () => {
           setProblems(result.data);
         }
       } catch (error) {
-        console.error('Failed to load problems:', error);
+        //
       } finally {
         setIsLoadingProblems(false);
       }

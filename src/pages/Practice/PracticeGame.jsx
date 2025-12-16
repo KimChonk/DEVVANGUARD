@@ -58,7 +58,7 @@ export default function PracticeGame() {
         }
       } catch (err) {
         setError("Failed to load problem: " + err.message);
-        console.error(err);
+        //
       } finally {
         setLoading(false);
       }
@@ -96,7 +96,7 @@ export default function PracticeGame() {
       setOutput(result.output);
     } catch (err) {
       setOutput(`Error: ${err.message}`);
-      console.error(err);
+      //
     } finally {
       setIsRunning(false);
     }
@@ -128,7 +128,7 @@ export default function PracticeGame() {
     } catch (err) {
       setShowAlertNotification(true);
       setAlertMessage("Error submitting practice: " + err.message);
-      console.error(err);
+      //
     }
   };
 
