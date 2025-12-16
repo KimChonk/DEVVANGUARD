@@ -125,7 +125,7 @@ export default function ProfileScreen() {
         setRecentActivity(recentTop3);
 
       } catch (error) {
-        console.error("Failed to fetch profile data:", error);
+        //
       } finally {
         setDataLoading(false); // Hoàn tất loading
       }
@@ -155,7 +155,7 @@ export default function ProfileScreen() {
             setUserBadges(response.data);
           }
         } catch (error) {
-          console.error("Error fetching badges:", error);
+          //
         } finally {
           setBadgesLoading(false);
         }
@@ -248,7 +248,7 @@ export default function ProfileScreen() {
         setIsLoading(false);
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
+      //
       alert("Error updating profile. Please try again.");
       setIsLoading(false);
     }

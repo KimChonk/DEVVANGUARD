@@ -151,7 +151,7 @@ export default function AdminDashboard() {
       }
 
     } catch (error) {
-      console.error("Error fetching data:", error);
+      //
       setMessage("Error fetching data: " + error.message);
     } finally {
       setLoading(false);
@@ -621,7 +621,7 @@ export default function AdminDashboard() {
         setMessage("Error logging out: " + result.message);
       }
     } catch (err) {
-      console.error("Logout error:", err);
+      //
       setMessage("Error logging out: " + err.message);
     }
   };

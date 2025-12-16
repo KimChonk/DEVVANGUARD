@@ -67,7 +67,7 @@ export default function PvPBattle() {
         try {
           await playerDisconnect(match.matchId);
         } catch (err) {
-          console.error('[PvPBattle] Error calling playerDisconnect:', err);
+          //
         }
       }
     };
@@ -144,7 +144,7 @@ export default function PvPBattle() {
                 setOpponentName('Opponent');
               }
             } catch (err) {
-              console.error('[PvPBattle] Failed to fetch opponent:', err);
+              //
               setOpponentName('Opponent');
             }
           } else {
@@ -160,25 +160,25 @@ export default function PvPBattle() {
               }
               setIsLoading(false);
             } else {
-            console.error('[PvPBattle] Problem data is null');
+            //
             setErrorMessage('Load problem failed');
             setShowErrorNotif(true);
               setIsLoading(false);
             }
           } else {
-            console.error('[PvPBattle] Problem ID missing:', matchData);
+            //
             setErrorMessage('Problem missing');
             setShowErrorNotif(true);
             setIsLoading(false);
           }
         } else {
-          console.error('[PvPBattle] Invalid match result:', matchResult);
+          //
           setErrorMessage('Match load failed');
           setShowErrorNotif(true);
           setIsLoading(false);
         }
       } catch (err) {
-        console.error('Failed to load battle:', err);
+        //
         setErrorMessage('Battle load failed');
         setShowErrorNotif(true);
         setIsLoading(false);
@@ -264,7 +264,7 @@ export default function PvPBattle() {
           }, 5000);
         }
       } catch (err) {
-        console.error('[PvPBattle] Polling error:', err);
+        //
       }
     }, 2000); // Poll every 2 seconds for faster result detection
 
@@ -304,7 +304,7 @@ export default function PvPBattle() {
         setOutput(result.detailedResults || result.output);
       }
     } catch (err) {
-      console.error('[PvPBattle] Run error:', err);
+      //
       setOutput(`Error: ${err.message}`);
       setAllTestsPassed(false);
     } finally {
@@ -358,7 +358,7 @@ export default function PvPBattle() {
         setShowErrorNotif(true);
       }
     } catch (err) {
-      console.error('Submit code error:', err);
+      //
       setErrorMessage(err.message || 'Submit failed');
       setShowErrorNotif(true);
     } finally {
@@ -373,7 +373,7 @@ export default function PvPBattle() {
         try {
           await playerDisconnect(match.matchId);
         } catch (err) {
-          console.error('[PvPBattle] Error calling playerDisconnect:', err);
+          //
         }
       }
       navigate('/pvp/lobby');
